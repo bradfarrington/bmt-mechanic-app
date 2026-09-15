@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{overflow:auto}body{min-width:2000px;min-height:3200px;position:relative;padding:20px 60px 80px}</style>
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.474.0/dist/umd/lucide.min.js"></script>
+<style>
+:root{--blue:#2563EB;--blue-dark:#1E3A8A;--blue-light:#3B82F6;--blue-tint:#EFF6FF;--blue-tint-strong:#DBEAFE;--blue-deepest:#0B1F52;--surface:#F8FAFC;--card:#FFFFFF;--surface-dark:#0F172A;--surface-dark-deep:#0B1220;--border:#E2E8F0;--border-subtle:#F1F5F9;--t-primary:#0F172A;--t-secondary:#475569;--t-muted:#64748B;--t-disabled:#CBD5E1;--t-faint:#94A3B8;--t-inverse:#FFFFFF;--success:#22C55E;--warning:#F59E0B;--danger:#EF4444;--plate:#FEF3C7;--grad-brand:linear-gradient(135deg,#1E3A8A 0%,#2563EB 50%,#3B82F6 100%);--grad-deep:linear-gradient(135deg,#0B1F52 0%,#1E3A8A 50%,#2563EB 100%);--grad-online:linear-gradient(135deg,#16A34A 0%,#22C55E 100%);--sh-card:0 4px 20px rgba(15,23,42,0.05);--sh-hero:0 20px 60px rgba(15,23,42,0.25);--sh-float:0 12px 32px rgba(15,23,42,0.10)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+*{box-sizing:border-box}
+body{margin:0;background:#EEF1F5;font-family:'Inter',system-ui,sans-serif;color:var(--t-primary)}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--blue-dark)}
+.frame{position:absolute;width:390px}
+.frame-label{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:15px;color:var(--t-secondary);margin-bottom:12px;letter-spacing:-0.2px;cursor:grab}
+.frame-label .meta{color:var(--t-faint);font-weight:400;margin-left:8px;font-size:13px}
+.phone{width:390px;height:844px;background:#fff;border-radius:48px;border:3px solid #0F172A;overflow:hidden;box-shadow:0 24px 72px rgba(15,23,42,0.18);position:relative}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:32px;background:#0F172A;border-radius:20px;z-index:5}
+.hi{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(15,23,42,0.85);z-index:5}
+.sb{height:47px;padding:16px 30px 6px;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:15px;color:var(--t-primary);position:relative;z-index:3}
+.sb .sb-icons{display:flex;gap:5px;align-items:center}.sb .sb-icons svg{width:16px;height:16px;stroke-width:2}
+.screen{height:calc(100% - 47px);background:var(--surface);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.h{height:52px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);gap:8px}
+.h.transp{background:transparent}
+.h .h-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.h-title{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--t-secondary);margin-left:-6px}
+.h-back svg{width:22px;height:22px}
+.icon-btn{width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--t-secondary)}
+.icon-btn svg{width:16px;height:16px}
+.body{padding:4px 18px 96px;flex:1;overflow-y:hidden;display:flex;flex-direction:column;gap:12px}
+.disp{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:38px;letter-spacing:-0.9px;line-height:42px}
+.h1{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:24px;letter-spacing:-0.6px;line-height:30px}
+.h2{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:20px;letter-spacing:-0.5px;line-height:26px}
+.h3{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.3px;line-height:22px}
+.h4{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:15px;line-height:20px}
+.body-lg{font-size:15px;line-height:22px}
+.b{font-size:13.5px;line-height:20px}
+.sm{font-size:12.5px;line-height:18px}
+.cap{font-size:11.5px;line-height:16px;color:var(--t-muted)}
+.overline{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--t-muted)}
+.faint{color:var(--t-faint)}.muted{color:var(--t-muted)}.sec{color:var(--t-secondary)}.inv{color:var(--t-inverse)}
+.center-t{text-align:center}.b6{font-weight:600}.b7{font-weight:700}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;letter-spacing:0.5px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--sh-card)}
+.card.pad-none{padding:0;overflow:hidden}
+.card.pad-lg{padding:16px}
+.card.selected{background:var(--blue-tint);border-color:var(--blue);border-width:1.5px;padding:11px}
+.card.tint{background:var(--blue-tint);border-color:var(--blue-tint-strong)}
+.card.warn{background:#FEF3C7;border-color:var(--warning);border-width:1.5px;padding:11px}
+.card.succ{background:#DCFCE7;border-color:var(--success);border-width:1.5px;padding:11px}
+.card.dark{background:var(--surface-dark-deep);color:#fff;border:none}
+.card.float{box-shadow:var(--sh-float);border:none}
+.card.grad-brand{background:var(--grad-brand);border:none;color:#fff;box-shadow:var(--sh-hero)}
+.row{display:flex;align-items:center;gap:10px}
+.col{display:flex;flex-direction:column}
+.grow{flex:1;min-width:0}
+.between{justify-content:space-between}
+.gap-4{gap:4px}.gap-6{gap:6px}.gap-8{gap:8px}.gap-10{gap:10px}.gap-12{gap:12px}
+.tile{width:34px;height:34px;border-radius:9px;background:var(--blue-tint);color:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tile.solid{background:var(--blue);color:#fff}
+.tile.warn-t{background:#FEF3C7;color:#B45309}
+.tile.dngr{background:#FEE2E2;color:#B91C1C}
+.tile.succ{background:#DCFCE7;color:#15803D}
+.tile.dark{background:var(--surface-dark-deep);color:#fff}
+.tile.on-dark{background:rgba(255,255,255,0.14);color:#fff}
+.tile.sm{width:26px;height:26px;border-radius:7px}
+.tile.lg{width:44px;height:44px;border-radius:11px}
+.tile.xl{width:56px;height:56px;border-radius:14px}
+.tile svg{width:16px;height:16px}.tile.sm svg{width:13px;height:13px}.tile.lg svg{width:20px;height:20px}.tile.xl svg{width:26px;height:26px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.pill.active{background:var(--blue-tint-strong);color:var(--blue-dark)}
+.pill.success{background:#DCFCE7;color:#15803D}
+.pill.pending{background:#FEF3C7;color:#B45309}
+.pill.error{background:#FEE2E2;color:#B91C1C}
+.pill.neutral{background:#F1F5F9;color:#334155}
+.pill.dark{background:#0F172A;color:#fff}
+.pill.on-job{background:var(--blue-tint-strong);color:var(--blue-dark);box-shadow:0 0 0 3px rgba(37,99,235,0.14)}
+.pill.on-job .dot{width:6px;height:6px;border-radius:3px;background:var(--blue);animation:pulse 2s ease-in-out infinite}
+.btn{height:40px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:-0.1px;padding:0 12px;border:none;cursor:pointer}
+.btn.primary{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(37,99,235,0.22)}
+.btn.secondary{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+.btn.ghost{background:transparent;color:var(--t-secondary)}
+.btn.success{background:var(--success);color:#fff;box-shadow:0 3px 10px rgba(34,197,94,0.28)}
+.btn.destructive{background:var(--danger);color:#fff}
+.btn.warn{background:var(--warning);color:#fff}
+.btn.sm{height:28px;font-size:11.5px;padding:0 10px;border-radius:7px}
+.btn.lg{height:52px;font-size:15px}
+.btn.full{width:100%}
+.btn svg{width:14px;height:14px}
+.btn.lg svg{width:18px;height:18px}
+.footer{padding:12px 18px 96px;background:var(--surface);border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:8px;position:absolute;bottom:82px;left:0;right:0}
+.footer.no-tabbar{bottom:0;padding-bottom:22px}
+.list-row{padding:10px 12px;display:flex;align-items:center;gap:10px}
+.list-row + .list-row{border-top:1px solid var(--border-subtle)}
+.divider{height:1px;background:var(--border-subtle)}
+.section-title{position:absolute;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:26px;letter-spacing:-0.5px;color:var(--t-primary);cursor:grab}
+.section-sub{position:absolute;font-family:'Inter',sans-serif;font-size:14px;color:var(--t-muted);cursor:grab;max-width:900px}
+
+/* Tab bar */
+.tabbar{height:82px;background:#fff;border-top:1px solid var(--border-subtle);display:flex;align-items:flex-start;justify-content:space-between;padding:10px 4px 22px;position:absolute;bottom:0;left:0;right:0;flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--t-muted);padding-top:2px}
+.tab.on{color:var(--blue)}
+.tab svg{width:20px;height:20px;stroke-width:2}
+.tab.on svg{stroke-width:2.4}
+.tab .lbl{font-size:9.5px;font-weight:700;letter-spacing:0.1px}
+.tab-spacer{flex:1}
+.tab-fab-online{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:56px;height:56px;border-radius:28px;background:var(--grad-online);color:#fff;border:none;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(34,197,94,0.42),0 0 0 5px #fff,0 0 0 10px rgba(34,197,94,0.20)}
+.tab-fab-online.on-job{background:var(--grad-brand);box-shadow:0 12px 28px rgba(37,99,235,0.42),0 0 0 5px #fff}
+.tab-fab-online svg{width:24px;height:24px;stroke-width:2.6}
+.tab-fab-lbl{position:absolute;top:42px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:700;letter-spacing:0.1px;text-align:center;white-space:nowrap}
+.tab-fab-lbl.online{color:var(--success)}
+.tab-fab-lbl.on-job{color:var(--blue)}
+
+.status-strip{padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:0.3px}
+.status-strip.active{background:var(--blue-tint);color:var(--blue-dark)}
+.status-strip.en-route{background:var(--grad-brand);color:#fff}
+.status-strip.in-progress{background:#FEF3C7;color:#78350F}
+.status-strip.completed{background:#DCFCE7;color:#14532D}
+.status-strip .dot{width:8px;height:8px;border-radius:4px;background:currentColor;animation:pulse 2s ease-in-out infinite}
+
+.locked-line{padding:8px 10px;border-radius:8px;background:#F1F5F9;display:inline-flex;align-items:center;gap:6px;color:var(--t-muted);font-size:12px;font-weight:600}
+.locked-line svg{width:12px;height:12px}
+
+.tl-item{padding:8px 0;display:flex;gap:10px;align-items:flex-start}
+.tl-dot{width:10px;height:10px;border-radius:5px;background:var(--blue);margin-top:5px;flex-shrink:0;position:relative;z-index:1}
+.tl-dot.done{background:var(--success)}
+.tl-dot.pending{background:var(--t-disabled)}
+.tl-line{position:absolute;left:16px;top:14px;bottom:0;width:2px;background:var(--border)}
+.tl-active{background:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,0.20)}
+
+/* signature */
+.sig-pad{background:#fff;border-radius:14px;padding:16px;min-height:280px;position:relative;overflow:hidden}
+.sig-line{position:absolute;bottom:70px;left:24px;right:24px;height:1px;background:var(--border);border-bottom:1px dashed var(--t-disabled)}
+.sig-x{position:absolute;bottom:74px;left:16px;font-size:20px;color:var(--t-disabled)}
+.sig-caveat{position:absolute;bottom:14px;left:24px;right:24px;font-size:11px;color:var(--t-faint);text-align:center}
+.sig-scribble{position:absolute;bottom:70px;left:60px;right:60px;height:60px;font-family:'Caveat',cursive;font-size:38px;color:var(--t-primary);white-space:nowrap;letter-spacing:-1px;font-weight:700}
+
+/* photo grid */
+.ph-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.ph{aspect-ratio:1;border-radius:10px;position:relative;overflow:hidden}
+.ph.a{background:linear-gradient(135deg,#94A3B8,#64748B)}
+.ph.b{background:linear-gradient(135deg,#F59E0B,#D97706)}
+.ph.c{background:linear-gradient(135deg,#DBEAFE,#93C5FD)}
+.ph.d{background:linear-gradient(135deg,#334155,#0F172A)}
+.ph.add{background:var(--blue-tint);border:2px dashed var(--blue-tint-strong);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--blue)}
+.ph.add svg{width:20px;height:20px}
+.ph.add .lbl{font-size:10px;font-weight:700}
+
+/* schedule row */
+.job-time{width:52px;text-align:center;flex-shrink:0}
+.job-time .hh{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:18px;letter-spacing:-0.4px;line-height:1}
+.job-time .mm{font-size:10.5px;color:var(--t-muted);margin-top:2px;font-weight:600}
+</style>
+
+
+<div class="section-title" style="left:60px;top:40px" data-drags-parent="1">Active job — the field cockpit</div>
+<div class="section-sub" style="left:60px;top:78px" data-drags-parent="1">Schedule, then the four job states (confirmed → en route → in progress → completed) with signature capture, photo runner, and the quick-quote sheet.</div>
+
+<!-- Row 1 -->
+
+<!-- Jobs list (schedule) -->
+<div class="frame" style="left:60px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Jobs · Schedule</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Jobs — schedule">
+      <div class="h transp"><div class="h-left"><div class="h-title">Jobs</div></div><div class="row gap-6"><div class="icon-btn"><i data-lucide="search"></i></div><div class="icon-btn"><i data-lucide="filter"></i></div></div></div>
+      <div class="body" style="padding-top:2px">
+        <div class="row gap-6">
+          <div class="pill dark" style="padding:5px 12px;font-size:11px">Today · 4</div>
+          <div class="pill neutral" style="padding:5px 12px;font-size:11px">This week</div>
+          <div class="pill neutral" style="padding:5px 12px;font-size:11px">Past</div>
+        </div>
+
+        <div class="col gap-6">
+          <div class="overline">Active</div>
+          <div class="card selected">
+            <div class="row">
+              <div class="job-time"><div class="hh">10:00</div><div class="mm">1h 15m</div></div>
+              <div class="grow">
+                <div class="row gap-6"><div class="pill on-job"><div class="dot"></div>En route</div><div class="b b7 sm">Front pads &amp; discs</div></div>
+                <div class="cap" style="margin-top:4px">Hannah R · Peckham · 1.2 mi · £72</div>
+              </div>
+              <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--blue)"></i>
+            </div>
+          </div>
+          <div class="card">
+            <div class="row">
+              <div class="job-time"><div class="hh">12:00</div><div class="mm">2h</div></div>
+              <div class="grow">
+                <div class="row gap-6"><div class="pill active">Confirmed</div><div class="b b7 sm">Full service</div></div>
+                <div class="cap" style="margin-top:4px">Marcus B · Dulwich · 2.8 mi · £88</div>
+              </div>
+              <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--t-muted)"></i>
+            </div>
+          </div>
+          <div class="card">
+            <div class="row">
+              <div class="job-time"><div class="hh">15:00</div><div class="mm">1h</div></div>
+              <div class="grow">
+                <div class="row gap-6"><div class="pill active">Confirmed</div><div class="b b7 sm">Diagnostic scan</div></div>
+                <div class="cap" style="margin-top:4px">Priya S · Brixton · 3.5 mi · £54</div>
+              </div>
+              <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--t-muted)"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col gap-6">
+          <div class="overline">Earlier today</div>
+          <div class="card">
+            <div class="row">
+              <div class="job-time"><div class="hh">08:00</div><div class="mm">45m</div></div>
+              <div class="grow">
+                <div class="row gap-6"><div class="pill success"><i data-lucide="check" style="width:10px;height:10px"></i>Complete</div><div class="b b7 sm">Battery replacement</div></div>
+                <div class="cap" style="margin-top:4px">James M · New Cross · £62 · Paid</div>
+              </div>
+              <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--t-muted)"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="tabbar">
+        <div class="tab"><i data-lucide="sun"></i><div class="lbl">Today</div></div>
+        <div class="tab on"><i data-lucide="wrench"></i><div class="lbl">Jobs</div></div>
+        <div class="tab-spacer"></div>
+        <div class="tab"><i data-lucide="message-circle"></i><div class="lbl">Inbox</div></div>
+        <div class="tab"><i data-lucide="user"></i><div class="lbl">Account</div></div>
+        <button class="tab-fab-online on-job"><i data-lucide="wrench"></i></button>
+        <div class="tab-fab-lbl on-job">On a job</div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Job detail · Confirmed -->
+<div class="frame" style="left:530px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Job · Confirmed <span class="meta">— before start</span></div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Job — confirmed">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Job BMT-A1B2</div></div><div class="icon-btn"><i data-lucide="more-horizontal"></i></div></div>
+      <div class="status-strip active"><div class="dot"></div>Confirmed · Today 10:00 – 11:15</div>
+      <div class="body" style="padding-top:12px">
+        <div>
+          <div class="h1">Front brake pads &amp; discs</div>
+          <div class="row gap-8" style="margin-top:6px"><div class="cap mono b7">FORD FOCUS · AB12 CDE</div><div class="cap">·</div><div class="cap">You earn <span class="b7" style="color:var(--t-primary)">£72</span></div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="card"><div class="cap">When</div><div class="b b7 sm" style="margin-top:4px">Today · 10–11:15am</div></div>
+          <div class="card"><div class="cap">Distance</div><div class="b b7 sm" style="margin-top:4px">1.2 mi · 6 min drive</div></div>
+        </div>
+
+        <div class="card">
+          <div class="row between" style="margin-bottom:10px">
+            <div class="row gap-8"><div class="tile lg" style="background:#DBEAFE;color:#1E3A8A;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:15px">HR</div><div class="col gap-4"><div class="b b7">Hannah Reeves</div><div class="cap muted">Customer</div></div></div>
+            <div class="icon-btn"><i data-lucide="message-circle"></i></div>
+          </div>
+          <div class="divider" style="margin-bottom:10px"></div>
+          <div class="col gap-8">
+            <div class="row gap-8"><i data-lucide="map-pin" style="width:14px;height:14px;color:var(--t-muted)"></i><div class="b sm grow">14 Oakwood Grove, SW11 6PJ</div></div>
+            <div class="row gap-8"><i data-lucide="phone" style="width:14px;height:14px;color:var(--t-muted)"></i><div class="locked-line grow" style="justify-content:flex-start"><i data-lucide="lock"></i>Revealed once you're en route</div></div>
+          </div>
+          <button class="btn secondary full" style="margin-top:10px"><i data-lucide="navigation-2"></i>Get directions</button>
+        </div>
+
+        <div class="card">
+          <div class="cap sec b7">Customer notes</div>
+          <div class="b sec" style="margin-top:6px;font-style:italic">"Car on the driveway. Gate code 4231. Key with the neighbour at 16 if I'm out."</div>
+        </div>
+
+        <div class="card dark">
+          <div class="cap" style="color:rgba(255,255,255,0.7);letter-spacing:1.1px;text-transform:uppercase;font-weight:700">Earnings breakdown</div>
+          <div class="row between" style="margin-top:10px"><div class="sm" style="color:rgba(255,255,255,0.82)">Customer pays</div><div class="b7 sm inv">£180</div></div>
+          <div class="row between" style="margin-top:6px"><div class="sm" style="color:rgba(255,255,255,0.82)">Minus parts (BMT-sourced)</div><div class="b7 sm inv">−£81</div></div>
+          <div class="row between" style="margin-top:6px"><div class="sm" style="color:rgba(255,255,255,0.82)">Minus 15% platform fee</div><div class="b7 sm inv">−£27</div></div>
+          <div class="divider" style="margin:10px 0;background:rgba(255,255,255,0.15)"></div>
+          <div class="row between"><div class="b b7 inv">You receive</div><div class="disp inv" style="font-size:26px">£72</div></div>
+          <div class="cap" style="color:rgba(255,255,255,0.7);margin-top:6px">Paid 24 hours after sign-off.</div>
+        </div>
+
+      </div>
+      <div class="footer">
+        <button class="btn primary lg full"><i data-lucide="navigation-2"></i>Start journey</button>
+        <div class="row gap-8"><button class="btn ghost full sm">Propose new time</button><button class="btn ghost full sm" style="color:var(--danger)">Cancel job</button></div>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><i data-lucide="sun"></i><div class="lbl">Today</div></div>
+        <div class="tab on"><i data-lucide="wrench"></i><div class="lbl">Jobs</div></div>
+        <div class="tab-spacer"></div>
+        <div class="tab"><i data-lucide="message-circle"></i><div class="lbl">Inbox</div></div>
+        <div class="tab"><i data-lucide="user"></i><div class="lbl">Account</div></div>
+        <button class="tab-fab-online on-job"><i data-lucide="wrench"></i></button>
+        <div class="tab-fab-lbl on-job">On a job</div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Job detail · En route -->
+<div class="frame" style="left:1000px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Job · En route</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Job — en route">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Job BMT-A1B2</div></div><div class="icon-btn"><i data-lucide="more-horizontal"></i></div></div>
+      <div class="status-strip en-route"><div class="dot"></div>You're marked as on the way · Hannah can see your ETA</div>
+      <div class="body" style="padding-top:12px">
+        <div>
+          <div class="h1">Front brake pads &amp; discs</div>
+          <div class="cap sec mono b7" style="margin-top:6px">FORD FOCUS · AB12 CDE</div>
+        </div>
+
+        <div class="card" style="padding:0;overflow:hidden">
+          <div style="height:130px;background:linear-gradient(135deg,#E0F2FE 0%,#DBEAFE 40%,#EFF6FF 100%);position:relative">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(15,23,42,0.05) 0 1px,transparent 1px 32px),repeating-linear-gradient(0deg,rgba(15,23,42,0.05) 0 1px,transparent 1px 32px)"></div>
+            <svg viewBox="0 0 340 130" style="position:absolute;inset:0;width:100%;height:100%"><path d="M20 100 Q60 50 130 70 T280 30" stroke="#2563EB" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="6 6"/></svg>
+            <div style="position:absolute;top:20px;left:32px;width:24px;height:24px;border-radius:12px;background:var(--blue);border:3px solid #fff;box-shadow:0 4px 12px rgba(37,99,235,0.4);display:flex;align-items:center;justify-content:center"><i data-lucide="wrench" style="width:11px;height:11px;color:#fff"></i></div>
+            <div style="position:absolute;bottom:18px;right:32px"><div style="width:24px;height:24px;border-radius:12px;background:var(--surface-dark-deep);border:3px solid #fff"></div></div>
+            <div style="position:absolute;bottom:10px;left:10px;background:rgba(15,18,32,0.85);color:#fff;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700">ETA 10:04 · 12 min</div>
+          </div>
+          <div style="padding:12px">
+            <div class="row between">
+              <div class="row gap-8"><div class="tile" style="background:#DBEAFE;color:#1E3A8A;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:13px">HR</div><div class="col gap-4"><div class="b b7">Hannah Reeves</div><div class="cap muted">14 Oakwood Grove, SW11</div></div></div>
+              <div class="row gap-6"><button class="btn secondary sm"><i data-lucide="phone"></i></button><button class="btn primary sm"><i data-lucide="message-circle"></i></button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card selected">
+          <div class="row gap-10">
+            <div class="tile solid"><i data-lucide="navigation-2"></i></div>
+            <div class="grow"><div class="b b7 sm">Open in Waze</div><div class="cap sec" style="margin-top:2px">SW11 6PJ · 1.2 mi · fastest route</div></div>
+            <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--blue)"></i>
+          </div>
+        </div>
+
+        <div class="col gap-6">
+          <div class="overline">Quick replies</div>
+          <div class="row gap-6" style="flex-wrap:wrap">
+            <div class="pill outline" style="padding:6px 12px;text-transform:none;letter-spacing:0;font-size:12px;background:#fff;color:var(--blue);border:1px solid var(--blue)">I'm 10 minutes away</div>
+            <div class="pill neutral" style="padding:6px 12px;text-transform:none;letter-spacing:0;font-size:12px">Running 15 min late</div>
+            <div class="pill neutral" style="padding:6px 12px;text-transform:none;letter-spacing:0;font-size:12px">Pulling into your street</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="footer">
+        <button class="btn primary lg full"><i data-lucide="check"></i>I've arrived — begin work</button>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><i data-lucide="sun"></i><div class="lbl">Today</div></div>
+        <div class="tab on"><i data-lucide="wrench"></i><div class="lbl">Jobs</div></div>
+        <div class="tab-spacer"></div>
+        <div class="tab"><i data-lucide="message-circle"></i><div class="lbl">Inbox</div></div>
+        <div class="tab"><i data-lucide="user"></i><div class="lbl">Account</div></div>
+        <button class="tab-fab-online on-job"><i data-lucide="wrench"></i></button>
+        <div class="tab-fab-lbl on-job">On a job</div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Job detail · In progress -->
+<div class="frame" style="left:1470px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Job · In progress</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Job — in progress">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Job BMT-A1B2</div></div><div class="icon-btn"><i data-lucide="more-horizontal"></i></div></div>
+      <div class="status-strip in-progress"><div class="dot"></div>Working · Started 10:14 · 42 min so far</div>
+      <div class="body" style="padding-top:12px">
+
+        <div class="col gap-6">
+          <div class="overline">Photos</div>
+          <div class="ph-grid">
+            <div class="ph a"></div>
+            <div class="ph b"></div>
+            <div class="ph c"></div>
+            <div class="ph d"></div>
+            <div class="ph add"><i data-lucide="camera"></i><div class="lbl">Add</div></div>
+          </div>
+        </div>
+
+        <div class="card selected">
+          <div class="row gap-10">
+            <div class="tile solid"><i data-lucide="camera"></i></div>
+            <div class="grow"><div class="b b7 sm">Inspection runner</div><div class="cap sec" style="margin-top:2px">Walk the 5-photo checklist before sign-off.</div></div>
+            <button class="btn primary sm">Start</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row between">
+            <div class="col gap-4"><div class="cap sec b7">Parts allocation</div><div class="b b7 sm" style="margin-top:2px">2 parts · BMT-sourced</div></div>
+            <a class="link sm">Change</a>
+          </div>
+          <div class="divider" style="margin:10px 0"></div>
+          <div class="row between"><div class="b sm sec">Brake pads (Bosch)</div><div class="b7 sm">£45</div></div>
+          <div class="row between" style="margin-top:6px"><div class="b sm sec">Discs (pair)</div><div class="b7 sm">£36</div></div>
+        </div>
+
+        <button class="btn secondary full"><i data-lucide="plus"></i>Add extra work &amp; quote customer</button>
+
+        <div class="card warn">
+          <div class="row gap-10">
+            <div class="tile warn-t"><i data-lucide="info"></i></div>
+            <div class="grow"><div class="b b7 sm" style="color:#78350F">Ready to sign off?</div><div class="cap" style="color:#78350F;margin-top:2px">Hand the phone to Hannah for her signature — that captures the £180 hold.</div></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="footer">
+        <button class="btn success lg full"><i data-lucide="pen-line"></i>Complete job &amp; charge customer</button>
+      </div>
+      <div class="tabbar">
+        <div class="tab"><i data-lucide="sun"></i><div class="lbl">Today</div></div>
+        <div class="tab on"><i data-lucide="wrench"></i><div class="lbl">Jobs</div></div>
+        <div class="tab-spacer"></div>
+        <div class="tab"><i data-lucide="message-circle"></i><div class="lbl">Inbox</div></div>
+        <div class="tab"><i data-lucide="user"></i><div class="lbl">Account</div></div>
+        <button class="tab-fab-online on-job"><i data-lucide="wrench"></i></button>
+        <div class="tab-fab-lbl on-job">On a job</div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Row 2 -->
+
+<!-- Signature pad -->
+<div class="frame" style="left:60px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Signature · Full-screen</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb dark"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" style="background:var(--surface-dark-deep);color:#fff" data-screen-label="Signature">
+      <div class="h transp"><div class="h-left"><div class="icon-btn" style="background:rgba(255,255,255,0.14);border:none;color:#fff"><i data-lucide="chevron-left"></i></div><div class="h-title inv">Customer signature</div></div><button class="btn sm" style="background:rgba(255,255,255,0.14);color:#fff">Retry</button></div>
+      <div style="padding:14px 18px 100px;flex:1;overflow-y:hidden;display:flex;flex-direction:column;gap:14px">
+        <div>
+          <div class="cap" style="color:rgba(255,255,255,0.7);letter-spacing:1.1px;text-transform:uppercase;font-weight:700">Hand phone to</div>
+          <div class="h2 inv" style="margin-top:4px">Hannah Reeves</div>
+          <div class="b" style="color:rgba(255,255,255,0.75);margin-top:4px">Ask her to sign to confirm the job's done. £180 will be taken from the pre-authorised card.</div>
+        </div>
+
+        <div class="sig-pad">
+          <div class="cap sec b7">Sign here</div>
+          <div class="sig-scribble">Hannah Reeves</div>
+          <div class="sig-line"></div>
+          <div class="sig-x">×</div>
+          <div class="sig-caveat">By signing you confirm the work is complete and the £180 charge is authorised.</div>
+        </div>
+
+        <div class="row gap-8">
+          <button class="btn full" style="background:rgba(255,255,255,0.14);color:#fff"><i data-lucide="undo-2"></i>Undo</button>
+          <button class="btn full" style="background:rgba(255,255,255,0.14);color:#fff"><i data-lucide="rotate-ccw"></i>Clear</button>
+        </div>
+
+        <div style="flex:1"></div>
+        <button class="btn success lg full" style="height:56px;font-size:15px"><i data-lucide="check"></i>Sign off · complete &amp; charge £180</button>
+        <button class="btn full" style="background:transparent;color:rgba(255,255,255,0.7)">Cancel</button>
+      </div>
+    </div>
+    <div class="hi" style="background:rgba(255,255,255,0.9)"></div>
+  </div>
+</div>
+
+<!-- Inspection runner (camera) -->
+<div class="frame" style="left:530px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Inspection runner <span class="meta">— new</span></div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb dark"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" style="background:#0F172A;color:#fff" data-screen-label="Inspection runner">
+      <div style="padding:14px 22px 0;display:flex;align-items:center;justify-content:space-between"><div class="icon-btn" style="background:rgba(255,255,255,0.14);border:none;color:#fff"><i data-lucide="x"></i></div><div class="cap inv" style="color:rgba(255,255,255,0.7);letter-spacing:1.1px;text-transform:uppercase;font-weight:700">Step 3 of 5</div></div>
+      <div style="padding:12px 24px 16px">
+        <div class="h2 inv">Front brake pads · closer look</div>
+        <div class="body-lg" style="color:rgba(255,255,255,0.82);margin-top:6px">Take a photo showing the wear from the side. This goes on the customer's report.</div>
+      </div>
+
+      <div style="flex:1;padding:0 18px;display:flex;flex-direction:column">
+        <div style="flex:1;background:#000;border-radius:20px;border:1px solid rgba(255,255,255,0.10);position:relative;overflow:hidden;min-height:280px">
+          <div style="position:absolute;inset:0;background:radial-gradient(circle at 60% 40%,rgba(148,163,184,0.35),transparent 60%),linear-gradient(135deg,#334155 0%,#0F172A 100%)"></div>
+          <!-- viewfinder brackets -->
+          <div style="position:absolute;top:24px;left:24px;width:32px;height:32px;border-top:3px solid #fff;border-left:3px solid #fff;border-radius:4px 0 0 0"></div>
+          <div style="position:absolute;top:24px;right:24px;width:32px;height:32px;border-top:3px solid #fff;border-right:3px solid #fff;border-radius:0 4px 0 0"></div>
+          <div style="position:absolute;bottom:24px;left:24px;width:32px;height:32px;border-bottom:3px solid #fff;border-left:3px solid #fff;border-radius:0 0 0 4px"></div>
+          <div style="position:absolute;bottom:24px;right:24px;width:32px;height:32px;border-bottom:3px solid #fff;border-right:3px solid #fff;border-radius:0 0 4px 0"></div>
+          <div style="position:absolute;top:14px;right:14px;background:rgba(0,0,0,0.5);color:#fff;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700">FLASH · AUTO</div>
+        </div>
+
+        <div style="padding:20px 0;display:flex;align-items:center;justify-content:space-between">
+          <div class="icon-btn" style="background:rgba(255,255,255,0.10);border:none;color:#fff;width:44px;height:44px;border-radius:12px"><i data-lucide="image" style="width:20px;height:20px"></i></div>
+          <button style="width:72px;height:72px;border-radius:36px;background:#fff;border:6px solid rgba(255,255,255,0.35);box-shadow:0 4px 14px rgba(0,0,0,0.4)"></button>
+          <div class="icon-btn" style="background:rgba(255,255,255,0.10);border:none;color:#fff;width:44px;height:44px;border-radius:12px"><i data-lucide="repeat-2" style="width:20px;height:20px"></i></div>
+        </div>
+
+        <div style="display:flex;gap:6px;padding-bottom:20px;justify-content:center">
+          <div style="width:32px;height:6px;border-radius:3px;background:var(--success)"></div>
+          <div style="width:32px;height:6px;border-radius:3px;background:var(--success)"></div>
+          <div style="width:32px;height:6px;border-radius:3px;background:#fff"></div>
+          <div style="width:32px;height:6px;border-radius:3px;background:rgba(255,255,255,0.30)"></div>
+          <div style="width:32px;height:6px;border-radius:3px;background:rgba(255,255,255,0.30)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="hi" style="background:rgba(255,255,255,0.9)"></div>
+  </div>
+</div>
+
+<!-- Quick-quote sheet -->
+<div class="frame" style="left:1000px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Quick-quote <span class="meta">— new</span></div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Quick-quote sheet">
+      <div style="background:rgba(15,23,42,0.55);flex:1;position:relative">
+        <div style="position:absolute;top:80px;left:16px;right:16px;color:rgba(255,255,255,0.6);font-size:12px">Job BMT-A1B2</div>
+        <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:8px 0 20px;max-height:calc(100% - 60px);overflow-y:hidden;display:flex;flex-direction:column;box-shadow:0 -12px 40px rgba(0,0,0,0.25)">
+          <div style="width:48px;height:5px;background:var(--border);border-radius:3px;margin:6px auto 12px"></div>
+          <div style="padding:0 18px 18px;flex:1;overflow-y:hidden;display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div class="h2">Quote for extra work</div>
+              <div class="b sec" style="margin-top:6px">Hannah gets a push — she can approve or decline. Approved work is added to the invoice and re-prices your payout.</div>
+            </div>
+
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--t-secondary);margin-bottom:6px">What did you find?</div>
+              <div style="border-radius:8px;border:1px solid var(--border);padding:10px 12px;min-height:44px;font-size:13px">Rear pads worn to 20% — needs replacing before they score the discs.</div>
+            </div>
+
+            <div class="col gap-6">
+              <div class="overline">Line items</div>
+              <div class="card pad-none">
+                <div class="list-row"><div class="tile sm"><i data-lucide="clock"></i></div><div class="grow"><div class="b b7 sm">Labour</div><div class="cap" style="margin-top:2px">1 hr × £45/hr</div></div><div class="b7 sm">£45</div></div>
+                <div class="list-row"><div class="tile sm"><i data-lucide="package"></i></div><div class="grow"><div class="b b7 sm">Rear brake pads</div><div class="cap" style="margin-top:2px">Bosch · 2 × £22.50</div></div><div class="b7 sm">£45</div></div>
+                <div class="list-row"><i data-lucide="plus-circle" style="width:16px;height:16px;color:var(--blue)"></i><div class="link sm b7 grow">Add another line</div></div>
+              </div>
+            </div>
+
+            <div class="card selected">
+              <div class="row between"><div class="col gap-4"><div class="cap sec b7">Customer pays</div><div class="cap muted">Added to booking</div></div><div class="disp" style="color:var(--blue-dark);font-size:28px">£90</div></div>
+              <div class="divider" style="margin:10px 0;background:var(--blue-tint-strong)"></div>
+              <div class="row between"><div class="cap sec">You earn</div><div class="b7 b">£36</div></div>
+            </div>
+
+            <div style="flex:1"></div>
+            <button class="btn primary lg full"><i data-lucide="send-horizontal"></i>Send quote to Hannah</button>
+            <button class="btn ghost full">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Job completed -->
+<div class="frame" style="left:1470px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Job · Completed</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Job — completed">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Job BMT-A1B2</div></div><div class="icon-btn"><i data-lucide="more-horizontal"></i></div></div>
+      <div class="status-strip completed"><div class="dot" style="animation:none"></div>Complete · Signed off 11:24 · Charging £180</div>
+      <div class="body" style="padding-top:12px">
+        <div class="card float pad-lg center-t">
+          <div class="tile xl succ" style="margin:0 auto"><i data-lucide="check-circle-2"></i></div>
+          <div class="h2" style="margin-top:12px">Nicely done.</div>
+          <div class="b sec" style="margin-top:6px">Hannah's signature is captured. Payout of £72 lands in your account tomorrow at 11:24.</div>
+        </div>
+
+        <div class="card dark">
+          <div class="cap" style="color:rgba(255,255,255,0.7);letter-spacing:1.1px;text-transform:uppercase;font-weight:700">You earned</div>
+          <div class="disp inv" style="margin-top:4px">£72</div>
+          <div class="cap" style="color:rgba(255,255,255,0.72);margin-top:2px">Paid Fri 16 Sep at 11:24 via Stripe</div>
+          <div class="divider" style="margin:12px 0;background:rgba(255,255,255,0.15)"></div>
+          <div class="row between" style="margin-bottom:6px"><div class="sm" style="color:rgba(255,255,255,0.82)">Customer paid</div><div class="b7 sm inv">£180</div></div>
+          <div class="row between" style="margin-bottom:6px"><div class="sm" style="color:rgba(255,255,255,0.82)">Parts</div><div class="b7 sm inv">−£81</div></div>
+          <div class="row between"><div class="sm" style="color:rgba(255,255,255,0.82)">Platform fee (15%)</div><div class="b7 sm inv">−£27</div></div>
+        </div>
+
+        <div class="col gap-6">
+          <div class="overline">Signed off</div>
+          <div class="card">
+            <div style="height:56px;background:#F8FAFC;border-radius:10px;position:relative;overflow:hidden">
+              <div style="position:absolute;top:6px;left:20px;font-family:'Caveat',cursive;font-size:28px;color:var(--t-primary);font-weight:700">Hannah Reeves</div>
+              <div style="position:absolute;bottom:6px;left:20px;font-size:10px;color:var(--t-faint)">Signed 11:24 · Thu 15 Sep</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row gap-8">
+          <button class="btn secondary full"><i data-lucide="camera"></i>Photos</button>
+          <button class="btn secondary full"><i data-lucide="message-circle"></i>Message</button>
+        </div>
+
+      </div>
+      <div class="tabbar">
+        <div class="tab"><i data-lucide="sun"></i><div class="lbl">Today</div></div>
+        <div class="tab on"><i data-lucide="wrench"></i><div class="lbl">Jobs</div></div>
+        <div class="tab-spacer"></div>
+        <div class="tab"><i data-lucide="message-circle"></i><div class="lbl">Inbox</div></div>
+        <div class="tab"><i data-lucide="user"></i><div class="lbl">Account</div></div>
+        <button class="tab-fab-online"><i data-lucide="power"></i></button>
+        <div class="tab-fab-lbl online">Online</div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+
+<script>window.addEventListener("DOMContentLoaded",function(){if(window.lucide&&window.lucide.createIcons)window.lucide.createIcons();});</script>
+</body>
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{overflow:auto}body{min-width:2000px;min-height:3200px;position:relative;padding:20px 60px 80px}</style>
+</head>
+<body>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.474.0/dist/umd/lucide.min.js"></script>
+<style>
+:root{--blue:#2563EB;--blue-dark:#1E3A8A;--blue-light:#3B82F6;--blue-tint:#EFF6FF;--blue-tint-strong:#DBEAFE;--blue-deepest:#0B1F52;--surface:#F8FAFC;--card:#FFFFFF;--surface-dark:#0F172A;--surface-dark-deep:#0B1220;--border:#E2E8F0;--border-subtle:#F1F5F9;--t-primary:#0F172A;--t-secondary:#475569;--t-muted:#64748B;--t-disabled:#CBD5E1;--t-faint:#94A3B8;--t-inverse:#FFFFFF;--success:#22C55E;--warning:#F59E0B;--danger:#EF4444;--plate:#FEF3C7;--grad-brand:linear-gradient(135deg,#1E3A8A 0%,#2563EB 50%,#3B82F6 100%);--grad-deep:linear-gradient(135deg,#0B1F52 0%,#1E3A8A 50%,#2563EB 100%);--grad-online:linear-gradient(135deg,#16A34A 0%,#22C55E 100%);--sh-card:0 4px 20px rgba(15,23,42,0.05);--sh-hero:0 20px 60px rgba(15,23,42,0.25);--sh-float:0 12px 32px rgba(15,23,42,0.10)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+*{box-sizing:border-box}
+body{margin:0;background:#EEF1F5;font-family:'Inter',system-ui,sans-serif;color:var(--t-primary)}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--blue-dark)}
+.frame{position:absolute;width:390px}
+.frame-label{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:15px;color:var(--t-secondary);margin-bottom:12px;letter-spacing:-0.2px;cursor:grab}
+.frame-label .meta{color:var(--t-faint);font-weight:400;margin-left:8px;font-size:13px}
+.phone{width:390px;height:844px;background:#fff;border-radius:48px;border:3px solid #0F172A;overflow:hidden;box-shadow:0 24px 72px rgba(15,23,42,0.18);position:relative}
+.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:32px;background:#0F172A;border-radius:20px;z-index:5}
+.hi{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:rgba(15,23,42,0.85);z-index:5}
+.hi-light{background:rgba(255,255,255,0.9)}
+.sb{height:47px;padding:16px 30px 6px;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:15px;color:var(--t-primary);position:relative;z-index:3}
+.sb.dark{color:#fff}
+.sb .sb-icons{display:flex;gap:5px;align-items:center;color:currentColor}.sb .sb-icons svg{width:16px;height:16px;stroke-width:2}
+.screen{height:calc(100% - 47px);background:var(--surface);overflow:hidden;position:relative;display:flex;flex-direction:column}
+.screen.grad{background:var(--grad-deep);color:#fff}
+.h{height:56px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.h.transp{background:transparent;color:inherit}
+.h .h-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.h-title{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.3px;color:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--t-secondary);margin-left:-6px}
+.h.transp .h-back{color:inherit}
+.h-back svg{width:22px;height:22px}
+
+.body{padding:8px 18px 24px;flex:1;overflow-y:hidden;display:flex;flex-direction:column;gap:16px}
+.disp{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:40px;letter-spacing:-1px;line-height:44px}
+.h1{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.7px;line-height:34px}
+.h2{font-family:'Inter Tight',sans-serif;font-weight:800;font-size:24px;letter-spacing:-0.5px;line-height:30px}
+.h3{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.4px;line-height:26px}
+.h4{font-family:'Inter Tight',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.2px;line-height:24px}
+.body-lg{font-size:16px;line-height:24px}
+.b{font-size:14px;line-height:21px}
+.sm{font-size:13px;line-height:20px}
+.cap{font-size:12px;line-height:17px;color:var(--t-muted)}
+.overline{font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--t-muted)}
+.faint{color:var(--t-faint)}.muted{color:var(--t-muted)}.sec{color:var(--t-secondary)}.inv{color:var(--t-inverse)}
+.center-t{text-align:center}.b6{font-weight:600}.b7{font-weight:700}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;letter-spacing:0.5px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--sh-card)}
+.card.pad-lg{padding:20px}
+.card.pad-none{padding:0;overflow:hidden}
+.card.selected{background:var(--blue-tint);border-color:var(--blue);border-width:1.5px;padding:15px}
+.card.tint{background:var(--blue-tint);border-color:var(--blue-tint-strong)}
+.card.warn{background:#FEF3C7;border-color:var(--warning);border-width:1.5px;padding:15px}
+.card.succ{background:#DCFCE7;border-color:var(--success);border-width:1.5px;padding:15px}
+.card.dngr{border-color:var(--danger)}
+.card.dark{background:var(--surface-dark-deep);border:none;color:#fff}
+.card.grad{background:var(--grad-deep);border:none;color:#fff;box-shadow:var(--sh-hero)}
+.card.grad-brand{background:var(--grad-brand);border:none;color:#fff;box-shadow:var(--sh-hero)}
+.card.float{box-shadow:var(--sh-float);border:none}
+
+.row{display:flex;align-items:center;gap:12px}
+.col{display:flex;flex-direction:column}
+.grow{flex:1;min-width:0}
+.between{justify-content:space-between}
+.gap-4{gap:4px}.gap-6{gap:6px}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+
+.tile{width:40px;height:40px;border-radius:10px;background:var(--blue-tint);color:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tile.solid{background:var(--blue);color:#fff}
+.tile.dark{background:var(--surface-dark);color:#fff}
+.tile.warn-t{background:#FEF3C7;color:#B45309}
+.tile.dngr{background:#FEE2E2;color:#B91C1C}
+.tile.succ{background:#DCFCE7;color:#15803D}
+.tile.on-dark{background:rgba(255,255,255,0.14);color:#fff}
+.tile.lg{width:48px;height:48px;border-radius:12px}
+.tile.xl{width:56px;height:56px;border-radius:14px}
+.tile svg{width:20px;height:20px}
+.tile.lg svg{width:24px;height:24px}
+.tile.xl svg{width:28px;height:28px}
+
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.pill.active{background:var(--blue-tint-strong);color:var(--blue-dark)}
+.pill.success{background:#DCFCE7;color:#15803D}
+.pill.pending{background:#FEF3C7;color:#B45309}
+.pill.error{background:#FEE2E2;color:#B91C1C}
+.pill.neutral{background:#F1F5F9;color:#334155}
+.pill.dark{background:#0F172A;color:#fff}
+.pill.outline{background:#fff;color:var(--blue);border:1px solid var(--blue)}
+.pill.on-dark{background:rgba(255,255,255,0.14);color:#fff;border:1px solid rgba(255,255,255,0.20)}
+.pill.online{background:#DCFCE7;color:#15803D;box-shadow:0 0 0 4px rgba(34,197,94,0.20)}
+.pill.online .dot{width:6px;height:6px;border-radius:3px;background:#22C55E;animation:pulse 2s ease-in-out infinite}
+.pill.on-job{background:var(--blue-tint-strong);color:var(--blue-dark);box-shadow:0 0 0 4px rgba(37,99,235,0.14)}
+
+.input{height:48px;border-radius:8px;border:1px solid var(--border);background:#fff;padding:0 14px;display:flex;align-items:center;gap:10px;color:var(--t-primary);font-size:14px}
+.input.focus{border-color:var(--blue);border-width:1.5px;padding:0 12.5px;box-shadow:0 0 0 4px rgba(37,99,235,0.10)}
+.input.err{border-color:var(--danger)}
+.input .val{flex:1}.input .plch{color:var(--t-faint)}
+.input svg{width:18px;height:18px;color:var(--t-muted)}
+.input-lbl{font-size:12px;font-weight:600;color:var(--t-secondary);margin-bottom:6px}
+.input-help{font-size:12px;color:var(--t-muted);margin-top:6px}
+
+.btn{height:48px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Inter',sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.1px;padding:0 16px;border:none;cursor:pointer}
+.btn.primary{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25)}
+.btn.secondary{background:#fff;color:var(--blue);border:1.5px solid var(--blue)}
+.btn.ghost{background:transparent;color:var(--t-secondary)}
+.btn.destructive{background:var(--danger);color:#fff}
+.btn.success{background:var(--success);color:#fff;box-shadow:0 4px 12px rgba(34,197,94,0.30)}
+.btn.on-dark{background:#fff;color:var(--blue-dark)}
+.btn.sm{height:32px;font-size:13px;padding:0 12px;border-radius:8px}
+.btn.md{height:40px}
+.btn.lg{height:52px;font-size:16px}
+.btn.full{width:100%}
+.btn svg{width:18px;height:18px}
+
+.footer{padding:14px 18px 24px;background:var(--surface);border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:10px}
+
+.link{color:var(--blue);font-weight:600}.link.on-dark{color:#fff}
+.divider{height:1px;background:var(--border-subtle)}
+
+.section-title{position:absolute;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:26px;letter-spacing:-0.5px;color:var(--t-primary);cursor:grab}
+.section-sub{position:absolute;font-family:'Inter',sans-serif;font-size:14px;color:var(--t-muted);cursor:grab;max-width:900px}
+
+.hero-tile{width:180px;height:180px;border-radius:24px;background:rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;color:#fff;position:relative}
+.hero-tile.big svg{width:96px;height:96px;stroke-width:1.5}
+.hero-tile .halo{position:absolute;inset:-20px;border-radius:32px;background:radial-gradient(circle at 50% 40%,rgba(59,130,246,0.35),transparent 70%);z-index:0}
+
+.wordmark{font-family:'Inter Tight',sans-serif;font-weight:900;letter-spacing:-2px;font-size:44px;color:#fff}
+.wordmark .dot-blue{color:var(--blue-light)}
+.wordmark-sub{font-family:'Inter',sans-serif;font-weight:500;font-size:14px;letter-spacing:2px;color:rgba(255,255,255,0.7);text-transform:uppercase;margin-top:8px}
+
+.stepper-wrap{padding:6px 18px 12px}
+.stepper-track{height:4px;background:var(--border-subtle);border-radius:999px;overflow:hidden}
+.stepper-fill{height:100%;background:var(--blue);border-radius:999px}
+.stepper-lbl{font-size:10.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--t-muted);margin-top:8px;display:flex;justify-content:space-between}
+
+.slider{height:6px;background:var(--border);border-radius:3px;position:relative;margin:14px 0}
+.slider .fill{position:absolute;top:0;left:0;height:100%;background:var(--blue);border-radius:3px}
+.slider .thumb{position:absolute;top:50%;width:22px;height:22px;background:#fff;border:3px solid var(--blue);border-radius:11px;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(0,0,0,0.15)}
+
+.day-row{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.day-row + .day-row{border-top:1px solid var(--border-subtle)}
+.day-row .day-name{width:44px;font-weight:700;font-size:13px}
+.day-row .day-hours{flex:1;font-size:13px;color:var(--t-secondary)}
+.day-row .day-hours.off{color:var(--t-disabled)}
+.switch{width:42px;height:24px;border-radius:12px;background:var(--blue);position:relative;flex-shrink:0}
+.switch::after{content:'';position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:10px;background:#fff}
+.switch.off{background:#CBD5E1}
+.switch.off::after{right:auto;left:2px}
+
+.spec-tile{padding:12px;border-radius:12px;border:1px solid var(--border);background:#fff;display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+.spec-tile.on{background:var(--blue-tint);border-color:var(--blue);border-width:1.5px;padding:11px}
+.spec-tile .lbl{font-size:11px;font-weight:700;color:var(--t-secondary);line-height:14px}
+.spec-tile.on .lbl{color:var(--blue-dark)}
+.spec-tile .ico{width:32px;height:32px;border-radius:8px;background:var(--blue-tint);color:var(--blue);display:flex;align-items:center;justify-content:center}
+.spec-tile.on .ico{background:var(--blue);color:#fff}
+.spec-tile .ico svg{width:16px;height:16px}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+</style>
+
+
+<div class="section-title" style="left:60px;top:40px" data-drags-parent="1">Mechanic app — Auth &amp; Onboarding</div>
+<div class="section-sub" style="left:60px;top:78px" data-drags-parent="1">Splash → sign in → set password (first login after admin approval) → Stripe Connect (payouts gate) → four-step availability wizard (postcode + radius, hours, specialisms, ready).</div>
+
+<!-- Row 1 -->
+
+<!-- Splash -->
+<div class="frame" style="left:60px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Splash <span class="meta">— for mechanics</span></div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb dark"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen grad" data-screen-label="Splash">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:0 32px">
+        <div style="width:96px;height:96px;border-radius:28px;background:rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:center;margin-bottom:28px;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16),0 12px 40px rgba(11,31,82,0.4)">
+          <i data-lucide="wrench" style="width:44px;height:44px;color:#fff;stroke-width:2"></i>
+        </div>
+        <div class="wordmark">Book<span class="dot-blue">.</span>My<span class="dot-blue">.</span>Tech</div>
+        <div class="wordmark-sub">For mechanics · The van edition</div>
+      </div>
+      <div style="padding:0 0 60px;display:flex;justify-content:center">
+        <div style="width:36px;height:36px;border-radius:18px;border:2.5px solid rgba(255,255,255,0.25);border-top-color:#fff;animation:spin 1s linear infinite"></div>
+      </div>
+    </div>
+    <div class="hi hi-light"></div>
+  </div>
+</div>
+
+<!-- Sign in -->
+<div class="frame" style="left:530px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Sign in</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Sign in">
+      <div class="h transp"><div class="h-left"><div class="h-title">Sign in</div></div></div>
+      <div class="body" style="padding-top:0">
+        <div style="margin-top:12px">
+          <div style="width:56px;height:56px;border-radius:16px;background:var(--grad-deep);display:flex;align-items:center;justify-content:center;margin-bottom:14px"><i data-lucide="wrench" style="width:28px;height:28px;color:#fff"></i></div>
+          <div class="h1">Welcome back.</div>
+          <div class="b sec" style="margin-top:6px">Your jobs, your schedule, your earnings — all in one place.</div>
+        </div>
+        <div style="margin-top:8px">
+          <div class="input-lbl">Email</div>
+          <div class="input"><i data-lucide="mail"></i><span class="val">alex@example.com</span></div>
+        </div>
+        <div>
+          <div class="row between" style="margin-bottom:6px"><div class="input-lbl" style="margin:0">Password</div><a class="link" style="font-size:12px">Forgot password?</a></div>
+          <div class="input focus"><i data-lucide="lock"></i><span class="val">••••••••••</span><i data-lucide="eye"></i></div>
+        </div>
+        <div style="flex:1"></div>
+        <button class="btn primary lg full">Sign in</button>
+        <div class="cap center-t">Not a mechanic yet? <a class="link">Apply to join</a></div>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Set password (first login) -->
+<div class="frame" style="left:1000px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Set password <span class="meta">— first login</span></div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Set password">
+      <div class="h transp"><div class="h-left"><div class="h-title">Welcome to BMT</div></div></div>
+      <div class="body" style="padding-top:0">
+        <div class="card succ">
+          <div class="row gap-12">
+            <div class="tile succ"><i data-lucide="check-circle-2"></i></div>
+            <div class="grow">
+              <div class="b b7" style="color:#14532D">Your application's approved.</div>
+              <div class="cap" style="color:#166534;margin-top:2px">Set a password to get into your dashboard.</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:6px">
+          <div class="h2">Set your password.</div>
+          <div class="b sec" style="margin-top:6px">Use at least 8 characters. This is what you'll sign in with from now on.</div>
+        </div>
+        <div>
+          <div class="input-lbl">New password</div>
+          <div class="input focus"><i data-lucide="lock"></i><span class="val">••••••••••••</span><i data-lucide="eye"></i></div>
+          <div class="row gap-4" style="margin-top:8px">
+            <div style="flex:1;height:4px;background:var(--success);border-radius:2px"></div>
+            <div style="flex:1;height:4px;background:var(--success);border-radius:2px"></div>
+            <div style="flex:1;height:4px;background:var(--success);border-radius:2px"></div>
+            <div style="flex:1;height:4px;background:var(--border);border-radius:2px"></div>
+          </div>
+        </div>
+        <div>
+          <div class="input-lbl">Confirm password</div>
+          <div class="input"><i data-lucide="lock"></i><span class="val">••••••••••••</span></div>
+        </div>
+        <div style="flex:1"></div>
+        <button class="btn primary lg full">Save and continue <i data-lucide="arrow-right"></i></button>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Connect Stripe -->
+<div class="frame" style="left:1470px;top:130px">
+  <div class="frame-label" data-drags-parent="1">Get paid · Stripe Connect</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Connect Stripe">
+      <div class="h transp"><div class="h-left"><div class="h-title">Get paid</div></div><div class="cap muted">2 of 5</div></div>
+      <div class="stepper-wrap"><div class="stepper-track"><div class="stepper-fill" style="width:40%"></div></div></div>
+      <div class="body" style="padding-top:2px">
+        <div>
+          <div class="h1">Connect your bank.</div>
+          <div class="b sec" style="margin-top:6px">One-off setup with Stripe so we can pay you for each job. Takes about 5 minutes.</div>
+        </div>
+        <div class="card grad-brand">
+          <div class="row gap-12">
+            <div class="tile on-dark lg"><i data-lucide="landmark"></i></div>
+            <div class="grow">
+              <div class="cap" style="color:rgba(255,255,255,0.7);letter-spacing:1.1px;text-transform:uppercase;font-weight:700">You'll be paid</div>
+              <div class="h3 inv" style="margin-top:4px">24 hours after each job</div>
+              <div class="cap" style="color:rgba(255,255,255,0.75);margin-top:4px">Straight to the account you connect. No invoices, no chasing.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col gap-8">
+          <div class="overline">What you'll need</div>
+          <div class="card pad-none">
+            <div style="padding:12px 14px;display:flex;gap:10px;align-items:center"><i data-lucide="user-round" style="width:18px;height:18px;color:var(--blue)"></i><div class="b b7 sm grow">Your legal name and date of birth</div></div>
+            <div class="divider"></div>
+            <div style="padding:12px 14px;display:flex;gap:10px;align-items:center"><i data-lucide="credit-card" style="width:18px;height:18px;color:var(--blue)"></i><div class="b b7 sm grow">Sort code and account number</div></div>
+            <div class="divider"></div>
+            <div style="padding:12px 14px;display:flex;gap:10px;align-items:center"><i data-lucide="id-card" style="width:18px;height:18px;color:var(--blue)"></i><div class="b b7 sm grow">Photo ID (passport or driving licence)</div></div>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="cap center-t faint">Stripe is our payment partner. Your bank details stay with them — not us.</div>
+      </div>
+      <div class="footer">
+        <button class="btn primary lg full"><i data-lucide="external-link"></i>Continue with Stripe</button>
+        <button class="btn ghost full">Skip for now</button>
+      </div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Row 2 -->
+
+<!-- Availability wizard 1: postcode + radius -->
+<div class="frame" style="left:60px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Set up · Where you work</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Set up — service area">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Set up</div></div><div class="cap muted">3 of 5</div></div>
+      <div class="stepper-wrap"><div class="stepper-track"><div class="stepper-fill" style="width:60%"></div></div><div class="stepper-lbl"><span>Where you work</span><span>Change later in Availability</span></div></div>
+      <div class="body" style="padding-top:2px">
+        <div>
+          <div class="h1">Where are you based?</div>
+          <div class="b sec" style="margin-top:6px">Jobs within your radius are the ones we'll offer you.</div>
+        </div>
+        <div>
+          <div class="input-lbl">Base postcode</div>
+          <div class="input focus"><i data-lucide="map-pin"></i><span class="val mono b7">SE15 4EX</span></div>
+          <div class="input-help">Peckham, London</div>
+        </div>
+        <div>
+          <div class="row between"><div class="input-lbl" style="margin:0">Service radius</div><div class="b b7" style="color:var(--blue)">8 miles</div></div>
+          <div class="slider"><div class="fill" style="width:35%"></div><div class="thumb" style="left:35%"></div></div>
+          <div class="row between cap muted"><span>2 mi</span><span>20 mi</span></div>
+        </div>
+        <div class="card">
+          <div style="height:120px;background:linear-gradient(135deg,#DBEAFE,#EFF6FF);border-radius:12px;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(15,23,42,0.05) 0 1px,transparent 1px 32px),repeating-linear-gradient(0deg,rgba(15,23,42,0.05) 0 1px,transparent 1px 32px)"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120px;height:120px;border:2px dashed var(--blue);border-radius:60px;background:rgba(37,99,235,0.10)"></div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;border-radius:10px;background:var(--blue);border:3px solid #fff;box-shadow:0 4px 10px rgba(37,99,235,0.35)"></div>
+          </div>
+          <div class="divider" style="margin:12px 0"></div>
+          <div class="row between">
+            <div class="col gap-4"><div class="cap">Customers in range</div><div class="h4">~2,400</div></div>
+            <div class="col gap-4" style="align-items:flex-end"><div class="cap">Weekly earning potential</div><div class="h4">~£1,400</div></div>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+      </div>
+      <div class="footer"><button class="btn primary lg full">Continue <i data-lucide="arrow-right"></i></button></div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Availability wizard 2: hours -->
+<div class="frame" style="left:530px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Set up · Working hours</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Set up — hours">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Set up</div></div><div class="cap muted">4 of 5</div></div>
+      <div class="stepper-wrap"><div class="stepper-track"><div class="stepper-fill" style="width:80%"></div></div><div class="stepper-lbl"><span>When you're around</span><span>Change any time</span></div></div>
+      <div class="body" style="padding-top:2px">
+        <div>
+          <div class="h1">When do you work?</div>
+          <div class="b sec" style="margin-top:6px">We only offer you jobs during these hours. Toggle a day off and we'll skip it.</div>
+        </div>
+        <div class="card pad-none">
+          <div class="day-row"><div class="day-name">Mon</div><div class="day-hours">08:00 — 18:00</div><div class="switch"></div></div>
+          <div class="day-row"><div class="day-name">Tue</div><div class="day-hours">08:00 — 18:00</div><div class="switch"></div></div>
+          <div class="day-row"><div class="day-name">Wed</div><div class="day-hours">08:00 — 18:00</div><div class="switch"></div></div>
+          <div class="day-row"><div class="day-name">Thu</div><div class="day-hours">08:00 — 18:00</div><div class="switch"></div></div>
+          <div class="day-row"><div class="day-name">Fri</div><div class="day-hours">08:00 — 16:00</div><div class="switch"></div></div>
+          <div class="day-row"><div class="day-name">Sat</div><div class="day-hours">09:00 — 14:00</div><div class="switch"></div></div>
+          <div class="day-row"><div class="day-name">Sun</div><div class="day-hours off">Day off</div><div class="switch off"></div></div>
+        </div>
+        <div class="cap muted">Tip: you can also long-press the Online button on the home screen to go offline for 30 min or 1 hour.</div>
+      </div>
+      <div class="footer"><button class="btn primary lg full">Continue <i data-lucide="arrow-right"></i></button></div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Availability wizard 3: specialisms -->
+<div class="frame" style="left:1000px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Set up · Specialisms</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen" data-screen-label="Set up — specialisms">
+      <div class="h transp"><div class="h-left"><div class="h-back"><i data-lucide="chevron-left"></i></div><div class="h-title">Set up</div></div><div class="cap muted">5 of 5</div></div>
+      <div class="stepper-wrap"><div class="stepper-track"><div class="stepper-fill" style="width:100%"></div></div><div class="stepper-lbl"><span>What you'll take on</span><span>Almost done</span></div></div>
+      <div class="body" style="padding-top:2px">
+        <div>
+          <div class="h1">What do you fix?</div>
+          <div class="b sec" style="margin-top:6px">Pick the work you're happy to take. We'll only offer jobs that match.</div>
+        </div>
+        <div class="spec-grid">
+          <div class="spec-tile on"><div class="ico"><i data-lucide="wrench"></i></div><div class="lbl">Brakes</div></div>
+          <div class="spec-tile on"><div class="ico"><i data-lucide="droplets"></i></div><div class="lbl">Servicing</div></div>
+          <div class="spec-tile on"><div class="ico"><i data-lucide="battery-charging"></i></div><div class="lbl">Battery</div></div>
+          <div class="spec-tile on"><div class="ico"><i data-lucide="stethoscope"></i></div><div class="lbl">Diagnostics</div></div>
+          <div class="spec-tile"><div class="ico"><i data-lucide="car-front"></i></div><div class="lbl">Suspension</div></div>
+          <div class="spec-tile"><div class="ico"><i data-lucide="disc-3"></i></div><div class="lbl">Clutch</div></div>
+          <div class="spec-tile"><div class="ico"><i data-lucide="timer"></i></div><div class="lbl">Cambelt</div></div>
+          <div class="spec-tile on"><div class="ico"><i data-lucide="clipboard-check"></i></div><div class="lbl">MOT prep</div></div>
+          <div class="spec-tile"><div class="ico"><i data-lucide="snowflake"></i></div><div class="lbl">Air-con</div></div>
+        </div>
+        <div class="card tint">
+          <div class="row gap-10"><div class="tile"><i data-lucide="sparkles"></i></div><div class="grow"><div class="b b7 sm">5 specialisms picked</div><div class="cap sec" style="margin-top:2px">Add more later in Availability. The more you pick, the more offers.</div></div></div>
+        </div>
+      </div>
+      <div class="footer"><button class="btn primary lg full">Finish setup <i data-lucide="check"></i></button></div>
+    </div>
+    <div class="hi"></div>
+  </div>
+</div>
+
+<!-- Ready -->
+<div class="frame" style="left:1470px;top:1090px">
+  <div class="frame-label" data-drags-parent="1">Ready · You're online</div>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="sb dark"><span>9:41</span><div class="sb-icons"><i data-lucide="signal"></i><i data-lucide="wifi"></i><i data-lucide="battery-full"></i></div></div>
+    <div class="screen grad" data-screen-label="Ready">
+      <div style="padding:60px 24px 20px">
+        <div style="width:72px;height:72px;border-radius:36px;background:var(--grad-online);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px rgba(34,197,94,0.20)">
+          <i data-lucide="power" style="width:34px;height:34px;color:#fff"></i>
+        </div>
+        <div class="h1 inv" style="font-size:32px;line-height:36px;margin-top:24px">You're all set.</div>
+        <div class="body-lg" style="color:rgba(255,255,255,0.82);margin-top:8px">You'll go online when you're ready. When a job matches, you'll get a push and 8 seconds to grab it before anyone else.</div>
+      </div>
+      <div style="flex:1;padding:6px 18px 20px;display:flex;flex-direction:column;gap:12px">
+        <div class="card" style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.14);box-shadow:none">
+          <div class="row gap-12">
+            <div class="tile lg on-dark"><i data-lucide="bell-ring"></i></div>
+            <div class="grow"><div class="b b7 inv">Turn on notifications</div><div class="cap" style="color:rgba(255,255,255,0.72);margin-top:2px">Otherwise you'll miss offers when the app is closed.</div></div>
+          </div>
+        </div>
+        <div class="card" style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.14);box-shadow:none">
+          <div class="row gap-12">
+            <div class="tile lg on-dark"><i data-lucide="map-pin"></i></div>
+            <div class="grow"><div class="b b7 inv">Location while working</div><div class="cap" style="color:rgba(255,255,255,0.72);margin-top:2px">So customers can see when you're on the way. Nothing tracked when you're offline.</div></div>
+          </div>
+        </div>
+        <div style="flex:1"></div>
+        <button class="btn full lg on-dark">Go to my dashboard <i data-lucide="arrow-right"></i></button>
+      </div>
+    </div>
+    <div class="hi hi-light"></div>
+  </div>
+</div>
+
+
+<script>window.addEventListener("DOMContentLoaded",function(){if(window.lucide&&window.lucide.createIcons)window.lucide.createIcons();});</script>
+</body>
+</html>
