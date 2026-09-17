@@ -8,12 +8,13 @@ out; `design/README.md` has the mockup → screen map and the build order.
 
 In this order. Tick them off and update this file as you go.
 
-1. **Get the CRM's reply to the inbox prompt** (`docs/inbox-crm-prompt.md` was
-   running in the `bookmytech` repo when we stopped on 2026-09-17). Brad pastes
-   it into the app session. Apply whatever it says it changed — paths, field
+1. **Get the rest of the CRM's reply to the inbox prompt**
+   (`docs/inbox-crm-prompt.md`). Only its last section has been seen — it is
+   recorded below. Brad pastes the full reply into the app session. Apply whatever it says it changed — paths, field
    names, refusal codes — in `src/lib/inbox.ts`, `src/lib/disputes.ts`,
    `src/lib/cases.ts`, `src/lib/uploads.ts` and the screens that use them.
-2. **Brad applies the SQL it gives.** It should include CRM migration 0032:
+2. **Brad applies the SQL it gives** — migration 0085. It should also cover CRM
+   migration 0032:
    production has no `resolution_reasons` / `resolution_cases` /
    `resolution_messages` tables, so "Get help" cannot work until it is applied.
    If the reply does not mention 0032, ask the CRM session about it again.
@@ -37,6 +38,29 @@ In this order. Tick them off and update this file as you go.
 Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
 outside the code". Nothing has run on a device yet; the sooner it does, the
 less there is to unpick.
+
+### What the CRM said about the inbox task (received 2026-09-17, tail only)
+
+Only the closing "Work needed in the app repos" section reached the app
+session — **the rest of the reply (what it built, what it changed from the
+prompt, the SQL to apply, whether 0032 is in it) still needs pasting in.** The
+migration is **0085**.
+
+**bmt-mechanic-app**
+- Regenerate types after 0085 (`npm run db:types`) — step 3 above.
+- "Mark all read" can return a non-zero count, because threads with unread
+  messages stay unread. *Already handled:* `(tabs)/inbox.tsx` sets the badge
+  from the count the route returns, and never marks a `thread:` row read
+  locally. Re-check once it is live rather than assume.
+
+**bmt-customer-app** — not this repo; do it in a customer-app session
+- Regenerate types after 0085: `dispute_messages` gains `photos` and
+  `visible_to`.
+- Render photos in its dispute thread. Until it does, a mechanic's photo message
+  shows there as text alone.
+- Its dispute responses may now carry an extra `code` field, and a sent message
+  an `id`. Both additive — a phone on an older build is unaffected; nothing has
+  to change.
 
 ## Picking up on a new machine
 
@@ -102,7 +126,7 @@ into the app session so any differences get applied.
 | `today-crm-prompt.md` | 66 | built; migration 0083 applied; types regenerated |
 | `job-crm-prompt.md` | 67 | built (`e54eba7`); migration 0084 is settings rows only — apply when convenient |
 | `job-extras-crm-prompt.md` | 68 | built (`38f67bd`) — **was not pushed/deployed when reported; check** |
-| `inbox-crm-prompt.md` | — | **running now (2026-09-17)** |
+| `inbox-crm-prompt.md` | 69? | built, migration **0085** — only the tail of its reply seen; full reply, SQL and 0032 still to confirm |
 
 ### When the inbox prompt's reply comes back
 
