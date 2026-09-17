@@ -319,6 +319,22 @@ export const sendQuote = (
   input: { kind: 'now' | 'follow_on'; title?: string; note?: string; lines: QuoteLineInput[] },
 ) => act<{ id: string }>(path(bookingId, 'quotes'), input);
 
+/**
+ * What was trimmed off a job by an approved revision, as a ready-made return
+ * visit quote. `lines` is empty unless the job is completed and a revision was
+ * approved on it — the same condition as the website's button.
+ */
+export async function fetchFollowOnDraft(
+  bookingId: string,
+): Promise<{ ok: true; draft: { title: string; note: string | null; lines: QuoteLineInput[] } } | JobFailure> {
+  const response = await api.get<{ title: string; note: string | null; lines: QuoteLineInput[] }>(
+    path(bookingId, 'follow-on-draft'),
+  );
+  return response.ok
+    ? { ok: true, draft: { ...response.data, lines: response.data.lines ?? [] } }
+    : failure(response);
+}
+
 export const withdrawQuote = (quoteId: string) =>
   act(`/mechanic/quotes/${encodeURIComponent(quoteId)}/withdraw`);
 
@@ -393,7 +409,8 @@ export interface RevisionPreview {
   after: { totalPence: number; mechanicPayoutPence: number; serviceDurationHours: number };
   diff: {
     differencePence: number;
-    direction: string;
+    /** From the sign of the price difference. */
+    direction: 'more' | 'less' | 'same';
     durationChange: number;
     lines: Record<'added' | 'removed' | 'kept', { description: string; linePence: number }[]>;
     parts: Record<'added' | 'removed' | 'kept', { name: string; quantity: number; linePence: number }[]>;

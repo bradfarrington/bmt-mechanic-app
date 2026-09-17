@@ -37,15 +37,29 @@ interface NewPart {
   price: string;
 }
 
+/** What a changed price means for the customer's card — the CRM's own wording for the mechanic. */
+function directionCopy(direction: 'more' | 'less' | 'same', differencePence: number) {
+  const amount = formatPence(Math.abs(differencePence));
+  if (direction === 'more') {
+    return `Customer pays ${amount} more. They’ll authorise it on their card when they approve. Don’t start the new work until it shows Approved.`;
+  }
+  if (direction === 'less') {
+    return `Customer pays ${amount} less. The difference is released from their hold when you complete the job. They still need to approve the change.`;
+  }
+  return 'Same price. The customer still needs to approve the change of work.';
+}
+
 const signed = (pence: number) => `${pence < 0 ? '−' : '+'}${formatPence(Math.abs(pence))}`;
 
 /**
  * "Change what's being done" — the booked repair turned out not to be the
  * right one. The mechanic takes repairs and parts off, adds others, and the
- * customer approves the re-priced job before work carries on. Once per job.
+ * customer approves the re-priced job before work carries on. A declined or
+ * lapsed revision can be tried again; an approved one is final.
  *
  * Every price is the CRM's: the screen edits a list of ids and asks for a
- * preview. If the customer declines, this is also where the job can be ended
+ * preview. `current.parts` is the mechanic's own parts only — supplier parts
+ * priced into a repair come and go with that repair. If the customer declines, this is also where the job can be ended
  * on site.
  */
 export default function ReviseScreen() {
@@ -294,7 +308,7 @@ export default function ReviseScreen() {
             <Text variant="h1">What needs doing instead?</Text>
             <Text color="textSecondary">
               Take off what isn’t right and add what is. The customer sees the new price and
-              approves it before you carry on. A job can be changed once.
+              approves it before you carry on.
             </Text>
           </View>
 
@@ -549,6 +563,9 @@ export default function ReviseScreen() {
                   </Text>
                 </Text>
               </View>
+              <Text variant="caption" color="textSecondary">
+                {directionCopy(preview.diff.direction, preview.diff.differencePence)}
+              </Text>
             </Card>
           )}
 

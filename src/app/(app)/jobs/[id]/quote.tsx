@@ -5,7 +5,14 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Button, Card, Icon, IconTile, Input, Notice, Overline, Screen, Text } from '@/components/ui';
 import { DetailSizing, Palette, Spacing } from '@/constants/theme';
-import { loadJob, previewQuote, sendQuote, type QuoteLineInput, type QuotePreview } from '@/lib/job';
+import {
+  fetchFollowOnDraft,
+  loadJob,
+  previewQuote,
+  sendQuote,
+  type QuoteLineInput,
+  type QuotePreview,
+} from '@/lib/job';
 import { formatPence } from '@/lib/offers';
 
 interface DraftLine {
@@ -25,6 +32,19 @@ const blank = (key: number, kind: DraftLine['kind']): DraftLine => ({
   amount: '1',
   price: '',
 });
+
+/** A line from the CRM's follow-on draft, as the form holds it. Anything but labour is entered as a part. */
+function fromInput(line: QuoteLineInput, key: number): DraftLine {
+  return line.kind === 'labour'
+    ? { key, kind: 'labour', description: line.description, amount: String(line.hours ?? 1), price: '' }
+    : {
+        key,
+        kind: 'part',
+        description: line.description,
+        amount: String(line.quantity ?? 1),
+        price: line.unitPence != null ? (line.unitPence / 100).toFixed(2) : '',
+      };
+}
 
 /** Only lines complete enough to price; the rest wait until they are. */
 function toInput(lines: DraftLine[]): QuoteLineInput[] {
@@ -70,6 +90,7 @@ export default function QuoteScreen() {
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [title, setTitle] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -81,6 +102,26 @@ export default function QuoteScreen() {
       active = false;
     };
   }, [id]);
+
+  // A return visit opened from the job itself (not from a fault) starts from
+  // what an approved revision trimmed off, if there was one.
+  useEffect(() => {
+    if (kind !== 'follow_on' || faultId) return;
+    let active = true;
+
+    fetchFollowOnDraft(id).then((result) => {
+      if (!active || !result.ok || result.draft.lines.length === 0) return;
+      const drafted = result.draft.lines.map((line, index) => fromInput(line, index + 1));
+      setLines(drafted);
+      setNextKey(drafted.length + 1);
+      setTitle(result.draft.title);
+      if (result.draft.note) setNote(result.draft.note);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [id, kind, faultId]);
 
   const input = toInput(lines);
   const signature = JSON.stringify(input);
@@ -122,7 +163,7 @@ export default function QuoteScreen() {
 
     const result = await sendQuote(id, {
       kind,
-      title: input[0]?.description,
+      title: title ?? input[0]?.description,
       note: note.trim() || undefined,
       // The first line answers the fault this quote was opened from.
       lines: input.map((line, index) => (index === 0 && faultId ? { ...line, faultId } : line)),
