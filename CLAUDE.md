@@ -49,6 +49,8 @@ lib helper, a config choice — copy that rather than inventing a second way.
 - `src/lib/job.ts` — one job: reads direct under RLS, every write through the
   CRM (`/mechanic/bookings/:id/*`). The money, the checklists and the map
   coordinates come from `GET …/job`; the app never prices or geocodes.
+- Revisions (`jobs/[id]/revise`) edit a list of repair ids and parts and ask the
+  CRM for a preview; the app never builds a snapshot or prices one.
 - `src/lib/location.ts` + `src/hooks/use-journey-sharing.ts` — the mechanic's
   position, upserted to `mechanic_locations` only while a job is `en_route`
   and its screen is open, and deleted when that ends.

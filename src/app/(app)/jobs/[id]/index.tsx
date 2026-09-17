@@ -6,6 +6,8 @@ import {
   Check,
   CircleCheck,
   ClipboardCheck,
+  Clock,
+  FilePenLine,
   Lock,
   MapPin,
   MessageCircle,
@@ -61,13 +63,17 @@ import {
   jobReference,
   loadJob,
   phoneRevealed,
+  removeFault,
   removePhoto,
   setMileage,
   setPartSourcing,
+  setPartStatus,
   startJourney,
   uploadPhoto,
   withdrawQuote,
   type JobExtras,
+  type JobPart,
+  type PartStatus,
   type JobRecord,
 } from '@/lib/job';
 import { estimateEta } from '@/lib/location';
@@ -87,6 +93,21 @@ const QUOTE_STATUS: Record<string, string> = {
   expired: 'Expired',
   draft: 'Draft',
 };
+
+const PART_STATUS: Record<string, string> = {
+  pending: 'Not ordered',
+  ordered: 'Ordered',
+  delivered: 'Delivered',
+  used: 'Used',
+  returned: 'Returned',
+};
+
+/** What comes next for a part: BMT's are ordered, delivered, then used; the mechanic's own are simply used. */
+function nextPartStep(part: JobPart): { status: PartStatus; label: string } | null {
+  if (part.status === 'ordered') return { status: 'delivered', label: 'Mark delivered' };
+  if (part.status === 'delivered' || part.status === 'pending') return { status: 'used', label: 'Mark used' };
+  return null;
+}
 
 /**
  * One job, from confirmed through to paid. The booking's `status` decides
@@ -158,7 +179,7 @@ export default function JobScreen() {
     );
   }
 
-  const { booking, photos, parts, quotes } = job;
+  const { booking, photos, parts, quotes, faults } = job;
   const money = extras?.money;
   const payout = formatPence(money?.payoutPence ?? booking.mechanic_payout_pence);
   const charge = formatPence(money?.chargePence ?? booking.total_pence);
@@ -692,6 +713,29 @@ export default function JobScreen() {
                 >
                   {part.sourcing === 'bmt' ? 'BMT-sourced · switch to my own' : 'My own · switch to BMT-sourced'}
                 </Text>
+                <View style={styles.line}>
+                  <Text variant="caption" color="textMuted">
+                    {PART_STATUS[part.status] ?? part.status}
+                  </Text>
+                  {(() => {
+                    const step = nextPartStep(part);
+                    return (
+                      step && (
+                        <Text
+                          variant="caption"
+                          color="blue"
+                          style={styles.strong}
+                          accessibilityRole="button"
+                          onPress={
+                            busy ? undefined : () => void run('part', () => setPartStatus(part.id, step.status))
+                          }
+                        >
+                          · {step.label}
+                        </Text>
+                      )
+                    );
+                  })()}
+                </View>
               </View>
               <Text variant="bodySm" style={styles.strong}>
                 {formatPence(part.total_pence)}
@@ -699,6 +743,72 @@ export default function JobScreen() {
             </View>
           ))}
         </Card>
+      )}
+
+      {status !== 'cancelled' && (faults.length > 0 || active) && (
+        <View style={styles.section}>
+          <Overline>Faults found</Overline>
+          {faults.map((fault) => (
+            <Card key={fault.id} style={styles.stack}>
+              <View style={styles.between}>
+                <Pill tone={fault.severity === 'urgent' ? 'error' : 'pending'}>
+                  {fault.severity === 'urgent' ? 'Urgent' : 'Advisory'}
+                </Pill>
+                {!!fault.quote_id && (
+                  <Text variant="caption" color="textMuted">
+                    Quoted
+                  </Text>
+                )}
+              </View>
+              <Text variant="bodySm">{fault.description}</Text>
+              {!fault.quote_id && (
+                <View style={styles.row}>
+                  {(status === 'in_progress' || status === 'completed') && !openQuote && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      style={styles.grow}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/jobs/[id]/quote',
+                          params: {
+                            id,
+                            kind: status === 'completed' ? 'follow_on' : 'now',
+                            faultId: fault.id,
+                            fault: fault.description,
+                          },
+                        })
+                      }
+                    >
+                      Quote for this
+                    </Button>
+                  )}
+                  {active && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      style={styles.grow}
+                      disabled={busy !== null}
+                      onPress={() => void run('fault', () => removeFault(fault.id))}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </View>
+              )}
+            </Card>
+          ))}
+          {active && (
+            <Button
+              fullWidth
+              variant="secondary"
+              iconLeft={TriangleAlert}
+              onPress={() => router.push({ pathname: '/jobs/[id]/fault', params: { id } })}
+            >
+              Note a fault
+            </Button>
+          )}
+        </View>
       )}
 
       {quotes.length > 0 && (
@@ -742,6 +852,46 @@ export default function JobScreen() {
       )}
 
       {status === 'in_progress' && (
+        <Button
+          fullWidth
+          variant="secondary"
+          iconLeft={FilePenLine}
+          onPress={() => router.push({ pathname: '/jobs/[id]/revise', params: { id } })}
+        >
+          Change what’s being done
+        </Button>
+      )}
+
+      {status === 'in_progress' && (
+        <Card tone="warn" style={styles.stack}>
+          <View style={styles.line}>
+            <Icon icon={Clock} size={DetailSizing.rowIcon} strokeWidth={2} color={Palette.warningText} />
+            <Text color="warningText" style={styles.strong}>
+              Can’t finish today?
+            </Text>
+          </View>
+          <Text variant="caption" color="warningText">
+            1. Trim today’s job to what you’ll get done — the customer approves and pays only for
+            that.{'\n'}2. Complete and charge as normal.{'\n'}3. Quote the rest as a return visit
+            from the finished job.
+          </Text>
+          <View style={styles.row}>
+            <Button
+              size="sm"
+              variant="secondary"
+              style={styles.grow}
+              onPress={() => router.push({ pathname: '/jobs/[id]/revise', params: { id } })}
+            >
+              Trim today’s job
+            </Button>
+            <Button size="sm" variant="secondary" style={styles.grow} onPress={() => router.push('/running-late')}>
+              Move my later jobs
+            </Button>
+          </View>
+        </Card>
+      )}
+
+      {status === 'in_progress' && (
         <Notice
           icon={extras?.completeBlocker ? TriangleAlert : CircleCheck}
           tone="warn"
@@ -753,6 +903,19 @@ export default function JobScreen() {
       )}
 
       {moneyCard}
+
+      {status === 'completed' && !openQuote && (
+        <Button
+          fullWidth
+          variant="secondary"
+          iconLeft={Plus}
+          onPress={() =>
+            router.push({ pathname: '/jobs/[id]/quote', params: { id, kind: 'follow_on' } })
+          }
+        >
+          Quote a return visit
+        </Button>
+      )}
 
       {status === 'completed' && (
         <Button

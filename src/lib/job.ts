@@ -66,11 +66,18 @@ export type JobQuote = Pick<
   'id' | 'kind' | 'status' | 'title' | 'total_pence' | 'mechanic_payout_pence' | 'sent_at'
 >;
 
+/** Something the mechanic noticed on the car — a note for the customer, and the seed of a quote. */
+export type JobFault = Pick<
+  Tables['booking_faults']['Row'],
+  'id' | 'description' | 'severity' | 'quote_id' | 'created_at'
+>;
+
 export interface JobRecord {
   booking: JobBooking;
   photos: JobPhoto[];
   parts: JobPart[];
   quotes: JobQuote[];
+  faults: JobFault[];
 }
 
 /** The photos bucket is public; its keys are unguessable booking UUIDs. */
@@ -79,7 +86,7 @@ const MEDIA_BUCKET = 'job-media';
 export async function loadJob(
   bookingId: string,
 ): Promise<{ ok: true; job: JobRecord } | { ok: false; error: string; missing?: boolean }> {
-  const [booking, media, parts, quotes] = await Promise.all([
+  const [booking, media, parts, quotes, faults] = await Promise.all([
     supabase
       .from('bookings')
       .select(BOOKING_COLUMNS)
@@ -101,6 +108,11 @@ export async function loadJob(
       .select('id, kind, status, title, total_pence, mechanic_payout_pence, sent_at')
       .eq('booking_id', bookingId)
       .order('sent_at', { ascending: false }),
+    supabase
+      .from('booking_faults')
+      .select('id, description, severity, quote_id, created_at')
+      .eq('booking_id', bookingId)
+      .order('created_at', { ascending: true }),
   ]);
 
   if (booking.error) {
@@ -121,6 +133,7 @@ export async function loadJob(
       })),
       parts: parts.data ?? [],
       quotes: quotes.data ?? [],
+      faults: faults.data ?? [],
     },
   };
 }
@@ -231,6 +244,21 @@ export const saveChecklistAnswer = (
     input,
   );
 
+/** A part's journey: ordered, delivered, then used on the car. */
+export type PartStatus = 'ordered' | 'delivered' | 'used';
+
+export const setPartStatus = (partId: string, status: PartStatus) =>
+  act(`/mechanic/booking-parts/${encodeURIComponent(partId)}/status`, { status });
+
+export const addFault = (
+  bookingId: string,
+  input: { description: string; severity: 'advisory' | 'urgent' },
+) => act<{ id: string }>(path(bookingId, 'faults'), input);
+
+/** Refused while the fault has a quote against it — withdraw the quote first. */
+export const removeFault = (faultId: string) =>
+  act(`/mechanic/faults/${encodeURIComponent(faultId)}/remove`);
+
 export const setPartSourcing = (partId: string, sourcing: 'self' | 'bmt') =>
   act<{ payoutPence: number }>(
     `/mechanic/booking-parts/${encodeURIComponent(partId)}/sourcing`,
@@ -265,6 +293,8 @@ export interface QuoteLineInput {
   /** Parts and other. */
   quantity?: number;
   unitPence?: number;
+  /** The fault this line answers, so the fault shows as quoted. */
+  faultId?: string;
 }
 
 export interface QuotePreview {
@@ -291,6 +321,156 @@ export const sendQuote = (
 
 export const withdrawQuote = (quoteId: string) =>
   act(`/mechanic/quotes/${encodeURIComponent(quoteId)}/withdraw`);
+
+/** A repair on the job, as the revision panel lists it. `id` is what a revision's `repairIds` takes. */
+export interface RevisionRepair {
+  id: string;
+  description: string;
+  linePence: number;
+}
+
+export interface RevisionPartView {
+  /** `booking_parts.id` for a part already on the job. */
+  id: string;
+  name: string;
+  quantity: number;
+  unitPence: number;
+  linePence: number;
+  sourcing: 'self' | 'bmt';
+}
+
+export interface RevisionSummary {
+  id: string;
+  status: 'sent' | 'approved' | 'declined' | 'withdrawn' | 'expired';
+  statusLabel: string;
+  reason: string;
+  note: string | null;
+  /** One line, ready to print — "Removed Front discs · added Rear pads". */
+  summary: string;
+  differencePence: number;
+  sentAt: string | null;
+  expiresAt: string | null;
+  respondedAt: string | null;
+}
+
+export interface OnSiteOption {
+  kind: 'diagnostic' | 'cancellation' | 'none';
+  label: string;
+  hint: string;
+  pence: number;
+}
+
+export interface RevisionState {
+  current: {
+    repairs: RevisionRepair[];
+    parts: RevisionPartView[];
+    totalPence: number;
+    mechanicPayoutPence: number;
+  };
+  revisions: RevisionSummary[];
+  canRevise: boolean;
+  /** Why a revision cannot be sent right now, in the CRM's words. */
+  reviseBlocker: string | null;
+  /** Present only once the customer has declined a revision. */
+  onSiteOptions?: OnSiteOption[] | null;
+}
+
+/** A part as a revision sends it: one already on the job (by id), or a new one, typed. */
+export interface RevisionPartInput {
+  id?: string | null;
+  name?: string | null;
+  quantity?: number | null;
+  unitPence?: number | null;
+}
+
+export interface RevisionDraft {
+  repairIds: string[];
+  parts: RevisionPartInput[];
+}
+
+export interface RevisionPreview {
+  before: { totalPence: number; mechanicPayoutPence: number; serviceDurationHours: number };
+  after: { totalPence: number; mechanicPayoutPence: number; serviceDurationHours: number };
+  diff: {
+    differencePence: number;
+    direction: string;
+    durationChange: number;
+    lines: Record<'added' | 'removed' | 'kept', { description: string; linePence: number }[]>;
+    parts: Record<'added' | 'removed' | 'kept', { name: string; quantity: number; linePence: number }[]>;
+  };
+}
+
+export interface CatalogueHit {
+  id: string;
+  description: string;
+  billedHours: number | null;
+  pricePence: number | null;
+  bundleName?: string;
+  optionLabel?: string | null;
+  fixedPrice?: boolean;
+}
+
+export async function fetchRevisionState(
+  bookingId: string,
+): Promise<{ ok: true; state: RevisionState } | JobFailure> {
+  const response = await api.get<RevisionState>(path(bookingId, 'revision'));
+  return response.ok ? { ok: true, state: response.data } : failure(response);
+}
+
+/** Anything bookable for this job's car. The CRM wants at least three characters. */
+export async function searchCatalogue(
+  bookingId: string,
+  query: string,
+): Promise<{ ok: true; hits: CatalogueHit[]; truncated: boolean } | JobFailure> {
+  const response = await api.get<{ hits: CatalogueHit[]; truncated: boolean }>(
+    path(bookingId, `catalogue?query=${encodeURIComponent(query)}`),
+  );
+  return response.ok ? { ok: true, ...response.data } : failure(response);
+}
+
+/** Prices a changed job without sending it. A draft the CRM cannot price yet is an ordinary refusal. */
+export async function previewRevision(
+  bookingId: string,
+  draft: RevisionDraft,
+): Promise<{ ok: true; preview: RevisionPreview } | JobFailure> {
+  const response = await api.post<RevisionPreview>(path(bookingId, 'revision/preview'), draft);
+  return response.ok ? { ok: true, preview: response.data } : failure(response);
+}
+
+/** The customer reads `reason` before approving; they have 24 hours. */
+export const sendRevision = (
+  bookingId: string,
+  input: RevisionDraft & { reason: string; note?: string },
+) => act<{ id: string }>(path(bookingId, 'revision'), input);
+
+export const withdrawRevision = (revisionId: string) =>
+  act(`/mechanic/revisions/${encodeURIComponent(revisionId)}/withdraw`);
+
+/** Only once the customer has declined a revision. Ends the job, charging the fee chosen — or nothing. */
+export const endJobOnSite = (
+  bookingId: string,
+  input: { charge: OnSiteOption['kind']; note?: string },
+) =>
+  act<{ status: string; chargedPence: number; payoutPence: number }>(
+    path(bookingId, 'end-on-site'),
+    input,
+  );
+
+/** Running late: propose new times for several jobs at once. Each succeeds or fails by itself. */
+export async function proposeReschedules(
+  items: { bookingId: string; newIso: string }[],
+  note: string,
+): Promise<
+  { ok: true; proposed: number; failed: { bookingId: string; error: string }[] } | JobFailure
+> {
+  const response = await api.post<{
+    proposed: number;
+    failed: { bookingId: string; error: string }[];
+  }>('/mechanic/reschedules', { items, note });
+  return response.ok
+    ? { ok: true, proposed: response.data.proposed, failed: response.data.failed ?? [] }
+    : failure(response);
+}
 
 /** "BMT-00042" */
 export function jobReference(jobNumber: number | null) {

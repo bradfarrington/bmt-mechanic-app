@@ -52,10 +52,18 @@ function toInput(lines: DraftLine[]): QuoteLineInput[] {
  */
 export default function QuoteScreen() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{
+    id: string;
+    kind?: string;
+    faultId?: string;
+    fault?: string;
+  }>();
+  const { id, faultId } = params;
+  // A return visit, quoted while working or once the job is complete; otherwise extra work now.
+  const kind = params.kind === 'follow_on' ? 'follow_on' : 'now';
 
   const [customer, setCustomer] = useState('the customer');
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(params.fault ?? '');
   const [lines, setLines] = useState<DraftLine[]>([blank(1, 'labour')]);
   const [nextKey, setNextKey] = useState(2);
   const [preview, setPreview] = useState<QuotePreview | null>(null);
@@ -113,10 +121,11 @@ export default function QuoteScreen() {
     setError(null);
 
     const result = await sendQuote(id, {
-      kind: 'now',
+      kind,
       title: input[0]?.description,
       note: note.trim() || undefined,
-      lines: input,
+      // The first line answers the fault this quote was opened from.
+      lines: input.map((line, index) => (index === 0 && faultId ? { ...line, faultId } : line)),
     });
     setSending(false);
 
@@ -128,7 +137,7 @@ export default function QuoteScreen() {
 
   return (
     <Screen
-      title="Quote for extra work"
+      title={kind === 'follow_on' ? 'Quote a return visit' : 'Quote for extra work'}
       avoidKeyboard
       footer={
         <Button
@@ -144,7 +153,9 @@ export default function QuoteScreen() {
       }
     >
       <Text color="textSecondary">
-        {`${customer} gets a notification and can approve or decline. Approved work is added to the booking and to what you’re paid.`}
+        {kind === 'follow_on'
+          ? `${customer} gets a notification. If they approve, they book the return visit and you’re offered it first.`
+          : `${customer} gets a notification and can approve or decline. Approved work is added to the booking and to what you’re paid.`}
       </Text>
 
       <Input
@@ -244,7 +255,7 @@ export default function QuoteScreen() {
                 Customer pays
               </Text>
               <Text variant="caption" color="textMuted">
-                Added to the booking
+                {kind === 'follow_on' ? 'For the return visit' : 'Added to the booking'}
               </Text>
             </View>
             <Text variant="display">{formatPence(preview.totalPence)}</Text>

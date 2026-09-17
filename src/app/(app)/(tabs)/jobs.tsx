@@ -1,10 +1,10 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import { CalendarX, TriangleAlert } from 'lucide-react-native';
+import { CalendarX, Clock, TriangleAlert } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 
 import { JobRow } from '@/components/job-row';
-import { Card, IconTile, Notice, Overline, Pill, Screen, Text } from '@/components/ui';
+import { Button, Card, IconTile, Notice, Overline, Pill, Screen, Text } from '@/components/ui';
 import { Palette, Spacing } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { isOpen, loadJobs, type Job, type JobRange } from '@/lib/jobs';
@@ -126,6 +126,13 @@ export default function JobsScreen() {
       {!jobs && !error && <ActivityIndicator color={Palette.blue} />}
 
       {range === 'past' ? section('Past jobs', done) : section('Active', active)}
+
+      {/* Only confirmed jobs can move — the one under way is not among them. */}
+      {range === 'today' && active.some((job) => job.status === 'confirmed') && (
+        <Button variant="secondary" iconLeft={Clock} onPress={() => router.push('/running-late')}>
+          Running late?
+        </Button>
+      )}
       {range !== 'past' && section(range === 'today' ? 'Earlier today' : 'Done', done)}
 
       {jobs?.length === 0 && (
