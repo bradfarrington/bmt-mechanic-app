@@ -75,6 +75,8 @@ export const Palette = {
 
   /** Title and copy on an amber `warn` callout */
   warningText: '#78350F',
+  /** Mechanic app: title and copy on a green `success` callout */
+  successText: '#14532D',
   /** A saved payment card that isn't the default one */
   paymentCard: '#334155',
 } as const;
@@ -673,6 +675,18 @@ export const DetailSizing = {
   addPhotoBorder: 2,
   /** The tick inside a selected review tag */
   chipIcon: 14,
+} as const;
+
+/** Mechanic app: the green power button on "You're all set." and its halo. */
+export const ReadyHero = { box: 72, glyph: 34, halo: 10 } as const;
+
+/** Mechanic app: `components/ui/slider.tsx` — the service-radius slider. */
+export const Slider = {
+  track: 6,
+  thumb: 22,
+  thumbBorder: 3,
+  /** Tall enough to grab with a thumb */
+  hitHeight: 44,
 } as const;
 
 /** A live status's breathing dot — in a pill, or on a live strip. */

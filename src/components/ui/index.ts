@@ -3,9 +3,13 @@ export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from '@
 export { Card, type CardProps } from '@/components/ui/card';
 export { Icon, type IconProps } from '@/components/ui/icon';
 export { IconTile, type IconTileProps, type IconTileSize } from '@/components/ui/icon-tile';
+export { Input, type InputProps } from '@/components/ui/input';
 export { Notice, type NoticeProps } from '@/components/ui/notice';
 export { Overline } from '@/components/ui/overline';
+export { PasswordStrength, type PasswordStrengthProps } from '@/components/ui/password-strength';
 export { Pill, type PillProps } from '@/components/ui/pill';
 export { PulseDot, type PulseDotProps } from '@/components/ui/pulse-dot';
 export { Screen, type ScreenProps } from '@/components/ui/screen';
+export { Slider, type SliderProps } from '@/components/ui/slider';
+export { Stepper, type StepperProps } from '@/components/ui/stepper';
 export { Text, type TextProps, type TextVariant } from '@/components/ui/text';

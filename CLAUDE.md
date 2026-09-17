@@ -31,8 +31,18 @@ lib helper, a config choice — copy that rather than inventing a second way.
   customer app). `tab-bar.tsx` is the tab bar and its centre status button.
 - `src/constants/theme.ts` — theme tokens: the customer app's file plus the
   mechanic additions from `design/TOKENS.md`, each marked "Mechanic app".
-- `src/lib/status.tsx` — Online / Offline / On a job / Locked. In memory until
-  the data layer lands.
+- `src/lib/auth.tsx` — session, `profiles` row and `mechanics` row. "Is a
+  mechanic" means **has a `mechanics` row**, not `role === 'mechanic'`.
+- `src/lib/mechanic.ts` — the mechanic's own settings. Anything RLS allows
+  (radius, specialisms, hours) is written direct with supabase-js, mirroring the
+  CRM's web actions; anything needing Stripe or the dispatcher goes through
+  `src/lib/api.ts` to the CRM's `/api/mobile/v1/mechanic/*`.
+- `src/lib/status.tsx` — Online / Offline / On a job / Locked, derived from the
+  `mechanics` row. Going online goes through the CRM, never a direct write.
+- `src/app/index.tsx` — entry router: sign-in, first-run setup (`(onboarding)`)
+  or Today. Saved working hours are the "has onboarded" signal.
+- `docs/*-crm-prompt.md` — work the CRM repo needs for this app, written as
+  prompts to run there.
 - `design/` — the target mockups, the screen → route map and the token additions.
 
 ## Building screens
@@ -59,6 +69,11 @@ npm run lint       # expo lint
 npx tsc --noEmit   # typecheck (keep clean)
 npx expo export --platform ios   # verify the iOS bundle builds
 ```
+
+Needs a `.env` — copy `.env.example`; the values are the customer app's. The
+web target only exists for quick layout checks: a static web export fails on
+`window` inside supabase-js, so export with `web.output` temporarily set to
+`"single"` and do not commit that change.
 
 Re-run `npx expo prebuild --platform ios` after touching `app.json` plugins or
 adding a native dependency. It regenerates `ios/` from scratch, so never hand-

@@ -1,4 +1,8 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import { Alert } from 'react-native';
+
+import { useAuth } from '@/lib/auth';
+import { setOnlineStatus } from '@/lib/mechanic';
 
 /**
  * What the mechanic is doing right now — the tab bar's centre button shows it
@@ -12,29 +16,49 @@ export type MechanicStatus = 'online' | 'offline' | 'on_job' | 'locked';
 
 interface StatusValue {
   status: MechanicStatus;
+  /** A toggle is on its way to the CRM. */
+  pending: boolean;
   /** Online ↔ Offline. Does nothing while on a job or locked. */
   toggle: () => void;
-  setStatus: (status: MechanicStatus) => void;
 }
 
 const StatusContext = createContext<StatusValue | null>(null);
 
-/**
- * Held in memory for the shell. Once the data layer lands this reads the
- * mechanic's availability and active booking from Supabase instead, and
- * `toggle` writes through the CRM.
- */
+/** Reads `mechanics.status` and the payouts flag; must sit inside `AuthProvider`. */
 export function StatusProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<MechanicStatus>('offline');
+  const { mechanic, refreshMechanic } = useAuth();
+  // What was just asked for, shown until the CRM's answer is read back.
+  const [requested, setRequested] = useState<'online' | 'offline' | null>(null);
 
-  function toggle() {
-    setStatus((current) =>
-      current === 'online' ? 'offline' : current === 'offline' ? 'online' : current,
-    );
+  const stored: MechanicStatus = !mechanic
+    ? 'offline'
+    : mechanic.status === 'on_job'
+      ? 'on_job'
+      : !mechanic.stripe_payouts_enabled
+        ? 'locked'
+        : mechanic.status === 'online'
+          ? 'online'
+          : 'offline';
+
+  const togglable = stored === 'online' || stored === 'offline';
+  const status = togglable && requested ? requested : stored;
+
+  async function toggle() {
+    if (!togglable || requested) return;
+    const next = stored === 'online' ? 'offline' : 'online';
+    setRequested(next);
+
+    const result = await setOnlineStatus(next);
+    if (result.ok) {
+      await refreshMechanic();
+    } else {
+      Alert.alert(next === 'online' ? "Couldn't go online" : "Couldn't go offline", result.error);
+    }
+    setRequested(null);
   }
 
   return (
-    <StatusContext.Provider value={{ status, toggle, setStatus }}>
+    <StatusContext.Provider value={{ status, pending: requested !== null, toggle }}>
       {children}
     </StatusContext.Provider>
   );

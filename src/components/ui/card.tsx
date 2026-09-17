@@ -9,9 +9,10 @@ export interface CardProps extends ViewProps {
   selected?: boolean;
   /**
    * `tint` — a pale-blue callout; `danger` — a red-bordered warning; `warn` —
-   * an amber callout (`.card.warn` in the mockups).
+   * an amber callout (`.card.warn` in the mockups); `success` — a green one
+   * (`.card.succ`).
    */
-  tone?: 'default' | 'tint' | 'danger' | 'warn';
+  tone?: 'default' | 'tint' | 'danger' | 'warn' | 'success';
   /** Lifted off the page by the float shadow, with no border — "sent" and "done" cards. */
   elevated?: boolean;
 }
@@ -51,6 +52,7 @@ const styles = StyleSheet.create({
   tint: { backgroundColor: Palette.blueTint, borderColor: Palette.blueTintStrong },
   danger: { borderWidth: 1.5, borderColor: Palette.danger },
   warn: { borderWidth: 1.5, borderColor: Palette.warning, backgroundColor: Tones.pending.bg },
+  success: { borderWidth: 1.5, borderColor: Palette.success, backgroundColor: Tones.success.bg },
   elevated: { borderColor: 'transparent', ...Shadows.float },
   selected: {
     borderWidth: 1.5,

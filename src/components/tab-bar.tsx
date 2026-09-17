@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import { Power, Wrench, type LucideIcon } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
@@ -82,7 +83,7 @@ const LOOKS: Record<MechanicStatus, StatusLook> = {
     icon: Power,
     iconColor: Palette.textSecondary,
     shadow: Shadows.fabOffline,
-    accessibilityLabel: 'Locked until payouts are set up',
+    accessibilityLabel: 'Locked until payouts are set up. Set up payouts',
   },
 };
 
@@ -116,8 +117,9 @@ function OnlineHalo() {
  * The hub tab bar: Today · Jobs · [Status] · Inbox · Account.
  *
  * The centre button is not a tab — it shows whether the mechanic is Online,
- * Offline or On a job, and toggles the first two. It is on every hub screen so
- * they never have to wonder which mode they are in.
+ * Offline or On a job, and toggles the first two. Locked (no payouts yet), it
+ * opens payout setup. It is on every hub screen so they never have to wonder
+ * which mode they are in.
  *
  * The bar is pulled up over the scene by `TabBarOverhang` rather than letting
  * the button poke out of it: a child outside its parent's bounds cannot be
@@ -126,9 +128,17 @@ function OnlineHalo() {
  * the screen behind.
  */
 export function TabBar({ state, navigation, insets, items }: TabBarProps) {
-  const { status, toggle } = useStatus();
+  const router = useRouter();
+  const { status, pending, toggle } = useStatus();
   const look = LOOKS[status];
-  const canToggle = status === 'online' || status === 'offline';
+  // On a job there is nothing to press; locked, the button leads to the fix.
+  const pressable = status !== 'on_job' && !pending;
+
+  function onStatusPress() {
+    if (status === 'locked') router.push('/payouts');
+    else toggle();
+  }
+
   const half = Math.ceil(items.length / 2);
 
   function renderTab(item: TabItem) {
@@ -204,11 +214,11 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
         {status === 'online' && <OnlineHalo />}
         <View style={[styles.fabRing, look.shadow]}>
           <Pressable
-            onPress={toggle}
-            disabled={!canToggle}
+            onPress={onStatusPress}
+            disabled={!pressable}
             accessibilityRole="button"
             accessibilityLabel={look.accessibilityLabel}
-            accessibilityState={{ disabled: !canToggle }}
+            accessibilityState={{ disabled: !pressable, busy: pending }}
             style={({ pressed }) => pressed && styles.pressed}
           >
             {look.gradient ? (

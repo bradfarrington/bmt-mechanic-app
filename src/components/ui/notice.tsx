@@ -14,7 +14,7 @@ export interface NoticeProps extends Omit<ViewProps, 'children'> {
    * `info` — pale-blue callout; `danger` — red border and tile; `warn` — amber
    * card, tile and copy ("Got a job on the go?").
    */
-  tone?: 'info' | 'danger' | 'warn';
+  tone?: 'info' | 'danger' | 'warn' | 'success';
   /** A string is set as the caption under the title; anything else renders as given. */
   children?: ReactNode;
 }
@@ -26,6 +26,7 @@ const LOOKS: Record<
   info: { card: 'tint', tile: 'accent', title: 'textPrimary', copy: 'textSecondary' },
   danger: { card: 'danger', tile: 'error', title: 'textPrimary', copy: 'textSecondary' },
   warn: { card: 'warn', tile: 'pending', title: 'warningText', copy: 'warningText' },
+  success: { card: 'success', tile: 'success', title: 'successText', copy: 'successText' },
 };
 
 /** A titled callout card with an icon tile — "Heads up", "Wrong app for this account". */

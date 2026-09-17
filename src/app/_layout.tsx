@@ -23,13 +23,18 @@ import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Palette } from '@/constants/theme';
+import { AuthProvider, useAuth } from '@/lib/auth';
 import { StatusProvider } from '@/lib/status';
 
-// Hold the splash until the fonts are registered, so headings never jump from
-// the system font to Inter Tight a beat after they appear.
+// Hold the splash until the persisted session and its mechanic record are
+// restored and the fonts are registered, so the app never flashes a signed-out
+// frame, or headings that jump from the system font to Inter Tight a beat
+// after they appear.
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
+  const { initialising } = useAuth();
+
   // Registered under the face names `fontFace` in `constants/theme.ts` hands out.
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -47,7 +52,8 @@ function RootNavigator() {
   });
   // A font that fails to load falls back to the system face — better than a
   // splash screen that never lifts.
-  const ready = fontsLoaded || fontError != null;
+  const fontsReady = fontsLoaded || fontError != null;
+  const ready = !initialising && fontsReady;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
@@ -71,10 +77,12 @@ export default function RootLayout() {
     <SafeAreaProvider>
       {/* Light-only app — the header bar is white, so dark content. */}
       <StatusBar style="dark" />
-      {/* Above the navigator: the tab bar and the job screens both read it. */}
-      <StatusProvider>
-        <RootNavigator />
-      </StatusProvider>
+      <AuthProvider>
+        {/* Above the navigator: the tab bar and the job screens both read it. */}
+        <StatusProvider>
+          <RootNavigator />
+        </StatusProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

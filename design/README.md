@@ -64,7 +64,7 @@ Expo Router conventions.
 |---|-------|-------------|
 | 1 | Splash | `src/app/index.tsx` (redirect shim, native splash config in `app.json`) |
 | 2 | Sign in | `src/app/(auth)/login.tsx` |
-| 3 | Set password (first login) | `src/app/(auth)/set-password.tsx` |
+| 3 | Set password (first login) | `src/app/set-password.tsx` — outside `(auth)`: the emailed link creates a session, which `(auth)` redirects away |
 | 4 | Connect Stripe · payouts gate | `src/app/(onboarding)/payouts.tsx` |
 | 5 | Set up · service area | `src/app/(onboarding)/service-area.tsx` |
 | 6 | Set up · working hours | `src/app/(onboarding)/hours.tsx` |

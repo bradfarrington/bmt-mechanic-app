@@ -2,13 +2,11 @@ import { Redirect, Stack } from 'expo-router';
 
 import { useAuth } from '@/lib/auth';
 
-/** The signed-in area — the tab hubs and everything pushed from them. */
-export default function AppLayout() {
+export default function AuthLayout() {
   const { session } = useAuth();
 
-  if (!session) {
-    return <Redirect href="/login" />;
-  }
+  // Already signed in — the entry router decides between setup and Today.
+  if (session) return <Redirect href="/" />;
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }
