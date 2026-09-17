@@ -146,7 +146,7 @@ does not give cleanly:
   "escalatesAt": "2026-09-19T09:44:00.000Z",  // null once escalated or closed
   "resolutionLabel": null, "resolutionNote": null, "resolutionRefundPence": null,
   "payoutLine": null,                         // the sentence the mechanic email uses, once resolved
-  "can": { "reply": true, "escalate": true, "withdraw": false, "offerRedo": true },
+  "can": { "reply": true, "escalate": true, "withdraw": false },
   "mechanicReasons": [{ "value": "refused_signoff", "label": "Customer disputes that the work was done" }]
 }
 ```
@@ -166,22 +166,15 @@ mechanic sees this" / "Only the customer sees this"). **The "Parties read disput
 thread" policy must hide a row from the other party** — do it in the policy, not
 the UI — and the customer app's direct read must keep working unchanged.
 
-### New: offer a re-do
+### Only Book My Tech decides a dispute
 
-**Only Book My Tech decides the outcome of a dispute** (owner's decision,
-2026-09-17). A mechanic cannot accept, agree or issue a refund — do not add any
-route that resolves a dispute on a mechanic's say-so. What a mechanic can do is
-reply, send evidence, ask BMT to step in, and make this offer, which decides
-nothing:
-
-- `POST /disputes/[id]/offer-redo` (`mechanic`) — `{ "note"?: "…" }`. Only on a
-  customer-opened dispute that is `opened`/`responded`. Posts a thread message
-  in fixed wording ("<Name> has offered to come back and put this right at no
-  extra cost. If you're happy with that, reply here to arrange a time."), plus
-  the note, and counts as the mechanic's response (`responded`). No new state
-  and no effect on the 48-hour escalation. Once per dispute. → `{ "id": "…" }`.
-
-`can.offerRedo` in the GET above says whether it applies.
+Owner's decision, 2026-09-17: **the customer and the mechanic can only
+communicate about a dispute; BMT decides all of it.** A mechanic cannot accept,
+agree, offer or issue anything — no refund, no settlement, no structured
+"offer". Do not add any route that resolves a dispute, moves money on one, or
+posts anything but the mechanic's own words and photos. The mechanic's routes
+are exactly the five in the table above: open, upload a photo, reply, ask BMT
+to step in, and withdraw an issue they raised themselves.
 
 ## Done when
 

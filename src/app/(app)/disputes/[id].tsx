@@ -20,7 +20,6 @@ import {
   escalateDispute,
   fetchDispute,
   fetchDisputeThread,
-  offerRedo,
   sendDisputeMessage,
   timeLeft,
   withdrawDispute,
@@ -50,9 +49,9 @@ const WHO: Record<DisputeMessage['sender_role'], string> = {
 
 /**
  * A dispute on one of the mechanic's jobs — customer, mechanic and Book My
- * Tech in one thread. The mechanic can reply (with photos), offer to put it
- * right, or ask BMT to step in; BMT steps in by itself after 48 hours, and only
- * BMT decides the outcome. What each dispute allows comes from the CRM in `can`.
+ * Tech in one thread. The mechanic can reply, with photos, and ask BMT to step
+ * in; BMT steps in by itself after 48 hours. Only BMT decides the outcome — the
+ * two parties can talk, and nothing more. What each dispute allows comes from the CRM in `can`.
  */
 export default function DisputeScreen() {
   const router = useRouter();
@@ -273,32 +272,15 @@ export default function DisputeScreen() {
           )}
         </View>
 
-        {(dispute.can.offerRedo || dispute.can.escalate || dispute.can.withdraw) && (
+        {(dispute.can.escalate || dispute.can.withdraw) && (
           <Card style={styles.options}>
             <Text variant="caption" color="textSecondary" style={styles.strong}>
               Your options
             </Text>
             <Text variant="caption" color="textSecondary">
-              Reply in the thread with your side and any photos. Book My Tech decides the outcome
-              if it comes to that. You can also:
+              Reply in the thread with your side and any photos. Book My Tech decides the
+              outcome.
             </Text>
-            {dispute.can.offerRedo && (
-              <Button
-                variant="secondary"
-                disabled={busy !== null}
-                loading={busy === 'redo'}
-                onPress={() =>
-                  confirm(
-                    'Offer to put it right?',
-                    `${dispute.customerName} is told you’ll come back and sort it at no extra cost. If they’re happy, they withdraw the dispute.`,
-                    'Offer a re-do',
-                    () => void run('redo', () => offerRedo(id)),
-                  )
-                }
-              >
-                Offer a re-do
-              </Button>
-            )}
             {dispute.can.escalate && (
               <Button
                 variant="secondary"

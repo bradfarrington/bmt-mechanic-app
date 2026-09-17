@@ -7,9 +7,9 @@ import { supabase } from '@/lib/supabase';
  * hides the other side's private BMT notes); the dispute itself and every
  * action go through the CRM.
  *
- * Only Book My Tech decides the outcome: a mechanic can reply, send evidence,
- * offer to put it right and ask BMT to step in, but never settle or refund. A
- * dispute left unanswered for 48 hours escalates to BMT by itself.
+ * Only Book My Tech decides a dispute. The customer and the mechanic can talk
+ * and send evidence, and either can ask BMT to step in; neither can settle,
+ * offer or refund anything. Unanswered for 48 hours, it goes to BMT by itself.
  */
 export interface Dispute {
   id: string;
@@ -36,7 +36,6 @@ export interface Dispute {
     reply: boolean;
     escalate: boolean;
     withdraw: boolean;
-    offerRedo: boolean;
   };
   /** The reasons a mechanic may raise — the vocabulary is role-scoped. */
   mechanicReasons: { value: string; label: string }[];
@@ -126,10 +125,6 @@ export const escalateDispute = (disputeId: string) => act(at(disputeId, '/escala
 
 /** Only whoever opened it can withdraw it. A withdrawn dispute cannot be reopened. */
 export const withdrawDispute = (disputeId: string) => act(at(disputeId, '/withdraw'));
-
-/** Offer to come back and put it right. Decides nothing — only BMT settles a dispute. Once per dispute. */
-export const offerRedo = (disputeId: string, note?: string) =>
-  act<{ id: string }>(at(disputeId, '/offer-redo'), note?.trim() ? { note: note.trim() } : {});
 
 /** "47h", "35 min" — how long until BMT steps in. Null once that has passed. */
 export function timeLeft(escalatesAt: string | null, now: number) {
