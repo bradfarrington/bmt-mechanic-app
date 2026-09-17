@@ -89,17 +89,11 @@ export const Fonts = Platform.select({
 });
 ```
 
-## Signature pad — Caveat
+## Signature pad — not used
 
-Customer signatures are rendered on the completed-job card and the
-signature-pad review view. Use the **Caveat** handwriting face — it reads
-as a real signature rather than a system-italic stand-in.
-
-```ts
-import { Caveat_500Medium, Caveat_700Bold } from '@expo-google-fonts/caveat';
-```
-
-Only used for signature rendering — never for UI copy.
+The mockups show a customer signature in Caveat. The owner decided against
+signatures (2026-09-17, following the CRM's removal on 2026-09-08), so the font
+is not loaded and there is no signature screen.
 
 ## Status-strip token group
 

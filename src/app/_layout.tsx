@@ -1,4 +1,3 @@
-import { Caveat_500Medium, Caveat_700Bold } from '@expo-google-fonts/caveat';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -48,8 +47,6 @@ function RootNavigator() {
     InterTight_900Black,
     JetBrainsMono_600SemiBold,
     JetBrainsMono_700Bold,
-    Caveat_500Medium,
-    Caveat_700Bold,
   });
   // A font that fails to load falls back to the system face — better than a
   // splash screen that never lifts.

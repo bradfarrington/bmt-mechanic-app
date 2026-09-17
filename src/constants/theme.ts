@@ -229,8 +229,7 @@ export const Radius = {
  * weight. Web takes a family stack and picks the face from `fontWeight`.
  *
  * Inter Tight is the display face (headings); Inter is the body face.
- * Mechanic app: JetBrains Mono sets reg plates, job IDs and account numbers,
- * and Caveat renders a customer's signature — never UI copy.
+ * Mechanic app: JetBrains Mono sets reg plates, job IDs and account numbers.
  */
 export const Fonts = Platform.select({
   ios: {
@@ -240,7 +239,6 @@ export const Fonts = Platform.select({
     serif: 'ui-serif',
     rounded: 'ui-rounded',
     mono: 'JetBrainsMono_700Bold',
-    signature: 'Caveat_500Medium',
   },
   android: {
     sans: 'Inter_400Regular',
@@ -249,7 +247,6 @@ export const Fonts = Platform.select({
     serif: 'serif',
     rounded: 'normal',
     mono: 'JetBrainsMono_700Bold',
-    signature: 'Caveat_500Medium',
   },
   default: {
     sans: 'normal',
@@ -258,7 +255,6 @@ export const Fonts = Platform.select({
     serif: 'serif',
     rounded: 'normal',
     mono: 'monospace',
-    signature: 'normal',
   },
   web: {
     sans: 'Inter, system-ui, sans-serif',
@@ -267,11 +263,10 @@ export const Fonts = Platform.select({
     serif: 'var(--font-serif)',
     rounded: 'var(--font-rounded)',
     mono: 'JetBrains Mono, var(--font-mono)',
-    signature: 'Caveat, cursive',
   },
 });
 
-export type FontFamily = 'sans' | 'display' | 'mono' | 'signature';
+export type FontFamily = 'sans' | 'display' | 'mono';
 
 /** Every face `app/_layout.tsx` loads, by family and weight. */
 const Faces: Record<FontFamily, Record<number, string>> = {
@@ -290,10 +285,6 @@ const Faces: Record<FontFamily, Record<number, string>> = {
   mono: {
     600: 'JetBrainsMono_600SemiBold',
     700: 'JetBrainsMono_700Bold',
-  },
-  signature: {
-    500: 'Caveat_500Medium',
-    700: 'Caveat_700Bold',
   },
 };
 
@@ -331,7 +322,6 @@ export function familyOfFace(fontFamily: string | undefined): FontFamily | null 
   if (fontFamily.startsWith('InterTight_')) return 'display';
   if (fontFamily.startsWith('Inter_')) return 'sans';
   if (fontFamily.startsWith('JetBrainsMono_')) return 'mono';
-  if (fontFamily.startsWith('Caveat_')) return 'signature';
   return null;
 }
 

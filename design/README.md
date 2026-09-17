@@ -18,7 +18,7 @@ with a 15% (or 12% for Pro-tier) commission coming out of each customer
 payment. This mobile app is the field tool that sits on their phone while
 the van is on the move — it exists to (a) surface live job offers within
 seconds so first-to-accept wins, (b) walk them through the lawful five-step
-job lifecycle and capture the pre-authorised Stripe charge on signature,
+job lifecycle and capture the pre-authorised Stripe charge on completion,
 (c) let them message the customer, snap photos, and quote for extra work,
 and (d) show them what they've earned and when it lands.
 
@@ -92,7 +92,7 @@ Expo Router conventions.
 | 2 | Job · confirmed | `src/app/(app)/jobs/[id]/index.tsx`, status = confirmed |
 | 3 | Job · en route | Same file, status = en_route |
 | 4 | Job · in progress | Same file, status = in_progress |
-| 5 | Signature · full-screen | **Not built.** The CRM removed customer signatures on the owner's instruction (2026-09-08); completing is a two-step "Confirm & charge" as on the web |
+| 5 | Signature · full-screen | **Not used** — the owner decided against signatures (2026-09-17). Completing is a two-step "Confirm & charge", as on the web |
 | 6 | Inspection runner | `src/app/(app)/jobs/[id]/inspect.tsx` — the CRM's real checklists (46–173 items, pass/advisory/fail), not the mockup's 5-photo walk |
 | 7 | Quick-quote sheet | `src/app/(app)/jobs/[id]/quote.tsx` — bottom sheet |
 | 8 | Job · completed | Same as #2, status = completed |
@@ -177,7 +177,7 @@ sheet.
 5. **Today & offers.** Real Supabase queries (`bookings` filtered by
    `mechanic_id + today`, `job_offers` realtime channel). Live offer detail
    with the accept/decline hero. This is the app.
-6. **Active job.** State-machine driven job detail + signature pad +
+6. **Active job.** State-machine driven job detail +
    photos. Foreground `expo-location` starts when Start Journey is tapped
    and stops when the job completes.
 7. **Inbox + messages.** Combined thread/notification feed, canned replies,
