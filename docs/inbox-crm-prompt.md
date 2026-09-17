@@ -146,7 +146,7 @@ does not give cleanly:
   "escalatesAt": "2026-09-19T09:44:00.000Z",  // null once escalated or closed
   "resolutionLabel": null, "resolutionNote": null, "resolutionRefundPence": null,
   "payoutLine": null,                         // the sentence the mechanic email uses, once resolved
-  "can": { "reply": true, "escalate": true, "withdraw": false, "acceptRefund": true, "offerRedo": true },
+  "can": { "reply": true, "escalate": true, "withdraw": false, "offerRedo": true },
   "mechanicReasons": [{ "value": "refused_signoff", "label": "Customer disputes that the work was done" }]
 }
 ```
@@ -166,30 +166,22 @@ mechanic sees this" / "Only the customer sees this"). **The "Parties read disput
 thread" policy must hide a row from the other party** — do it in the policy, not
 the UI — and the customer app's direct read must keep working unchanged.
 
-### New: two mechanic responses — **the owner may strike this section; ask if unsure**
+### New: offer a re-do
 
-The design gives the mechanic three answers to a customer's dispute: contest
-(above), accept the refund, or offer to come back.
+**Only Book My Tech decides the outcome of a dispute** (owner's decision,
+2026-09-17). A mechanic cannot accept, agree or issue a refund — do not add any
+route that resolves a dispute on a mechanic's say-so. What a mechanic can do is
+reply, send evidence, ask BMT to step in, and make this offer, which decides
+nothing:
 
-- `POST /disputes/[id]/accept-refund` (`mechanic`) — only on a customer-opened
-  dispute that is `opened`/`responded` and has `refund_requested_pence`. Resolves
-  it through the **same code path as `resolveDispute`** — refund to the customer,
-  `recordRefundClawback` against the mechanic, events, emails —
-  with `resolved_by_role: 'mechanic'` (the column already allows it), resolution
-  `full_refund` or `partial_refund` by amount, note "The mechanic accepted the
-  refund." **No `mechanic_flags` row and no suspension count** for a refund the
-  mechanic chose to give. → `{ "refundPence": 22000 }`. Make it safe against a
-  double call, as `complete` and `end-on-site` are.
-- `POST /disputes/[id]/offer-redo` (`mechanic`) — `{ "note"?: "…" }`. Posts a
-  thread message in fixed wording ("<Name> has offered to come back and put this
-  right at no extra cost. If you're happy with that, reply here to arrange a
-  time — you can withdraw the dispute once it's sorted."), plus the note, and
-  counts as the mechanic's response (`responded`). No new state: the customer
-  accepts by arranging it in the thread and withdrawing. Once per dispute.
-  → `{ "id": "…" }`.
+- `POST /disputes/[id]/offer-redo` (`mechanic`) — `{ "note"?: "…" }`. Only on a
+  customer-opened dispute that is `opened`/`responded`. Posts a thread message
+  in fixed wording ("<Name> has offered to come back and put this right at no
+  extra cost. If you're happy with that, reply here to arrange a time."), plus
+  the note, and counts as the mechanic's response (`responded`). No new state
+  and no effect on the 48-hour escalation. Once per dispute. → `{ "id": "…" }`.
 
-`can.acceptRefund` / `can.offerRedo` in the GET above say whether each applies;
-leave them `false` if this section is struck.
+`can.offerRedo` in the GET above says whether it applies.
 
 ## Done when
 
@@ -198,6 +190,6 @@ leave them `false` if this section is struck.
 - A mechanic's token can raise a case with a photo, reply in it and close it;
   open a dispute, reply with a photo, escalate and withdraw.
 - A private note is unreadable with the other party's token **under RLS**.
-- Two overlapping `accept-refund` calls refund once.
+- No mechanic route can resolve a dispute or move money on one.
 - Each push in §2 arrives once, on `updates`, with its `data`.
 - The customer app and the web dispute, case and inbox pages behave as before.

@@ -17,7 +17,6 @@ import { Button, Card, Icon, IconTile, Notice, Overline, Pill, Screen, Text } fr
 import { ChatBubble, ChatComposer } from '@/components/ui/chat';
 import { DetailSizing, JobPhotos, Palette, Radius, Spacing, type Tone } from '@/constants/theme';
 import {
-  acceptRefund,
   escalateDispute,
   fetchDispute,
   fetchDisputeThread,
@@ -52,8 +51,8 @@ const WHO: Record<DisputeMessage['sender_role'], string> = {
 /**
  * A dispute on one of the mechanic's jobs — customer, mechanic and Book My
  * Tech in one thread. The mechanic can reply (with photos), offer to put it
- * right, accept the refund, or ask BMT to step in; BMT steps in by itself
- * after 48 hours. What each dispute allows comes from the CRM in `can`.
+ * right, or ask BMT to step in; BMT steps in by itself after 48 hours, and only
+ * BMT decides the outcome. What each dispute allows comes from the CRM in `can`.
  */
 export default function DisputeScreen() {
   const router = useRouter();
@@ -274,13 +273,14 @@ export default function DisputeScreen() {
           )}
         </View>
 
-        {(dispute.can.acceptRefund || dispute.can.offerRedo || dispute.can.escalate || dispute.can.withdraw) && (
+        {(dispute.can.offerRedo || dispute.can.escalate || dispute.can.withdraw) && (
           <Card style={styles.options}>
             <Text variant="caption" color="textSecondary" style={styles.strong}>
               Your options
             </Text>
             <Text variant="caption" color="textSecondary">
-              Reply in the thread with your side and any photos. Or:
+              Reply in the thread with your side and any photos. Book My Tech decides the outcome
+              if it comes to that. You can also:
             </Text>
             {dispute.can.offerRedo && (
               <Button
@@ -314,24 +314,6 @@ export default function DisputeScreen() {
                 }
               >
                 Ask Book My Tech to step in
-              </Button>
-            )}
-            {dispute.can.acceptRefund && refund != null && (
-              <Button
-                variant="destructive"
-                disabled={busy !== null}
-                loading={busy === 'refund'}
-                onPress={() =>
-                  confirm(
-                    `Accept the ${formatPence(refund)} refund?`,
-                    `${dispute.customerName} is refunded ${formatPence(refund)} and it comes out of your next payout. This closes the dispute and can’t be undone.`,
-                    'Accept refund',
-                    () => void run('refund', () => acceptRefund(id)),
-                    true,
-                  )
-                }
-              >
-                {`Accept refund · ${formatPence(refund)}`}
               </Button>
             )}
             {dispute.can.withdraw && (
