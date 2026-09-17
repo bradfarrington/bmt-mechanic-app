@@ -398,6 +398,8 @@ export const Typography = {
   },
   /** Mechanic app: "You earn" on the offer screen. */
   payout: { fontSize: 56, ...fontFace('display', '800'), letterSpacing: -1.5, lineHeight: 58 },
+  /** Mechanic app: the figure in the middle of the goal ring. */
+  ringValue: { fontSize: 24, ...fontFace('display', '800'), letterSpacing: -0.5, lineHeight: 28 },
   /** Mechanic app: a job's start time in a list row. */
   jobTime: { fontSize: 16, ...fontFace('display', '800'), letterSpacing: -0.3, lineHeight: 20 },
   /** Mechanic app: KPI tile value. */
@@ -681,6 +683,19 @@ export const DetailSizing = {
   addPhotoBorder: 2,
   /** The tick inside a selected review tag */
   chipIcon: 14,
+} as const;
+
+/** Mechanic app: `components/ui/sheet.tsx` — the handle at the top of a bottom sheet. */
+export const Sheet = { grabberWidth: 36, grabberHeight: 4 } as const;
+
+/** Mechanic app: `components/goal-ring.tsx` — today's earnings against the daily goal. */
+export const GoalRing = {
+  size: 120,
+  stroke: 10,
+  track: 'rgba(255, 255, 255, 0.16)',
+  /** Amber on the way there, green once the goal is met */
+  progress: '#F59E0B',
+  met: '#22C55E',
 } as const;
 
 /** Mechanic app: `components/offer-card.tsx` — a live offer in the feed. */

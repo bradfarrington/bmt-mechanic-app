@@ -170,19 +170,52 @@ export async function refreshStripeStatus(): Promise<
     : { ok: false, error: failure(response) };
 }
 
+/** The CRM's bounds on `mechanics.daily_goal_pence`. */
+export const GOAL_MIN_PENCE = 1000;
+export const GOAL_MAX_PENCE = 200_000;
+
+/** What they want to earn in a day — theirs to set, written direct under RLS. */
+export async function updateDailyGoal(
+  mechanicId: string,
+  goalPence: number | null,
+): Promise<ActionResult> {
+  if (goalPence !== null && (goalPence < GOAL_MIN_PENCE || goalPence > GOAL_MAX_PENCE)) {
+    return { ok: false, error: 'Pick a goal between £10 and £2,000.' };
+  }
+
+  const { error } = await supabase
+    .from('mechanics')
+    // Not in the generated types until `npm run db:types` follows the migration.
+    .update({ daily_goal_pence: goalPence } as never)
+    .eq('id', mechanicId);
+
+  return error ? { ok: false, error: FAILED } : { ok: true };
+}
+
+/** When a spell offline should end by itself. The CRM works out `next_shift` from their hours. */
+export type Resume = { minutes: 30 | 60 } | { at: 'next_shift' };
+
 /**
- * Go online or offline. Through the CRM rather than a direct write, although
+ * Go online or offline, optionally coming back by itself. Also how a mechanic
+ * who is already offline sets, changes or clears that timer.
+ *
+ * Through the CRM rather than a direct write, although
  * RLS would allow one: the CRM refuses `online` without payouts, and on going
  * online re-offers any booking still waiting for a mechanic. A direct write
  * would skip both.
  */
 export async function setOnlineStatus(
   status: 'online' | 'offline',
-): Promise<{ ok: true; status: 'online' | 'offline' } | { ok: false; error: string }> {
-  const response = await api.post<{ status: 'online' | 'offline' }>('/mechanic/status', {
-    status,
-  });
+  resume?: Resume,
+): Promise<
+  | { ok: true; status: 'online' | 'offline'; resumeAt: string | null }
+  | { ok: false; error: string }
+> {
+  const response = await api.post<{ status: 'online' | 'offline'; resumeAt?: string | null }>(
+    '/mechanic/status',
+    { status, ...(status === 'offline' && resume ? { resume } : {}) },
+  );
   return response.ok
-    ? { ok: true, status: response.data.status }
+    ? { ok: true, status: response.data.status, resumeAt: response.data.resumeAt ?? null }
     : { ok: false, error: failure(response) };
 }

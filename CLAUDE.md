@@ -43,6 +43,8 @@ lib helper, a config choice — copy that rather than inventing a second way.
   the CRM every 10s while Today is focused (the CRM does not use Supabase
   Realtime). Never read an offered booking from `bookings`: before acceptance
   the customer's name, phone and address are not the mechanic's to see.
+- `src/lib/summary.ts` — the CRM's half of a day (`GET /mechanic/summary`):
+  distances, leave-by, accept rate and totals. The app never geocodes.
 - `src/lib/jobs.ts` — the mechanic's own bookings, read direct under RLS.
 - `src/lib/push.ts` — Expo push via `/mechanic/devices`, Android channel
   `offers`; a tapped offer push opens `/offer/[id]`.

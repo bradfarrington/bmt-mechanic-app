@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   mono: Typography.mono,
   monoSm: Typography.monoSm,
   payout: Typography.payout,
+  ringValue: Typography.ringValue,
   jobTime: Typography.jobTime,
   kpiLabel: Typography.kpiLabel,
   kpiValue: Typography.kpiValue,

@@ -37,7 +37,9 @@ Notifications.setNotificationHandler({
  * Android 8+ refuses to show anything without a channel. The CRM addresses
  * offer pushes to this exact id.
  */
-const ANDROID_CHANNEL = 'offers';
+const OFFERS_CHANNEL = 'offers';
+/** Everything that is not a race — tomorrow's running order, the end-of-day recap, back online. */
+const UPDATES_CHANNEL = 'updates';
 
 export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 
@@ -70,10 +72,14 @@ export async function registerForPush(): Promise<RegisterResult> {
 
   if (Platform.OS === 'android') {
     // Before the token: Android 13+ wants at least one channel first.
-    await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL, {
+    await Notifications.setNotificationChannelAsync(OFFERS_CHANNEL, {
       name: 'Job offers',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
+    });
+    await Notifications.setNotificationChannelAsync(UPDATES_CHANNEL, {
+      name: 'Your day',
+      importance: Notifications.AndroidImportance.DEFAULT,
     });
   }
 
@@ -135,19 +141,30 @@ export async function unregisterForPush() {
   }
 }
 
+/** Where a tapped notification leads. */
+export type PushLink =
+  | { type: 'offer'; offerId: string }
+  | { type: 'tomorrow' | 'recap'; day?: string };
+
 /**
- * The offer a tapped notification points at, or null.
- *
- * The CRM sends `data: { type: 'offer', offerId }`; anything else is simply
- * not a deep link.
+ * The CRM's `data` payload, read defensively: `{ type: 'offer', offerId }`,
+ * `{ type: 'tomorrow' | 'recap', day }`. Anything else — including
+ * `{ type: 'status' }`, which only needs the app opening — is not a deep link.
  */
-export function offerIdFromResponse(
+export function linkFromResponse(
   response: Notifications.NotificationResponse | null | undefined,
-): string | null {
+): PushLink | null {
   const data = response?.notification.request.content.data as
-    | { type?: unknown; offerId?: unknown }
+    | { type?: unknown; offerId?: unknown; day?: unknown }
     | undefined;
-  return data?.type === 'offer' && typeof data.offerId === 'string' ? data.offerId : null;
+
+  if (data?.type === 'offer' && typeof data.offerId === 'string') {
+    return { type: 'offer', offerId: data.offerId };
+  }
+  if (data?.type === 'tomorrow' || data?.type === 'recap') {
+    return { type: data.type, day: typeof data.day === 'string' ? data.day : undefined };
+  }
+  return null;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { formatLondon, londonInstant, londonParts } from '@/lib/london-time';
+import { dayInstant, formatLondon, londonDayKey, londonInstant, londonParts } from '@/lib/london-time';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -97,6 +97,37 @@ export async function loadToday(
       weekJobs: week.data.length,
     },
   };
+}
+
+/** A London day's jobs, earliest first, cancelled ones left out. `day` is a `YYYY-MM-DD` key. */
+export async function loadDay(
+  mechanicId: string,
+  day: string,
+): Promise<{ ok: true; jobs: Job[] } | { ok: false; error: string }> {
+  // A day key reads as London noon; its calendar day is what matters.
+  const at = dayInstant(day);
+  if (!at) return { ok: false, error: 'That day isn’t valid.' };
+  const { start, end } = londonDay(at);
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(JOB_COLUMNS)
+    .eq('mechanic_id', mechanicId)
+    .in('status', [...OPEN, 'completed'])
+    .gte('scheduled_at', start.toISOString())
+    .lt('scheduled_at', end.toISOString())
+    .order('scheduled_at', { ascending: true })
+    .returns<Job[]>();
+
+  return error
+    ? { ok: false, error: "Couldn't load those jobs. Try again in a moment." }
+    : { ok: true, jobs: data };
+}
+
+/** The London day after `now`, as a key. */
+export function tomorrowKey(now: Date = new Date()) {
+  const { year, month, day } = londonParts(now);
+  return londonDayKey(londonInstant(year, month, day + 1, 12));
 }
 
 export function isOpen(job: Pick<Job, 'status'>) {

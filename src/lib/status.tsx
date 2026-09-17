@@ -2,7 +2,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import { Alert } from 'react-native';
 
 import { useAuth } from '@/lib/auth';
-import { setOnlineStatus } from '@/lib/mechanic';
+import { setOnlineStatus, type Resume } from '@/lib/mechanic';
 
 /**
  * What the mechanic is doing right now — the tab bar's centre button shows it
@@ -20,6 +20,13 @@ interface StatusValue {
   pending: boolean;
   /** Online ↔ Offline. Does nothing while on a job or locked. */
   toggle: () => void;
+  /**
+   * Go offline — or, already offline, set when to come back. `resume` omitted
+   * means until they say otherwise, which also cancels a timer.
+   */
+  goOffline: (resume?: Resume) => void;
+  /** When a timed spell offline ends, if one is running. */
+  resumeAt: string | null;
 }
 
 const StatusContext = createContext<StatusValue | null>(null);
@@ -43,12 +50,11 @@ export function StatusProvider({ children }: { children: ReactNode }) {
   const togglable = stored === 'online' || stored === 'offline';
   const status = togglable && requested ? requested : stored;
 
-  async function toggle() {
+  async function change(next: 'online' | 'offline', resume?: Resume) {
     if (!togglable || requested) return;
-    const next = stored === 'online' ? 'offline' : 'online';
     setRequested(next);
 
-    const result = await setOnlineStatus(next);
+    const result = await setOnlineStatus(next, resume);
     if (result.ok) {
       await refreshMechanic();
     } else {
@@ -57,8 +63,18 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     setRequested(null);
   }
 
+  const resumeAt = status === 'offline' ? (mechanic?.resume_online_at ?? null) : null;
+
   return (
-    <StatusContext.Provider value={{ status, pending: requested !== null, toggle }}>
+    <StatusContext.Provider
+      value={{
+        status,
+        pending: requested !== null,
+        toggle: () => void change(stored === 'online' ? 'offline' : 'online'),
+        goOffline: (resume) => void change('offline', resume),
+        resumeAt,
+      }}
+    >
       {children}
     </StatusContext.Provider>
   );

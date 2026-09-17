@@ -1,11 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
-import { Power, Wrench, type LucideIcon } from 'lucide-react-native';
+import { Calendar, Clock, Power, Wrench, type LucideIcon } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { Animated, Pressable, StyleSheet, View } from 'react-native';
 
+import { ChoiceList, type ChoiceItem } from '@/components/choice-list';
 import { Icon } from '@/components/ui/icon';
+import { Sheet } from '@/components/ui/sheet';
 import { Text } from '@/components/ui/text';
 import {
   BrandGradient,
@@ -129,7 +131,8 @@ function OnlineHalo() {
  */
 export function TabBar({ state, navigation, insets, items }: TabBarProps) {
   const router = useRouter();
-  const { status, pending, toggle } = useStatus();
+  const { status, pending, toggle, goOffline } = useStatus();
+  const [sheetOpen, setSheetOpen] = useState(false);
   const look = LOOKS[status];
   // On a job there is nothing to press; locked, the button leads to the fix.
   const pressable = status !== 'on_job' && !pending;
@@ -138,6 +141,38 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
     if (status === 'locked') router.push('/payouts');
     else toggle();
   }
+
+  // Long-press: step away for a while and come back without having to remember.
+  const canSchedule = (status === 'online' || status === 'offline') && !pending;
+  const pick = (action: () => void) => () => {
+    setSheetOpen(false);
+    action();
+  };
+  // Offline, the same three timers mean "come back then" — the CRM keeps them.
+  const lead = status === 'online' ? 'Go offline' : 'Go online';
+  const choices: ChoiceItem[] = [
+    ...(status === 'online'
+      ? []
+      : [{ key: 'now', icon: Power, label: 'Go online now', onPress: pick(toggle) }]),
+    {
+      key: '30',
+      icon: Clock,
+      label: `${lead} ${status === 'online' ? 'for' : 'in'} 30 min`,
+      onPress: pick(() => goOffline({ minutes: 30 })),
+    },
+    {
+      key: '60',
+      icon: Clock,
+      label: `${lead} ${status === 'online' ? 'for' : 'in'} 1 hour`,
+      onPress: pick(() => goOffline({ minutes: 60 })),
+    },
+    {
+      key: 'shift',
+      icon: Calendar,
+      label: `${lead} ${status === 'online' ? 'until' : 'at'} my next shift`,
+      onPress: pick(() => goOffline({ at: 'next_shift' })),
+    },
+  ];
 
   const half = Math.ceil(items.length / 2);
 
@@ -215,9 +250,11 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
         <View style={[styles.fabRing, look.shadow]}>
           <Pressable
             onPress={onStatusPress}
+            onLongPress={canSchedule ? () => setSheetOpen(true) : undefined}
             disabled={!pressable}
             accessibilityRole="button"
             accessibilityLabel={look.accessibilityLabel}
+            accessibilityHint={canSchedule ? 'Long press for timed options' : undefined}
             accessibilityState={{ disabled: !pressable, busy: pending }}
             style={({ pressed }) => pressed && styles.pressed}
           >
@@ -236,6 +273,14 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
           </Pressable>
         </View>
       </View>
+
+      <Sheet
+        visible={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        title={status === 'online' ? 'Take a break' : 'Back to work'}
+      >
+        <ChoiceList items={choices} />
+      </Sheet>
     </View>
   );
 }

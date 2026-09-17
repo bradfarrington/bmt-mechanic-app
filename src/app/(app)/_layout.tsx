@@ -17,6 +17,15 @@ export default function AppLayout() {
         name="offer/[id]"
         options={{ animation: 'slide_from_bottom', gestureDirection: 'vertical' }}
       />
+      {/* Both open from a push as well as from inside the app. */}
+      <Stack.Screen
+        name="tomorrow"
+        options={{ animation: 'slide_from_bottom', gestureDirection: 'vertical' }}
+      />
+      <Stack.Screen
+        name="recap"
+        options={{ animation: 'slide_from_bottom', gestureDirection: 'vertical' }}
+      />
     </Stack>
   );
 }

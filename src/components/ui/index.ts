@@ -10,6 +10,7 @@ export { PasswordStrength, type PasswordStrengthProps } from '@/components/ui/pa
 export { Pill, type PillProps } from '@/components/ui/pill';
 export { PulseDot, type PulseDotProps } from '@/components/ui/pulse-dot';
 export { Screen, type ScreenProps } from '@/components/ui/screen';
+export { Sheet, type SheetProps } from '@/components/ui/sheet';
 export { Slider, type SliderProps } from '@/components/ui/slider';
 export { Stepper, type StepperProps } from '@/components/ui/stepper';
 export { Text, type TextProps, type TextVariant } from '@/components/ui/text';

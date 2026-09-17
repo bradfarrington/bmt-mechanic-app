@@ -3,10 +3,11 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import type { Session } from '@supabase/supabase-js';
 
-import { offerIdFromResponse, getPushPermission, registerForPush } from '@/lib/push';
+import { linkFromResponse, getPushPermission, registerForPush } from '@/lib/push';
 
 /**
- * A tapped notification opens its offer.
+ * A tapped notification opens what it is about — an offer, tomorrow's running
+ * order, or the end-of-day recap.
  *
  * Two paths, because the listener does not fire when the tap is what launched
  * the app: `getLastNotificationResponseAsync` covers the cold start, the
@@ -23,9 +24,13 @@ export function usePushDeepLinks() {
 
   useEffect(() => {
     const open = (response: Notifications.NotificationResponse | null | undefined) => {
-      const offerId = offerIdFromResponse(response);
-      if (offerId) {
-        router.push({ pathname: '/offer/[id]', params: { id: offerId } });
+      const link = linkFromResponse(response);
+      if (!link) return;
+
+      if (link.type === 'offer') {
+        router.push({ pathname: '/offer/[id]', params: { id: link.offerId } });
+      } else {
+        router.push({ pathname: `/${link.type}`, params: link.day ? { day: link.day } : {} });
       }
     };
 
