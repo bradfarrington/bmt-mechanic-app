@@ -39,6 +39,13 @@ lib helper, a config choice — copy that rather than inventing a second way.
   `src/lib/api.ts` to the CRM's `/api/mobile/v1/mechanic/*`.
 - `src/lib/status.tsx` — Online / Offline / On a job / Locked, derived from the
   `mechanics` row. Going online goes through the CRM, never a direct write.
+- `src/lib/offers.ts` + `src/hooks/use-offers.ts` — live offers, **polled** from
+  the CRM every 10s while Today is focused (the CRM does not use Supabase
+  Realtime). Never read an offered booking from `bookings`: before acceptance
+  the customer's name, phone and address are not the mechanic's to see.
+- `src/lib/jobs.ts` — the mechanic's own bookings, read direct under RLS.
+- `src/lib/push.ts` — Expo push via `/mechanic/devices`, Android channel
+  `offers`; a tapped offer push opens `/offer/[id]`.
 - `src/app/index.tsx` — entry router: sign-in, first-run setup (`(onboarding)`)
   or Today. Saved working hours are the "has onboarded" signal.
 - `docs/*-crm-prompt.md` — work the CRM repo needs for this app, written as
@@ -67,6 +74,7 @@ npm run start      # Metro only, against an already-installed dev build
 npm run web        # web target
 npm run lint       # expo lint
 npx tsc --noEmit   # typecheck (keep clean)
+npm run db:types   # regenerate src/types/database.ts after a CRM migration
 npx expo export --platform ios   # verify the iOS bundle builds
 ```
 

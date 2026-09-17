@@ -83,6 +83,9 @@ const styles = StyleSheet.create({
   pillLg: Typography.pillLg,
   cardNumber: Typography.cardNumber,
   mono: Typography.mono,
+  monoSm: Typography.monoSm,
+  payout: Typography.payout,
+  jobTime: Typography.jobTime,
   kpiLabel: Typography.kpiLabel,
   kpiValue: Typography.kpiValue,
 });

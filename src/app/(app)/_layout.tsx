@@ -10,5 +10,13 @@ export default function AppLayout() {
     return <Redirect href="/login" />;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      {/* Rises over the tabs like a sheet, from the feed or from a push. */}
+      <Stack.Screen
+        name="offer/[id]"
+        options={{ animation: 'slide_from_bottom', gestureDirection: 'vertical' }}
+      />
+    </Stack>
+  );
 }

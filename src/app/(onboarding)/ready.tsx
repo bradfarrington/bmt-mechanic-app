@@ -1,10 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ArrowRight, BellRing, MapPin, Power, type LucideIcon } from 'lucide-react-native';
+import { ArrowRight, MapPin, Power, type LucideIcon } from 'lucide-react-native';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { PushPrompt } from '@/components/push-prompt';
 import { Button, Icon, IconTile, Text } from '@/components/ui';
 import {
   BrandGradientDeep,
@@ -20,11 +21,6 @@ import {
 import { useAuth } from '@/lib/auth';
 
 const NEXT: readonly { icon: LucideIcon; title: string; body: string }[] = [
-  {
-    icon: BellRing,
-    title: 'Notifications',
-    body: 'We’ll ask to send them, so you hear about offers when the app is closed.',
-  },
   {
     icon: MapPin,
     title: 'Location while working',
@@ -73,6 +69,11 @@ export default function ReadyScreen() {
               'status button stays locked — tap it to finish.'}
         </Text>
       </View>
+
+      <PushPrompt
+        onDark
+        reason="Otherwise you’ll miss offers when the app is closed. First to accept wins."
+      />
 
       {NEXT.map((item) => (
         <View key={item.title} style={styles.card}>

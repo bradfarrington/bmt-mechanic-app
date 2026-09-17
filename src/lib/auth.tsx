@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { unregisterForPush } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
 
@@ -225,6 +226,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
 
       async signOut() {
+        // Before the session goes — the removal call needs the token. A shared
+        // phone must not keep getting the previous mechanic's offers.
+        await unregisterForPush();
         await supabase.auth.signOut();
       },
 

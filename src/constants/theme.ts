@@ -386,6 +386,8 @@ export const Typography = {
   cardNumber: { fontSize: 16, ...fontFace('display', '700'), letterSpacing: 2, lineHeight: 22 },
   /** Mechanic app: an identifier — a job ID, a reg in a row, an account number. */
   mono: { fontSize: 13, ...fontFace('mono', '700'), lineHeight: 18 },
+  /** Mechanic app: a reg inline in a caption. */
+  monoSm: { fontSize: 12, ...fontFace('mono', '600'), lineHeight: 17 },
   /** Mechanic app: KPI tile label — 9.5pt Inter 700, uppercase. */
   kpiLabel: {
     fontSize: 9.5,
@@ -394,6 +396,10 @@ export const Typography = {
     textTransform: 'uppercase',
     lineHeight: 13,
   },
+  /** Mechanic app: "You earn" on the offer screen. */
+  payout: { fontSize: 56, ...fontFace('display', '800'), letterSpacing: -1.5, lineHeight: 58 },
+  /** Mechanic app: a job's start time in a list row. */
+  jobTime: { fontSize: 16, ...fontFace('display', '800'), letterSpacing: -0.3, lineHeight: 20 },
   /** Mechanic app: KPI tile value. */
   kpiValue: { fontSize: 18, ...fontFace('display', '800'), letterSpacing: -0.3, lineHeight: 24 },
 } as const;
@@ -675,6 +681,23 @@ export const DetailSizing = {
   addPhotoBorder: 2,
   /** The tick inside a selected review tag */
   chipIcon: 14,
+} as const;
+
+/** Mechanic app: `components/offer-card.tsx` — a live offer in the feed. */
+export const OfferCard = {
+  /** Map-pin and clock beside the where and when */
+  metaIcon: 12,
+  /** Width of the red halo round a fresh offer */
+  halo: 4,
+} as const;
+
+/** Mechanic app: the offer screen — the payout set large on the brand gradient. */
+export const OfferHero = {
+  tile: 66,
+  tileRadius: 18,
+  glyph: 32,
+  detailIcon: 16,
+  acceptHeight: 60,
 } as const;
 
 /** Mechanic app: the green power button on "You're all set." and its halo. */

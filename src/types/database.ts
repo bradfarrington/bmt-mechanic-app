@@ -2287,6 +2287,45 @@ export type Database = {
           },
         ]
       }
+      mechanic_push_tokens: {
+        Row: {
+          created_at: string
+          last_seen_at: string
+          mechanic_id: string
+          platform: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          last_seen_at?: string
+          mechanic_id: string
+          platform: string
+          token: string
+        }
+        Update: {
+          created_at?: string
+          last_seen_at?: string
+          mechanic_id?: string
+          platform?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mechanic_push_tokens_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: false
+            referencedRelation: "mechanic_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mechanic_push_tokens_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: false
+            referencedRelation: "mechanics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mechanic_suspensions: {
         Row: {
           id: string

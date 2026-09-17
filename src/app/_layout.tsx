@@ -23,6 +23,7 @@ import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { Palette } from '@/constants/theme';
+import { usePushDeepLinks, usePushRegistration } from '@/hooks/use-push';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { StatusProvider } from '@/lib/status';
 
@@ -33,7 +34,7 @@ import { StatusProvider } from '@/lib/status';
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
-  const { initialising } = useAuth();
+  const { initialising, session } = useAuth();
 
   // Registered under the face names `fontFace` in `constants/theme.ts` hands out.
   const [fontsLoaded, fontError] = useFonts({
@@ -58,6 +59,11 @@ function RootNavigator() {
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
   }, [ready]);
+
+  // A tapped notification opens its offer; a signed-in device keeps its token
+  // on file with the CRM. Neither prompts — see `components/push-prompt`.
+  usePushDeepLinks();
+  usePushRegistration(session);
 
   if (!ready) return null;
 
