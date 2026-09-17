@@ -4,6 +4,40 @@ Last updated **2026-09-17**, end of day. Read this first when picking the work
 up, on this machine or a new one. `CLAUDE.md` explains how the code is laid
 out; `design/README.md` has the mockup → screen map and the build order.
 
+## Start here next session
+
+In this order. Tick them off and update this file as you go.
+
+1. **Get the CRM's reply to the inbox prompt** (`docs/inbox-crm-prompt.md` was
+   running in the `bookmytech` repo when we stopped on 2026-09-17). Brad pastes
+   it into the app session. Apply whatever it says it changed — paths, field
+   names, refusal codes — in `src/lib/inbox.ts`, `src/lib/disputes.ts`,
+   `src/lib/cases.ts`, `src/lib/uploads.ts` and the screens that use them.
+2. **Brad applies the SQL it gives.** It should include CRM migration 0032:
+   production has no `resolution_reasons` / `resolution_cases` /
+   `resolution_messages` tables, so "Get help" cannot work until it is applied.
+   If the reply does not mention 0032, ask the CRM session about it again.
+3. **`npm run db:types`**, then remove the two stand-ins:
+   - `src/lib/cases.ts` — the hand-written `CaseReason` / `HelpCase` /
+     `CaseMessage` types and the untyped `db` client → use the generated types.
+   - `src/lib/disputes.ts` — the defensive read of `dispute_messages.photos` /
+     `visible_to` in `fetchDisputeThread`.
+   Then `npx tsc --noEmit`, `npm run lint`, commit and push to `inbox`.
+4. **Check CRM Task 68 is live.** Commit `38f67bd` (faults, revisions, end on
+   site, part status, running late) was not pushed or deployed when it was
+   reported. Until it is, those screens answer with an error.
+5. **Start step 8, the Account tail**, on a new branch `account` off `inbox` —
+   see "Next" at the bottom of this file. Same routine as every other step:
+   read the mockup, read how the CRM's web mechanic pages do it, write
+   `docs/account-crm-prompt.md`, build the app against it, check the layouts
+   with fake data, commit and push, hand Brad the one-line prompt to run.
+6. When step 8 lands, point `src/lib/links.ts` at the real earnings, reviews and
+   documents screens instead of the Account tab.
+
+Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
+outside the code". Nothing has run on a device yet; the sooner it does, the
+less there is to unpick.
+
 ## Picking up on a new machine
 
 ```bash
