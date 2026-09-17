@@ -354,6 +354,7 @@ export default function TodayScreen() {
               job={job}
               next={job.id === nextId}
               distance={distanceFor(extras, job.id)}
+              onPress={() => router.push({ pathname: '/jobs/[id]', params: { id: job.id } })}
             />
           ))}
         </View>

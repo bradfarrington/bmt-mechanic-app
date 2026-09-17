@@ -1,4 +1,5 @@
 import { dayInstant, formatLondon, londonDayKey, londonInstant, londonParts } from '@/lib/london-time';
+import type { Tone } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -9,7 +10,7 @@ import { supabase } from '@/lib/supabase';
 const JOB_COLUMNS =
   'id, job_number, status, scheduled_at, slot_window, candidate_days, repair_description, ' +
   'vehicle_make, vehicle_model, vehicle_reg, postcode, area, mechanic_payout_pence, ' +
-  'service_duration_hours, completed_at';
+  'service_duration_hours, completed_at, customer_name';
 
 export interface Job {
   id: string;
@@ -27,6 +28,8 @@ export interface Job {
   mechanic_payout_pence: number | null;
   service_duration_hours: number | null;
   completed_at: string | null;
+  /** Theirs to see once the job is assigned to them. */
+  customer_name: string | null;
 }
 
 /** Work still to do, or under way. */
@@ -40,11 +43,12 @@ function londonDay(at: Date) {
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-/** Monday 00:00 London of the week containing `at`. */
-function londonWeekStart(at: Date) {
+/** Monday 00:00 to the next Monday 00:00, London, for the week containing `at`. */
+function londonWeek(at: Date) {
   const { year, month, day } = londonParts(at);
-  const sinceMonday = Math.max(0, WEEKDAYS.indexOf(formatLondon(at, { weekday: 'short' })));
-  return londonInstant(year, month, day - sinceMonday);
+  const monday = day - Math.max(0, WEEKDAYS.indexOf(formatLondon(at, { weekday: 'short' })));
+  // By calendar day, not by adding hours: a week with a clock change is not 168 of them.
+  return { start: londonInstant(year, month, monday), end: londonInstant(year, month, monday + 7) };
 }
 
 export interface TodaySummary {
@@ -78,7 +82,7 @@ export async function loadToday(
       .select('mechanic_payout_pence')
       .eq('mechanic_id', mechanicId)
       .eq('status', 'completed')
-      .gte('completed_at', londonWeekStart(now).toISOString()),
+      .gte('completed_at', londonWeek(now).start.toISOString()),
   ]);
 
   if (today.error || week.error) {
@@ -122,6 +126,64 @@ export async function loadDay(
   return error
     ? { ok: false, error: "Couldn't load those jobs. Try again in a moment." }
     : { ok: true, jobs: data };
+}
+
+export type JobRange = 'today' | 'week' | 'past';
+
+/**
+ * The schedule. `today` and `week` (Monday to Sunday, London) run earliest
+ * first; `past` is the last 50 finished or cancelled jobs, newest first.
+ */
+export async function loadJobs(
+  mechanicId: string,
+  range: JobRange,
+  now: Date = new Date(),
+): Promise<{ ok: true; jobs: Job[] } | { ok: false; error: string }> {
+  let query = supabase.from('bookings').select(JOB_COLUMNS).eq('mechanic_id', mechanicId);
+
+  if (range === 'past') {
+    query = query
+      .in('status', ['completed', 'cancelled'])
+      .order('scheduled_at', { ascending: false })
+      .limit(50);
+  } else {
+    const { start, end } = range === 'today' ? londonDay(now) : londonWeek(now);
+    query = query
+      .in('status', [...OPEN, 'completed'])
+      .gte('scheduled_at', start.toISOString())
+      .lt('scheduled_at', end.toISOString())
+      .order('scheduled_at', { ascending: true });
+  }
+
+  const { data, error } = await query.returns<Job[]>();
+  return error
+    ? { ok: false, error: "Couldn't load your jobs. Pull down to try again." }
+    : { ok: true, jobs: data };
+}
+
+/** "Hannah R" — enough to recognise a customer in a list without printing their surname. */
+export function customerShortName(job: Pick<Job, 'customer_name'>) {
+  const parts = job.customer_name?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (parts.length === 0) return null;
+  const [first, ...rest] = parts;
+  const last = rest[rest.length - 1];
+  return last ? `${first} ${last[0]?.toUpperCase()}` : first;
+}
+
+/** How a status reads on a pill, and the pill's tone. */
+export function jobStatusMeta(status: string): { label: string; tone: Tone; live?: boolean } {
+  switch (status) {
+    case 'en_route':
+      return { label: 'En route', tone: 'active', live: true };
+    case 'in_progress':
+      return { label: 'Working', tone: 'pending', live: true };
+    case 'completed':
+      return { label: 'Complete', tone: 'success' };
+    case 'cancelled':
+      return { label: 'Cancelled', tone: 'error' };
+    default:
+      return { label: 'Confirmed', tone: 'active' };
+  }
 }
 
 /** The London day after `now`, as a key. */
