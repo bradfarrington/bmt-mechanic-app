@@ -15,15 +15,7 @@ import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
-/**
- * `daily_goal_pence` and `resume_online_at` arrive with the CRM's Today-extras
- * migration; until the generated types catch up (`npm run db:types`) they are
- * declared here, optional so a database without them still reads cleanly.
- */
-export type Mechanic = Database['public']['Tables']['mechanics']['Row'] & {
-  daily_goal_pence?: number | null;
-  resume_online_at?: string | null;
-};
+export type Mechanic = Database['public']['Tables']['mechanics']['Row'];
 
 export interface AuthState {
   session: Session | null;

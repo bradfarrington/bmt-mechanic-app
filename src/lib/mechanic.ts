@@ -185,8 +185,7 @@ export async function updateDailyGoal(
 
   const { error } = await supabase
     .from('mechanics')
-    // Not in the generated types until `npm run db:types` follows the migration.
-    .update({ daily_goal_pence: goalPence } as never)
+    .update({ daily_goal_pence: goalPence })
     .eq('id', mechanicId);
 
   return error ? { ok: false, error: FAILED } : { ok: true };

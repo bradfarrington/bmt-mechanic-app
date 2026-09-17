@@ -2035,6 +2035,42 @@ export type Database = {
           },
         ]
       }
+      mechanic_daily_pushes: {
+        Row: {
+          day: string
+          kind: string
+          mechanic_id: string
+          sent_at: string
+        }
+        Insert: {
+          day: string
+          kind: string
+          mechanic_id: string
+          sent_at?: string
+        }
+        Update: {
+          day?: string
+          kind?: string
+          mechanic_id?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mechanic_daily_pushes_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: false
+            referencedRelation: "mechanic_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mechanic_daily_pushes_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: false
+            referencedRelation: "mechanics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mechanic_documents: {
         Row: {
           created_at: string
@@ -2408,6 +2444,7 @@ export type Database = {
           base_postcode: string | null
           bio: string | null
           created_at: string
+          daily_goal_pence: number | null
           id: string
           is_pro: boolean
           is_suspended: boolean
@@ -2415,6 +2452,7 @@ export type Database = {
           last_seen_at: string | null
           online_at: string | null
           rating: number
+          resume_online_at: string | null
           service_radius_miles: number
           specialisms: string[]
           status: string
@@ -2430,6 +2468,7 @@ export type Database = {
           base_postcode?: string | null
           bio?: string | null
           created_at?: string
+          daily_goal_pence?: number | null
           id: string
           is_pro?: boolean
           is_suspended?: boolean
@@ -2437,6 +2476,7 @@ export type Database = {
           last_seen_at?: string | null
           online_at?: string | null
           rating?: number
+          resume_online_at?: string | null
           service_radius_miles?: number
           specialisms?: string[]
           status?: string
@@ -2452,6 +2492,7 @@ export type Database = {
           base_postcode?: string | null
           bio?: string | null
           created_at?: string
+          daily_goal_pence?: number | null
           id?: string
           is_pro?: boolean
           is_suspended?: boolean
@@ -2459,6 +2500,7 @@ export type Database = {
           last_seen_at?: string | null
           online_at?: string | null
           rating?: number
+          resume_online_at?: string | null
           service_radius_miles?: number
           specialisms?: string[]
           status?: string
