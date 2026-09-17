@@ -128,10 +128,12 @@ export async function setArrivalWindow(
   return response.ok ? { ok: true } : failure(response);
 }
 
+/** "£72", "£1,240", "£54.50" — whole pounds unless there are pence to show. */
 export function formatPence(pence: number | null | undefined) {
   if (pence == null) return '—';
   const pounds = pence / 100;
-  return `£${Number.isInteger(pounds) ? pounds : pounds.toFixed(2)}`;
+  const digits = Number.isInteger(pounds) ? 0 : 2;
+  return `£${pounds.toLocaleString('en-GB', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
 /** "New" for the first minute, then "3m ago", "2h ago". */

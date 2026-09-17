@@ -117,13 +117,17 @@ export default function TodayScreen() {
       back={false}
       action={
         status === 'online' ? (
-          <Pill tone="success" pulse>
+          <Pill tone="success" pulse style={styles.headerPill}>
             Online
           </Pill>
         ) : status === 'on_job' ? (
-          <Pill tone="active">On a job</Pill>
+          <Pill tone="active" style={styles.headerPill}>
+            On a job
+          </Pill>
         ) : (
-          <Pill tone="neutral">Offline</Pill>
+          <Pill tone="neutral" style={styles.headerPill}>
+            Offline
+          </Pill>
         )
       }
       refreshControl={
@@ -296,6 +300,8 @@ export default function TodayScreen() {
 }
 
 const styles = StyleSheet.create({
+  // A pill pins itself to the top of a row; the header centres its children.
+  headerPill: { alignSelf: 'center' },
   intro: { gap: Spacing[1] / 2 },
   stack: { gap: Spacing[3] },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing[3] },
