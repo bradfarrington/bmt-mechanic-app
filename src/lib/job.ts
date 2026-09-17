@@ -78,6 +78,8 @@ export interface JobRecord {
   parts: JobPart[];
   quotes: JobQuote[];
   faults: JobFault[];
+  /** The dispute on this job, if one has ever been opened — a booking can only have one. */
+  disputeId: string | null;
 }
 
 /** The photos bucket is public; its keys are unguessable booking UUIDs. */
@@ -86,7 +88,7 @@ const MEDIA_BUCKET = 'job-media';
 export async function loadJob(
   bookingId: string,
 ): Promise<{ ok: true; job: JobRecord } | { ok: false; error: string; missing?: boolean }> {
-  const [booking, media, parts, quotes, faults] = await Promise.all([
+  const [booking, media, parts, quotes, faults, dispute] = await Promise.all([
     supabase
       .from('bookings')
       .select(BOOKING_COLUMNS)
@@ -113,6 +115,7 @@ export async function loadJob(
       .select('id, description, severity, quote_id, created_at')
       .eq('booking_id', bookingId)
       .order('created_at', { ascending: true }),
+    supabase.from('disputes').select('id').eq('booking_id', bookingId).maybeSingle(),
   ]);
 
   if (booking.error) {
@@ -134,6 +137,7 @@ export async function loadJob(
       parts: parts.data ?? [],
       quotes: quotes.data ?? [],
       faults: faults.data ?? [],
+      disputeId: dispute.data?.id ?? null,
     },
   };
 }

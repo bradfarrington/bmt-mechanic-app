@@ -24,6 +24,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Palette } from '@/constants/theme';
 import { usePushDeepLinks, usePushRegistration } from '@/hooks/use-push';
 import { AuthProvider, useAuth } from '@/lib/auth';
+import { InboxProvider } from '@/lib/inbox-state';
 import { StatusProvider } from '@/lib/status';
 
 // Hold the splash until the persisted session and its mechanic record are
@@ -83,7 +84,10 @@ export default function RootLayout() {
       <AuthProvider>
         {/* Above the navigator: the tab bar and the job screens both read it. */}
         <StatusProvider>
-          <RootNavigator />
+          {/* Shared by the Inbox tab and the tab bar's unread dot. */}
+          <InboxProvider>
+            <RootNavigator />
+          </InboxProvider>
         </StatusProvider>
       </AuthProvider>
     </SafeAreaProvider>

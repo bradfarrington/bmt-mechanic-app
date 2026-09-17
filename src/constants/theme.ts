@@ -574,6 +574,8 @@ export const TabBar = {
   fabLift: 20,
   fabIconSize: 26,
   fabIconStroke: 2.6,
+  /** Mechanic app: the Inbox tab's unread dot. */
+  unreadDot: 10,
   /** The Online state's green ring, outside the white one… */
   fabHalo: 5,
   /** …and how long it takes to fade out and back. */

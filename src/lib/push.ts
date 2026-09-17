@@ -4,6 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import { api } from '@/lib/api';
+import type { InboxLink } from '@/lib/inbox';
 
 /**
  * Push notifications — how a mechanic hears about an offer while the app is
@@ -141,34 +142,55 @@ export async function unregisterForPush() {
   }
 }
 
-/** Where a tapped notification leads. */
+/** Where a tapped notification leads. The inbox's links, plus the three that are not inbox rows. */
 export type PushLink =
+  | InboxLink
   | { type: 'offer'; offerId: string }
-  | { type: 'tomorrow' | 'recap'; day?: string }
-  | { type: 'message'; bookingId: string };
+  | { type: 'tomorrow'; day?: string }
+  | { type: 'recap'; day?: string };
 
 /**
- * The CRM's `data` payload, read defensively: `{ type: 'offer', offerId }`,
- * `{ type: 'tomorrow' | 'recap', day }`, `{ type: 'message', bookingId }`. Anything else — including
- * `{ type: 'status' }`, which only needs the app opening — is not a deep link.
+ * The CRM's `data` payload, read defensively. `{ type: 'status' }` and anything
+ * unrecognised only need the app opening, so they are not a link.
  */
 export function linkFromResponse(
   response: Notifications.NotificationResponse | null | undefined,
 ): PushLink | null {
-  const data = response?.notification.request.content.data as
-    | { type?: unknown; offerId?: unknown; day?: unknown; bookingId?: unknown }
-    | undefined;
+  const data = (response?.notification.request.content.data ?? {}) as Record<string, unknown>;
+  const text = (key: string) => (typeof data[key] === 'string' ? (data[key] as string) : null);
 
-  if (data?.type === 'offer' && typeof data.offerId === 'string') {
-    return { type: 'offer', offerId: data.offerId };
+  switch (data.type) {
+    case 'offer': {
+      const offerId = text('offerId');
+      return offerId ? { type: 'offer', offerId } : null;
+    }
+    case 'tomorrow':
+      return { type: 'tomorrow', day: text('day') ?? undefined };
+    case 'recap':
+      return { type: 'recap', day: text('day') ?? undefined };
+    case 'message': {
+      const id = text('bookingId');
+      return id ? { type: 'thread', id } : null;
+    }
+    case 'job': {
+      const id = text('bookingId');
+      return id ? { type: 'job', id } : null;
+    }
+    case 'dispute': {
+      const id = text('disputeId');
+      return id ? { type: 'dispute', id } : null;
+    }
+    case 'case': {
+      const id = text('caseId');
+      return id ? { type: 'case', id } : null;
+    }
+    case 'earnings':
+    case 'reviews':
+    case 'documents':
+      return { type: data.type };
+    default:
+      return null;
   }
-  if (data?.type === 'message' && typeof data.bookingId === 'string') {
-    return { type: 'message', bookingId: data.bookingId };
-  }
-  if (data?.type === 'tomorrow' || data?.type === 'recap') {
-    return { type: data.type, day: typeof data.day === 'string' ? data.day : undefined };
-  }
-  return null;
 }
 
 /**

@@ -19,6 +19,7 @@ import {
   TabBar as TabBarTokens,
   type PaletteColor,
 } from '@/constants/theme';
+import { useInbox } from '@/lib/inbox-state';
 import { useStatus, type MechanicStatus } from '@/lib/status';
 
 export interface TabItem {
@@ -133,6 +134,7 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
   const router = useRouter();
   const { status, pending, toggle, goOffline, activeJobId } = useStatus();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { unreadCount } = useInbox();
   const look = LOOKS[status];
   // On a job the button leads back to it; locked, it leads to the fix.
   const pressable = (status !== 'on_job' || !!activeJobId) && !pending;
@@ -204,9 +206,12 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
         onPress={onPress}
         accessibilityRole="tab"
         accessibilityState={{ selected: focused }}
-        accessibilityLabel={item.label}
+        accessibilityLabel={
+          item.name === 'inbox' && unreadCount > 0 ? `${item.label}, ${unreadCount} unread` : item.label
+        }
         style={styles.tab}
       >
+        {item.name === 'inbox' && unreadCount > 0 && <View style={styles.unread} />}
         <Icon
           icon={item.icon}
           size={TabBarTokens.iconSize}
@@ -305,6 +310,20 @@ const styles = StyleSheet.create({
     height: TabBarTokens.contentHeight,
     alignItems: 'center',
     gap: TabBarTokens.labelGap,
+  },
+  // A dot, not a count: it says "look", and the Inbox says what at.
+  unread: {
+    position: 'absolute',
+    top: 0,
+    left: '50%',
+    marginLeft: TabBarTokens.iconSize / 2 - TabBarTokens.unreadDot / 2,
+    width: TabBarTokens.unreadDot,
+    height: TabBarTokens.unreadDot,
+    borderRadius: TabBarTokens.unreadDot / 2,
+    borderWidth: 1.5,
+    borderColor: Palette.surfaceCard,
+    backgroundColor: Palette.danger,
+    zIndex: 1,
   },
   statusLabel: {
     // Measured from the bar's top edge in the mockup; the row starts below its padding.

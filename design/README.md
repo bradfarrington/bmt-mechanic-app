@@ -103,8 +103,8 @@ Expo Router conventions.
 |---|-------|-------------|
 | 1 | Inbox · unified feed | `src/app/(app)/(tabs)/inbox.tsx` — Inbox tab |
 | 2 | Messages · canned replies | `src/app/(app)/jobs/[id]/messages.tsx` |
-| 3 | Raise a case | `src/app/(app)/cases/new.tsx` |
-| 4 | Dispute · three-way | `src/app/(app)/disputes/[id].tsx` |
+| 3 | Raise a case | `src/app/(app)/cases/new.tsx` — plus `cases/index.tsx` (Get help list) and `cases/[id].tsx` (the thread with BMT) |
+| 4 | Dispute · three-way | `src/app/(app)/disputes/[id].tsx` — plus `disputes/new/[bookingId].tsx` ("Raise an issue" from a job) |
 
 ### 05 — Account & Earnings (`mockups/05-account-earnings.html`)
 

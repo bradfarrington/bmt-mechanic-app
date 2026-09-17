@@ -8,6 +8,8 @@ import {
   ClipboardCheck,
   Clock,
   FilePenLine,
+  LifeBuoy,
+  ShieldAlert,
   Lock,
   MapPin,
   MessageCircle,
@@ -179,7 +181,7 @@ export default function JobScreen() {
     );
   }
 
-  const { booking, photos, parts, quotes, faults } = job;
+  const { booking, photos, parts, quotes, faults, disputeId } = job;
   const money = extras?.money;
   const payout = formatPence(money?.payoutPence ?? booking.mechanic_payout_pence);
   const charge = formatPence(money?.chargePence ?? booking.total_pence);
@@ -915,6 +917,34 @@ export default function JobScreen() {
         >
           Quote a return visit
         </Button>
+      )}
+
+      {/* A dispute puts the customer in the loop; Get help is between the mechanic and BMT. */}
+      {(disputeId || ['en_route', 'in_progress', 'completed'].includes(status)) && (
+        <View style={styles.row}>
+          <Button
+            variant="ghost"
+            size="sm"
+            iconLeft={ShieldAlert}
+            style={styles.grow}
+            onPress={() =>
+              disputeId
+                ? router.push({ pathname: '/disputes/[id]', params: { id: disputeId } })
+                : router.push({ pathname: '/disputes/new/[bookingId]', params: { bookingId: id } })
+            }
+          >
+            {disputeId ? 'View dispute' : 'Raise an issue'}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            iconLeft={LifeBuoy}
+            style={styles.grow}
+            onPress={() => router.push({ pathname: '/cases/new', params: { bookingId: id } })}
+          >
+            Get help from BMT
+          </Button>
+        </View>
       )}
 
       {status === 'completed' && (

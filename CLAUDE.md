@@ -54,6 +54,12 @@ lib helper, a config choice — copy that rather than inventing a second way.
 - `src/lib/location.ts` + `src/hooks/use-journey-sharing.ts` — the mechanic's
   position, upserted to `mechanic_locations` only while a job is `en_route`
   and its screen is open, and deleted when that ends.
+- `src/lib/inbox.ts` + `src/lib/inbox-state.tsx` — the unified feed, built by
+  the CRM (`GET /mechanic/inbox`) and shared by the Inbox tab and the tab bar's
+  unread dot. `src/lib/links.ts` turns an inbox row or a push into a route.
+- `src/lib/disputes.ts` / `src/lib/cases.ts` — a dispute has the customer in
+  it and can move money; a Get-help case is between the mechanic and BMT only.
+  `resolution_*` tables are typed by hand until CRM migration 0032 is applied.
 - `src/lib/messages.ts` — the booking thread; polled, like the CRM's own.
 - `src/lib/push.ts` — Expo push via `/mechanic/devices`, Android channel
   `offers`; a tapped offer push opens `/offer/[id]`.

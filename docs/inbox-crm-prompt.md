@@ -92,6 +92,14 @@ SMS, or not at all (a new review, a payout). Add `sendPushToMechanic` on the
 
 ## 3. Get help — resolution cases (`mechanic`; messages on `message`)
 
+**Check first: the Resolution Center is not live.** The production database has
+no `resolution_reasons`, `resolution_cases` or `resolution_messages` — they are
+absent from `supabase gen types` (2026-09-17), so migration 0032 was never
+applied, and the web "Get help" pages cannot be working. Confirm, and give Brad
+the SQL to apply (0032, plus the `resolution_*` event types in the
+`booking_events` CHECK if those are missing too) along with this task's own
+migration.
+
 `app/actions/resolutions.ts` is cookie-bound with no caller-parameterised core:
 extract one (`openResolutionCaseFor(input, caller)` etc.) and have the server
 actions call it. Note the `resolution_reasons` SELECT policy keys on
