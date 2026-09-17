@@ -75,8 +75,8 @@ Expo Router conventions.
 
 | # | Frame | Target path |
 |---|-------|-------------|
-| 1 | Today · online | `src/app/(app)/(tabs)/index.tsx` — Home tab |
-| 2 | Live offers | `src/app/(app)/(tabs)/index.tsx` (offers section) or `offers.tsx` |
+| 1 | Today · online | `src/app/(app)/(tabs)/today.tsx` — Today tab |
+| 2 | Live offers | `src/app/(app)/(tabs)/today.tsx` (offers section) or `offers.tsx` |
 | 3 | Offer detail · accept/decline | `src/app/(app)/offer/[id].tsx` — modal presentation |
 | 4 | Offer · already taken | Same route, "gone" state |
 | 5 | Today · offline | Same as #1, different online-state |
@@ -129,7 +129,7 @@ customer app for muscle memory, different centre control.
 (app)/
   (tabs)/
     _layout.tsx       — tab bar (Today · Jobs · Status FAB · Inbox · Account)
-    index.tsx         — Today tab (default landing)
+    today.tsx         — Today tab (default landing; `/` belongs to the root `index.tsx`)
     jobs.tsx          — Jobs tab
     inbox.tsx         — Inbox tab
     account.tsx       — Account tab
