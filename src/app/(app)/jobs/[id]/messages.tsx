@@ -14,8 +14,8 @@ import {
 
 import { Card, IconTile, Pill, Screen, Text } from '@/components/ui';
 import { ChatBubble, ChatComposer } from '@/components/ui/chat';
-import { Palette, Sizing, Spacing } from '@/constants/theme';
-import { loadJob } from '@/lib/job';
+import { Chat, Palette, Radius, Sizing, Spacing } from '@/constants/theme';
+import { initials, jobReference, loadJob } from '@/lib/job';
 import { formatDay, formatLondon, londonDayKey } from '@/lib/london-time';
 import {
   CANNED_REPLIES,
@@ -40,6 +40,8 @@ export default function MessagesScreen() {
   const { id, draft: initialDraft } = useLocalSearchParams<{ id: string; draft?: string }>();
 
   const [customer, setCustomer] = useState<string | null>(null);
+  /** "BMT-04210 · Ford Focus" under the customer's name. */
+  const [reference, setReference] = useState<string | null>(null);
   const [closed, setClosed] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,13 @@ export default function MessagesScreen() {
     let active = true;
     loadJob(id).then((result) => {
       if (!active || !result.ok) return;
-      setCustomer(result.job.booking.customer_name?.trim() || null);
+      const { booking } = result.job;
+      setCustomer(booking.customer_name?.trim() || null);
+      setReference(
+        [jobReference(booking.job_number), [booking.vehicle_make, booking.vehicle_model].filter(Boolean).join(' ')]
+          .filter(Boolean)
+          .join(' · '),
+      );
       setClosed(CLOSED_STATUSES.includes(result.job.booking.status));
     });
     return () => {
@@ -114,6 +122,27 @@ export default function MessagesScreen() {
     >
       <Screen
         title={customer ?? 'Messages'}
+        titleContent={
+          customer ? (
+            <View style={styles.threadTitle}>
+              <View style={styles.avatar}>
+                <Text variant="bodySm" color="blueDark" style={styles.strong}>
+                  {initials(customer)}
+                </Text>
+              </View>
+              <View style={styles.threadName}>
+                <Text variant="headerTitle" numberOfLines={1}>
+                  {customer}
+                </Text>
+                {!!reference && (
+                  <Text variant="monoSm" color="textMuted" numberOfLines={1}>
+                    {reference}
+                  </Text>
+                )}
+              </View>
+            </View>
+          ) : undefined
+        }
         footerStyle={styles.composerBar}
         footer={
           closed ? (
@@ -241,6 +270,17 @@ const styles = StyleSheet.create({
   centre: { textAlign: 'center' },
   empty: { alignItems: 'center', gap: Spacing[3] },
   day: { gap: Spacing[2] },
+  threadTitle: { flexDirection: 'row', alignItems: 'center', gap: Spacing[2] },
+  threadName: { flexShrink: 1 },
+  avatar: {
+    width: Chat.headerAvatar,
+    height: Chat.headerAvatar,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.inner,
+    backgroundColor: Palette.blueTintStrong,
+  },
+  strong: { fontWeight: '700' },
   composer: { gap: Spacing[2] },
   // The replies scroll edge to edge, past the footer's padding.
   repliesBleed: { marginHorizontal: -Sizing.screenPadding },
