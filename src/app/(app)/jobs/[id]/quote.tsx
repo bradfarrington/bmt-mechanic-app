@@ -223,10 +223,17 @@ export default function QuoteScreen() {
         </View>
       </View>
 
-      {(!!error || !!previewError) && (
-        <Notice icon={TriangleAlert} tone="danger" title="Check the quote">
-          {error ?? previewError ?? ''}
+      {!!error && (
+        <Notice icon={TriangleAlert} tone="danger" title="That didn’t send">
+          {error}
         </Notice>
+      )}
+
+      {/* The CRM declines to price a line that is still being typed; that is a hint, not a failure. */}
+      {!error && !!previewError && complete && (
+        <Text variant="caption" color="textMuted">
+          {previewError}
+        </Text>
       )}
 
       {preview && complete && (
