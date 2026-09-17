@@ -1,8 +1,16 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
-import { Alert } from 'react-native';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
+import { Alert, AppState } from 'react-native';
 
 import { useAuth } from '@/lib/auth';
 import { setOnlineStatus, type Resume } from '@/lib/mechanic';
+import { supabase } from '@/lib/supabase';
 
 /**
  * What the mechanic is doing right now — the tab bar's centre button shows it
@@ -27,6 +35,10 @@ interface StatusValue {
   goOffline: (resume?: Resume) => void;
   /** When a timed spell offline ends, if one is running. */
   resumeAt: string | null;
+  /** The booking they are driving to or working on, if any. */
+  activeJobId: string | null;
+  /** Re-read after anything that starts or ends a job. */
+  refreshStatus: () => Promise<void>;
 }
 
 const StatusContext = createContext<StatusValue | null>(null);
@@ -37,9 +49,39 @@ export function StatusProvider({ children }: { children: ReactNode }) {
   // What was just asked for, shown until the CRM's answer is read back.
   const [requested, setRequested] = useState<'online' | 'offline' | null>(null);
 
+  const mechanicId = mechanic?.id;
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+
+  // The CRM's job lifecycle never moves `mechanics.status` to `on_job`, so "On a
+  // job" is read off the bookings: one of theirs is en route or in progress.
+  // A promise, not an async function: state is only written inside the
+  // `.then`, so the effect below never sets state synchronously.
+  const loadActiveJob = useCallback((): Promise<void> => {
+    if (!mechanicId) return Promise.resolve();
+    return Promise.resolve(
+      supabase
+        .from('bookings')
+        .select('id')
+        .eq('mechanic_id', mechanicId)
+        .in('status', ['en_route', 'in_progress'])
+        .order('en_route_at', { ascending: false })
+        .limit(1),
+    ).then(({ data, error }) => {
+      if (!error) setActiveJobId(data[0]?.id ?? null);
+    });
+  }, [mechanicId]);
+
+  useEffect(() => {
+    void loadActiveJob();
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void loadActiveJob();
+    });
+    return () => subscription.remove();
+  }, [loadActiveJob]);
+
   const stored: MechanicStatus = !mechanic
     ? 'offline'
-    : mechanic.status === 'on_job'
+    : mechanic.status === 'on_job' || activeJobId
       ? 'on_job'
       : !mechanic.stripe_payouts_enabled
         ? 'locked'
@@ -73,6 +115,8 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         toggle: () => void change(stored === 'online' ? 'offline' : 'online'),
         goOffline: (resume) => void change('offline', resume),
         resumeAt,
+        activeJobId: mechanic ? activeJobId : null,
+        refreshStatus: loadActiveJob,
       }}
     >
       {children}

@@ -29,6 +29,8 @@ export function usePushDeepLinks() {
 
       if (link.type === 'offer') {
         router.push({ pathname: '/offer/[id]', params: { id: link.offerId } });
+      } else if (link.type === 'message') {
+        router.push({ pathname: '/jobs/[id]/messages', params: { id: link.bookingId } });
       } else {
         router.push({ pathname: `/${link.type}`, params: link.day ? { day: link.day } : {} });
       }

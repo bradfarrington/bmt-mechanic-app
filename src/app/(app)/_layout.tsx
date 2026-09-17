@@ -17,6 +17,11 @@ export default function AppLayout() {
         name="offer/[id]"
         options={{ animation: 'slide_from_bottom', gestureDirection: 'vertical' }}
       />
+      {/* The quote rises over the job it belongs to. */}
+      <Stack.Screen
+        name="jobs/[id]/quote"
+        options={{ animation: 'slide_from_bottom', gestureDirection: 'vertical' }}
+      />
       {/* Both open from a push as well as from inside the app. */}
       <Stack.Screen
         name="tomorrow"

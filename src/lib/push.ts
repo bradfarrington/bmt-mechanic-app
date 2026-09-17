@@ -144,22 +144,26 @@ export async function unregisterForPush() {
 /** Where a tapped notification leads. */
 export type PushLink =
   | { type: 'offer'; offerId: string }
-  | { type: 'tomorrow' | 'recap'; day?: string };
+  | { type: 'tomorrow' | 'recap'; day?: string }
+  | { type: 'message'; bookingId: string };
 
 /**
  * The CRM's `data` payload, read defensively: `{ type: 'offer', offerId }`,
- * `{ type: 'tomorrow' | 'recap', day }`. Anything else — including
+ * `{ type: 'tomorrow' | 'recap', day }`, `{ type: 'message', bookingId }`. Anything else — including
  * `{ type: 'status' }`, which only needs the app opening — is not a deep link.
  */
 export function linkFromResponse(
   response: Notifications.NotificationResponse | null | undefined,
 ): PushLink | null {
   const data = response?.notification.request.content.data as
-    | { type?: unknown; offerId?: unknown; day?: unknown }
+    | { type?: unknown; offerId?: unknown; day?: unknown; bookingId?: unknown }
     | undefined;
 
   if (data?.type === 'offer' && typeof data.offerId === 'string') {
     return { type: 'offer', offerId: data.offerId };
+  }
+  if (data?.type === 'message' && typeof data.bookingId === 'string') {
+    return { type: 'message', bookingId: data.bookingId };
   }
   if (data?.type === 'tomorrow' || data?.type === 'recap') {
     return { type: data.type, day: typeof data.day === 'string' ? data.day : undefined };

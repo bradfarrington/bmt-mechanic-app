@@ -77,7 +77,7 @@ const LOOKS: Record<MechanicStatus, StatusLook> = {
     iconColor: Palette.textInverse,
     gradient: BrandGradient,
     shadow: Shadows.fab,
-    accessibilityLabel: 'You are on a job',
+    accessibilityLabel: 'You are on a job. Open it',
   },
   locked: {
     label: 'Locked',
@@ -131,15 +131,17 @@ function OnlineHalo() {
  */
 export function TabBar({ state, navigation, insets, items }: TabBarProps) {
   const router = useRouter();
-  const { status, pending, toggle, goOffline } = useStatus();
+  const { status, pending, toggle, goOffline, activeJobId } = useStatus();
   const [sheetOpen, setSheetOpen] = useState(false);
   const look = LOOKS[status];
-  // On a job there is nothing to press; locked, the button leads to the fix.
-  const pressable = status !== 'on_job' && !pending;
+  // On a job the button leads back to it; locked, it leads to the fix.
+  const pressable = (status !== 'on_job' || !!activeJobId) && !pending;
 
   function onStatusPress() {
     if (status === 'locked') router.push('/payouts');
-    else toggle();
+    else if (status === 'on_job') {
+      if (activeJobId) router.push({ pathname: '/jobs/[id]', params: { id: activeJobId } });
+    } else toggle();
   }
 
   // Long-press: step away for a while and come back without having to remember.

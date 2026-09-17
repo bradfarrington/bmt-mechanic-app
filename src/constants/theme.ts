@@ -685,6 +685,9 @@ export const DetailSizing = {
   chipIcon: 14,
 } as const;
 
+/** Mechanic app: photo thumbnails on a job. */
+export const JobPhotos = { size: 72 } as const;
+
 /** Mechanic app: `components/ui/sheet.tsx` — the handle at the top of a bottom sheet. */
 export const Sheet = { grabberWidth: 36, grabberHeight: 4 } as const;
 

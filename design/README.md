@@ -92,8 +92,8 @@ Expo Router conventions.
 | 2 | Job · confirmed | `src/app/(app)/jobs/[id]/index.tsx`, status = confirmed |
 | 3 | Job · en route | Same file, status = en_route |
 | 4 | Job · in progress | Same file, status = in_progress |
-| 5 | Signature · full-screen | `src/app/(app)/jobs/[id]/signature.tsx` — modal |
-| 6 | Inspection runner | `src/app/(app)/jobs/[id]/inspect.tsx` — modal |
+| 5 | Signature · full-screen | **Not built.** The CRM removed customer signatures on the owner's instruction (2026-09-08); completing is a two-step "Confirm & charge" as on the web |
+| 6 | Inspection runner | `src/app/(app)/jobs/[id]/inspect.tsx` — the CRM's real checklists (46–173 items, pass/advisory/fail), not the mockup's 5-photo walk |
 | 7 | Quick-quote sheet | `src/app/(app)/jobs/[id]/quote.tsx` — bottom sheet |
 | 8 | Job · completed | Same as #2, status = completed |
 

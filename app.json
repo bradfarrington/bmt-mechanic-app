@@ -42,6 +42,20 @@
         {
           "color": "#2563EB"
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUseUsageDescription": "Book My Tech shares your location with your customer while you are on the way to their job, so they can see when you will arrive."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Book My Tech uses your photos when you add them to a job.",
+          "cameraPermission": "Book My Tech uses the camera to photograph the work on a job.",
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {
