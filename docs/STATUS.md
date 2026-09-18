@@ -145,7 +145,7 @@ the item it replaces. Nothing changed in the app: the feed is the CRM's.
 
 ```bash
 git clone https://github.com/bradfarrington/bmt-mechanic-app.git
-cd bmt-mechanic-app && git checkout inbox      # the latest work — see Branches
+cd bmt-mechanic-app                            # main has everything
 npm install
 cp .env.example .env                           # then fill in — the three values are
                                                # the same as bmt-customer-app's .env
@@ -161,15 +161,10 @@ push needs a dev build on a real phone.
 
 ## Branches
 
-Each step is its own branch, **stacked** on the one before. Nothing is merged
-to `main` and no PRs are open — `main` still holds only the design mockups.
-
-```
-main → scaffold-shell → auth-stack → today-offers → today-extras
-     → active-job → job-extras → inbox → account  ← latest; has everything
-```
-
-To land it: merge in that order, or merge `account` alone (it contains the rest).
+**`main` has everything** (fast-forwarded to `account` on 2026-09-18, at
+`f4d0839`). The step branches — `scaffold-shell → auth-stack → today-offers →
+today-extras → active-job → job-extras → inbox → account` — are history now;
+work on `main` or a new branch off it.
 
 ## Build order (`design/README.md`) — status
 
