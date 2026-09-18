@@ -56,12 +56,16 @@ In this order. Tick them off and update this file as you go.
 10. **Rebuild before the next device test** (`npx expo prebuild --platform ios`
     then `npx expo run:ios`): the permission strings changed in `app.json`
     and only a prebuild picks them up.
-11. **Check with the CRM:** this mechanic's Earnings finds no completed jobs in
-    a year and Stripe lists no transfers, yet the ledger and Inbox show a £51
-    earning and payout for Job 00081 on 27 Aug, and `mechanics.job_count` is
-    0. Most likely Job 00081 is no longer `completed` (disputed, say) — the
-    web earnings page filters the same way — but worth one look at that
-    booking's status and the payout row's `stripe_transfer_id`.
+11. ~~Check with the CRM~~ — **explained 2026-09-18, not an app bug.** Job
+    00081 (test data) was completed on 27 Aug, its £51 transfer reversed 33 s
+    later by since-removed "reverse on dispute" code (commit `527a5fe` took it
+    out that afternoon), and the booking was later deleted. So Earnings, the
+    Stripe list and `job_count` are all correct. Only the Inbox's "Payout sent ·
+    £51" was wrong: it reads two leftover ledger rows that net to zero. The
+    CRM offered to delete them. Separately, `/earnings` lists Stripe transfers
+    for the mechanic's *current* Connect account only, so a replaced account
+    would hide earlier payouts; listing from the ledger's `stripe_transfer_id`s
+    would fix it, with no change to the app's contract.
 
 Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
 outside the code". Nothing has run on a device yet; the sooner it does, the
