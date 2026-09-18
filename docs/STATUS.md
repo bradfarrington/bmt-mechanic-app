@@ -222,6 +222,16 @@ into the app session so any differences get applied.
   route behind it, write a CRM prompt for it and build against that — do not
   drop it and list it as missing.
 
+## Welcome carousel (added 2026-09-18)
+
+A signed-out first launch now opens three welcome slides (`(auth)/welcome.tsx`,
+copied from the customer app's, mechanic copy) before sign-in. "Skip" goes to
+sign-in; the last slide's "Apply to join" opens the application over sign-in,
+with "Sign in" beneath. Shown once per device (`lib/welcome.ts`, AsyncStorage
+key `bmt.mechanic.welcome-seen`); signing out does not bring it back. Not in
+the mockups — added at the owner's request. First slide checked on the
+simulator; the others not yet.
+
 ## Applying to join (added 2026-09-18)
 
 "Apply to join" on sign-in now opens the application in the app

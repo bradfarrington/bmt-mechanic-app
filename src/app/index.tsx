@@ -5,9 +5,11 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Palette } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { loadWorkingWeek } from '@/lib/mechanic';
+import { useWelcomeSeen } from '@/lib/welcome';
 
 /**
- * Entry router. No session goes to sign-in; a mechanic who has never saved
+ * Entry router. No session goes to sign-in — or, on this device's first
+ * launch, to the welcome carousel, which ends at applying or signing in; a mechanic who has never saved
  * their working hours goes through first-run setup; everyone else lands on
  * Today.
  *
@@ -20,6 +22,7 @@ import { loadWorkingWeek } from '@/lib/mechanic';
  */
 export default function Index() {
   const { session, mechanic } = useAuth();
+  const welcomeSeen = useWelcomeSeen();
   const mechanicId = mechanic?.id;
   const [configured, setConfigured] = useState<boolean | null>(null);
 
@@ -38,7 +41,7 @@ export default function Index() {
     };
   }, [mechanicId]);
 
-  if (!session) return <Redirect href="/login" />;
+  if (!session) return <Redirect href={welcomeSeen ? '/login' : '/welcome'} />;
   // Signed in but the record could not be read: Today can say so.
   if (!mechanic) return <Redirect href="/today" />;
 

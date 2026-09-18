@@ -74,8 +74,11 @@ lib helper, a config choice — copy that rather than inventing a second way.
   CRM. `src/lib/account.ts` is the email change and deletion, under
   `/mechanic/account/*`. Availability reuses `src/lib/mechanic.ts`. There is
   no Pro screen: `is_pro` is an admin-set flag with nothing behind it yet.
-- `src/app/index.tsx` — entry router: sign-in, first-run setup (`(onboarding)`)
-  or Today. Saved working hours are the "has onboarded" signal.
+- `src/app/index.tsx` — entry router: the welcome carousel (first launch,
+  signed out — `src/lib/welcome.ts`), sign-in, first-run setup
+  (`(onboarding)`) or Today. Saved working hours are the "has onboarded" signal.
+- `src/app/(auth)/apply/` — applying to join, anonymous, through the CRM's
+  `/applications` routes (`src/lib/application.ts`).
 - `docs/*-crm-prompt.md` — work the CRM repo needs for this app, written as
   prompts to run there.
 - `design/` — the target mockups, the screen → route map and the token additions.

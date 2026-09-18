@@ -26,15 +26,19 @@ import { usePushDeepLinks, usePushRegistration } from '@/hooks/use-push';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { InboxProvider } from '@/lib/inbox-state';
 import { StatusProvider } from '@/lib/status';
+import { loadWelcomeSeen, useWelcomeSeen } from '@/lib/welcome';
 
 // Hold the splash until the persisted session and its mechanic record are
-// restored and the fonts are registered, so the app never flashes a signed-out
-// frame, or headings that jump from the system font to Inter Tight a beat
-// after they appear.
+// restored, the fonts are registered and we know whether to show the welcome,
+// so the app never flashes a signed-out frame, headings that jump from the
+// system font to Inter Tight a beat after they appear, or sign-in before the
+// welcome replaces it.
 SplashScreen.preventAutoHideAsync();
+loadWelcomeSeen();
 
 function RootNavigator() {
   const { initialising, session } = useAuth();
+  const welcomeSeen = useWelcomeSeen();
 
   // Registered under the face names `fontFace` in `constants/theme.ts` hands out.
   const [fontsLoaded, fontError] = useFonts({
@@ -52,7 +56,7 @@ function RootNavigator() {
   // A font that fails to load falls back to the system face — better than a
   // splash screen that never lifts.
   const fontsReady = fontsLoaded || fontError != null;
-  const ready = !initialising && fontsReady;
+  const ready = !initialising && fontsReady && welcomeSeen !== null;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
