@@ -30,8 +30,8 @@ In this order. Tick them off and update this file as you go.
 6. ~~When the CRM's Task 70 reply is in~~ — **done 2026-09-18.** Contract kept
    exactly; the three additive deviations are applied (see "What the CRM said
    about the Account task"). Brad applied migration 0086; types regenerated.
-   **The CRM's commit `05f0648` was not pushed when it reported** — check
-   `git status` in the CRM repo before assuming the routes are deployed.
+   The CRM's Task 70 is on its `origin/main` (`05f0648`, the Inbox fix
+   `5c58a69`, and `1a492e5` recording 0086 as applied).
 7. **`npx expo prebuild --platform ios`** — step 8 added `expo-document-picker`,
    a native module. Any dev build made before it needs rebuilding.
 8. Step 8's layouts were **not** checked with fake data in a web build (the
@@ -106,11 +106,11 @@ Answers: there is no per-mechanic "replied" count — the app counts rows, as
 the web does. A replacement upload of the same `doc_type` is a new row; the
 newest is current — as the app assumes.
 
-**A follow-up the CRM offered, not yet asked for:** the Inbox keeps showing
-an old document row's "has expired" / "wasn't accepted" item after a
-replacement is uploaded, because it reads every verified/rejected/expired row
-and the replacement is `pending_review`. The CRM will make it the newest row
-per type on request. Brad decides.
+**Follow-up, done (`5c58a69`):** the Inbox used to keep showing an old
+document row's "has expired" / "wasn't accepted" item after a replacement was
+uploaded. It now reads the newest row per `doc_type`, as the Documents screen
+and the grace sweep already did, so a `pending_review` replacement silences
+the item it replaces. Nothing changed in the app: the feed is the CRM's.
 
 ## Picking up on a new machine
 
@@ -177,7 +177,7 @@ into the app session so any differences get applied.
 | `job-crm-prompt.md` | 67 | built (`e54eba7`); migration 0084 is settings rows only — apply when convenient |
 | `job-extras-crm-prompt.md` | 68 | built (`38f67bd`); pushed to the CRM's `main` |
 | `inbox-crm-prompt.md` | 69 | built (`8bce93b`); migration 0085 applied; types regenerated |
-| `account-crm-prompt.md` | 70 | built (`05f0648`, **check it is pushed**); migration 0086 applied; types regenerated |
+| `account-crm-prompt.md` | 70 | built (`05f0648`), pushed; migration 0086 applied; types regenerated |
 
 ## Decisions the owner has made — do not reopen
 
