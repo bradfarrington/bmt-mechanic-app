@@ -10,7 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "uk.co.thedigicraft.bmt.mechanic"
+      "appleTeamId": "TM59K3Z7SU",
+      "bundleIdentifier": "uk.co.thedigicraft.bmt.mechanic",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "uk.co.thedigicraft.bmt.mechanic",
