@@ -24,7 +24,7 @@ export interface AccountRowProps {
 
 /**
  * One line of a settings list: the mockup's `.list-row`. Used by the Account
- * tab, Documents, Go Pro and the Help centre — copied from the customer app's
+ * tab, Documents and the Help centre — copied from the customer app's
  * `SettingsRow` and given a badge and a trailing slot.
  */
 export function AccountRow({

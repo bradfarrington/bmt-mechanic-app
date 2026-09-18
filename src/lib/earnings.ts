@@ -199,3 +199,8 @@ export async function stripeDashboardUrl(): Promise<{ ok: true; url: string } | 
 export function formatPounds(pence: number) {
   return `£${Math.round(pence / 100).toLocaleString('en-GB')}`;
 }
+
+/** "15%" from 0.15. */
+export function formatRate(rate: number) {
+  return `${Math.round(rate * 100)}%`;
+}

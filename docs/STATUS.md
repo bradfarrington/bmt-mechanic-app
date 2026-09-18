@@ -22,14 +22,14 @@ In this order. Tick them off and update this file as you go.
    `origin/main` (HEAD `d025f29`). Whether Vercel has deployed it has not been
    checked from here; the CRM auto-deploys `main`.
 5. ~~Start step 8, the Account tail~~ — **built 2026-09-18** on branch
-   `account` (off `inbox`). Eleven screens, six lib files, three components;
+   `account` (off `inbox`). Ten screens, five lib files, three components;
    `docs/account-crm-prompt.md` is the CRM's side. **Brad runs it in the CRM
    repo** (the one-liner is the quote at the top of that file), then pastes
    the reply here — the CRM keeps its reply in
    `bookmytech/docs/tasks/70-*.md`, so it can be read from there too.
 6. **When the CRM's Task 70 reply is in:** apply any changed paths or shapes in
-   `src/lib/earnings.ts`, `documents.ts`, `profile.ts`, `reviews.ts`, `pro.ts`
-   and `account.ts`; apply its SQL if any; `npm run db:types`.
+   `src/lib/earnings.ts`, `documents.ts`, `profile.ts`, `reviews.ts` and
+   `account.ts`; apply its SQL if any; `npm run db:types`.
 7. **`npx expo prebuild --platform ios`** — step 8 added `expo-document-picker`,
    a native module. Any dev build made before it needs rebuilding.
 8. Step 8's layouts were **not** checked with fake data in a web build (the
@@ -122,7 +122,7 @@ To land it: merge in that order, or merge `account` alone (it contains the rest)
 | 6 | Active job: Jobs tab, job screen, messages, checklists, quotes, cancel, reschedule, live location | `active-job` | done |
 | 6b | Faults, revisions, end on site, part status, running late | `job-extras` | done |
 | 7 | Inbox feed, disputes, Get help cases | `inbox` | done |
-| 8 | Account: earnings, availability, documents, profile, reviews, Pro, help, email, password, delete | `account` | built — **CRM side (Task 70) not yet run**; no fake-data layout check |
+| 8 | Account: earnings, availability, documents, profile, reviews, help, email, password, delete (no Pro — see Known limits) | `account` | built — **CRM side (Task 70) not yet run**; no fake-data layout check |
 
 "Done" means: typechecks, lints clean, the iOS bundle exports, and the layouts
 were checked with fake data in a throwaway web build. **None of it has been run
@@ -144,7 +144,7 @@ into the app session so any differences get applied.
 | `job-crm-prompt.md` | 67 | built (`e54eba7`); migration 0084 is settings rows only — apply when convenient |
 | `job-extras-crm-prompt.md` | 68 | built (`38f67bd`); pushed to the CRM's `main` |
 | `inbox-crm-prompt.md` | 69 | built (`8bce93b`); migration 0085 applied; types regenerated |
-| `account-crm-prompt.md` | 70 | **written, not yet run in the CRM** — earnings/Stripe, documents, avatar, review reply, Pro, email change, deletion |
+| `account-crm-prompt.md` | 70 | **written, not yet run in the CRM** — earnings/Stripe, documents, avatar, review reply, email change, deletion |
 
 ## Decisions the owner has made — do not reopen
 
@@ -187,9 +187,10 @@ into the app session so any differences get applied.
 - The Help centre offers email and "Raise a case" only. The mockup's Chat and
   Phone tiles have no support chat, number or hours behind them anywhere in the
   CRM; add them to `src/app/(app)/help.tsx` when real ones exist.
-- Go Pro prints what `GET /mechanic/pro` returns. Until Task 70 lands it shows
-  the `is_pro` badge and a generic "what Pro is for" list, and says BMT sets
-  the tier — which is true today: `take_rate_pro` is seeded but never applied.
+- **No Go Pro screen** (owner decision 2026-09-18). Mockup frame 7 is not
+  built: `mechanics.is_pro` is an admin-set flag with no criteria, no path to
+  it and a `take_rate_pro` the pricing engine never applies. If the tier is
+  ever built in the CRM, it gets its own prompt and screen.
 - Earnings draws no "next payout": mechanics are paid per job on completion
   (owner decision 2026-07-01). The web page's weekly payout preview and its
   `•••• 4242` were placeholder UI and were not ported.

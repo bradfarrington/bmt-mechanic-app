@@ -71,9 +71,9 @@ lib helper, a config choice — copy that rather than inventing a second way.
   direct, uploads and views through the CRM (the bucket is private).
   `src/lib/profile.ts` writes name, phone and bio direct; the avatar goes
   through the CRM. `src/lib/reviews.ts` reads direct; a reply goes through the
-  CRM. `src/lib/pro.ts` prints whatever `GET /mechanic/pro` says and hard-codes
-  no threshold. `src/lib/account.ts` is the email change and deletion, under
-  `/mechanic/account/*`. Availability reuses `src/lib/mechanic.ts`.
+  CRM. `src/lib/account.ts` is the email change and deletion, under
+  `/mechanic/account/*`. Availability reuses `src/lib/mechanic.ts`. There is
+  no Pro screen: `is_pro` is an admin-set flag with nothing behind it yet.
 - `src/app/index.tsx` — entry router: sign-in, first-run setup (`(onboarding)`)
   or Today. Saved working hours are the "has onboarded" signal.
 - `docs/*-crm-prompt.md` — work the CRM repo needs for this app, written as

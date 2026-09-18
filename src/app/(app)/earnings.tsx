@@ -17,6 +17,7 @@ import {
   fetchEarnings,
   fetchLedgerBalance,
   formatPounds,
+  formatRate,
   monthSummary,
   PERIODS,
   seriesLabels,
@@ -27,7 +28,6 @@ import {
 } from '@/lib/earnings';
 import { formatDay } from '@/lib/london-time';
 import { formatPence } from '@/lib/offers';
-import { formatRate } from '@/lib/pro';
 
 /**
  * Earnings — mockup frame 2. The sums are the app's own, from its completed

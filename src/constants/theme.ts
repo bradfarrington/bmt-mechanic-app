@@ -748,15 +748,6 @@ export const EarningsChart = {
   empty: 'rgba(37, 99, 235, 0.25)',
 } as const;
 
-/** Mechanic app: the Go Pro screen — its page wash, and the progress bar on the gold card. */
-export const ProScreen = {
-  /** `#FFFBF3` in the mockup: the page behind the gold card */
-  background: '#FFFBF3',
-  /** Title and back chevron on that page */
-  ink: '#78350F',
-  barTrack: 'rgba(255, 255, 255, 0.20)',
-  barHeight: 8,
-} as const;
 
 /** Mechanic app: `components/stars.tsx` — a rating as five stars, on Reviews and the Account card. */
 export const ReviewStars = { size: 14, sizeLg: 20, gap: 2 } as const;

@@ -4,7 +4,6 @@ import {
   CalendarX,
   ChevronDown,
   ChevronRight,
-  Crown,
   Landmark,
   LifeBuoy,
   Mail,
@@ -94,16 +93,6 @@ const ARTICLES: readonly Article[] = [
       'it from the job page as early as you can: a job you drop is re-offered to other ' +
       'mechanics, and repeated late cancellations count against you. A customer who is not there ' +
       'when you arrive is a case for Get help, not a cancellation.',
-  },
-  {
-    id: 'pro',
-    icon: Crown,
-    title: 'Pro tier & how to keep it',
-    summary: 'Lower commission, first look at offers',
-    body:
-      'Pro mechanics pay a lower commission and see offers first. Go Pro on your Account ' +
-      'shows how far along you are, what Pro gives and the standards that keep it. Book My ' +
-      'Tech sets the tier for now.',
   },
   {
     id: 'legal',

@@ -1,7 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import {
-  Award,
   Banknote,
   CalendarClock,
   FolderLock,
@@ -31,7 +30,6 @@ import {
   type EarningsRemote,
 } from '@/lib/earnings';
 import { DAY_NAMES, loadWorkingWeek, WEEK_ORDER, type WorkingDay } from '@/lib/mechanic';
-import { fetchPro, formatRate, type ProStatus } from '@/lib/pro';
 import { fetchReviews, reviewStats, type ReviewStats } from '@/lib/reviews';
 import { SPECIALISMS } from '@/lib/specialisms';
 
@@ -52,7 +50,6 @@ export default function AccountScreen() {
   const [remote, setRemote] = useState<EarningsRemote | null>(null);
   const [docsLine, setDocsLine] = useState<ReturnType<typeof documentsAlert> | undefined>();
   const [reviews, setReviews] = useState<ReviewStats | null>(null);
-  const [pro, setPro] = useState<ProStatus | null>(null);
   const [openingStripe, setOpeningStripe] = useState(false);
 
   useFocusEffect(
@@ -66,7 +63,6 @@ export default function AccountScreen() {
       void fetchEarnings().then((result) => active && result.ok && setRemote(result.earnings));
       void fetchDocuments().then((rows) => active && setDocsLine(rows ? documentsAlert(rows) : null));
       void fetchReviews().then((rows) => active && rows && setReviews(reviewStats(rows)));
-      void fetchPro().then((result) => active && result.ok && setPro(result.pro));
 
       return () => {
         active = false;
@@ -108,15 +104,6 @@ export default function AccountScreen() {
       ? `${remote.account.bankName} •• ${remote.account.last4}`
       : 'Manage in your Stripe dashboard';
 
-  const proTitle = mechanic?.is_pro
-    ? 'Pro tier'
-    : pro
-      ? `Go Pro · ${countLabel(Math.max(0, pro.progress.jobsNeeded - pro.progress.jobsDone), 'job')} to go`
-      : 'Go Pro';
-  const proLine = pro
-    ? `${formatRate(pro.proRate)} commission & priority offers`
-    : 'Lower commission and priority on offers';
-
   const reviewsLine = reviews?.count
     ? `${reviews.average?.toFixed(1)} average across ${countLabel(reviews.count, 'review')}`
     : 'No reviews yet';
@@ -137,9 +124,6 @@ export default function AccountScreen() {
           </View>
           <View style={styles.heroPills}>
             {verified && <Pill tone="success">Verified</Pill>}
-            <Pill tone={mechanic?.is_pro ? 'pending' : 'neutral'}>
-              {mechanic?.is_pro ? 'Pro tier' : 'Standard tier'}
-            </Pill>
           </View>
         </View>
       </Card>
@@ -188,14 +172,6 @@ export default function AccountScreen() {
             subtitle={openingStripe ? 'Opening Stripe…' : bankLine}
             divided
             onPress={() => void openStripe()}
-          />
-          <AccountRow
-            icon={Award}
-            tone="pending"
-            title={proTitle}
-            subtitle={proLine}
-            divided
-            onPress={() => router.push('/pro')}
           />
         </Card>
       </View>

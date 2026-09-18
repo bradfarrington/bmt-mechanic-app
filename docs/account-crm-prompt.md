@@ -2,8 +2,13 @@
 
 Seventh and last of the mechanic-app prompts. Needs Tasks 64–69 in. It covers
 the Account tab: earnings and payouts, documents, profile and avatar, reviews,
-Pro, and the account-level things the customer app already has — changing the
+and the account-level things the customer app already has — changing the
 sign-in email and deleting the account. The owner needs all of them in the app.
+
+Not in scope: the Pro tier. `mechanics.is_pro` is an admin-set flag with no
+criteria, no path to it and a `take_rate_pro` that is never applied (Task 11
+Stage 2 was deferred), so the app shows nothing for it. If it is ever built,
+it gets its own prompt.
 
 > Read `/Users/bradfarrington/Downloads/bmt-mechanic-app/docs/account-crm-prompt.md`
 > and do everything below the horizontal rule in it.
@@ -38,7 +43,7 @@ What it cannot do is see Stripe. Answer with:
   // fronted refund is being recovered.
   "balance": { "totalEarnedPence": 0, "totalPaidOutPence": 0, "totalClawedBackPence": 0, "balancePence": 0 },
   // The rate that will be applied to their next job, as a fraction — today
-  // `take_rate_base`; see §5.
+  // `take_rate_base`.
   "commissionRate": 0.15,
   // null until Connect is set up. Stripe's external account on the Express
   // account: bank name and last four, nothing else.
@@ -87,37 +92,7 @@ public `avatars` bucket, `profiles.avatar_url` written with the cache-buster.
 `{ "response": "…" }` → `{}`. Twin of `respondToReview`: 1–1000 characters,
 "This isn't your review." as 403. Editing an existing reply is the same call.
 
-## 5. Pro — `GET /pro` (`mechanicfeed`)
-
-Task 11 Stage 2 was deferred to Task 13 and `take_rate_pro` is seeded but
-never applied, so today Pro is a badge. The app has a Go Pro screen anyway
-(mockup frame 7 of `05-account-earnings.html`) and the owner wants it built,
-so give it something true to draw:
-
-```jsonc
-{
-  "isPro": false,
-  "standardRate": 0.15, "proRate": 0.12,           // platform_settings
-  // The path to Pro, as the CRM defines it. The mockup's version: 40 completed
-  // jobs, then keep a 4.7 rating, an 80% accept rate and at most one lost
-  // dispute per 30 days. Use those unless the owner has better; the app prints
-  // whatever `label`s come back and never hard-codes a threshold.
-  "progress": { "jobsDone": 37, "jobsNeeded": 40 },
-  "keep": [{ "label": "Stay above a 4.7 average rating", "met": true }, { "label": "Accept at least 80% of offers", "met": true }, { "label": "No more than 1 dispute lost per 30 days", "met": true }],
-  // What Pro gives. The mockup lists 12% commission, priority on offers, a Pro
-  // badge and advance-book slots. Only list what is true, or will be with this
-  // task; the app prints these, it does not invent them.
-  "perks": [{ "title": "12% commission, down from 15%", "detail": "Roughly £3 more on every £100 job." }]
-}
-```
-
-**Two things for the owner to decide, which I have not assumed:** whether this
-task also makes `take_rate_pro` real (apply it in `lib/pricing/calculate.ts`
-when the assigned mechanic `is_pro`, snapshot it on the booking) and whether
-Pro is granted automatically when `progress` completes, or by an admin as now.
-Say which you did.
-
-## 6. Account — email change and deletion
+## 5. Account — email change and deletion
 
 Both exist for customers (`/account/email`, `/account/delete`) and both
 refuse a staff token. Mechanics need the same two, under
@@ -155,7 +130,6 @@ refuse a staff token. Mechanics need the same two, under
   `/earnings`, and a dashboard link from `/stripe/dashboard`.
 - It can upload a document and open it; upload an avatar; reply to a review
   and edit that reply.
-- `/pro` answers with true figures for a mechanic with and without `is_pro`.
 - It can start an email change and delete its account, and each blocker
   refuses with its code.
 - A customer's token gets 403 everywhere; another mechanic's gets 403/404.

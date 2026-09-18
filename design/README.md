@@ -116,7 +116,7 @@ Expo Router conventions.
 | 4 | Documents | `src/app/(app)/documents.tsx` |
 | 5 | Profile | `src/app/(app)/profile.tsx` |
 | 6 | Reviews | `src/app/(app)/reviews.tsx` |
-| 7 | Go Pro | `src/app/(app)/pro.tsx` |
+| 7 | Go Pro | **Not built** — the owner decided against it (2026-09-18): `is_pro` is an admin-set flag with no criteria or rate behind it in the CRM |
 | 8 | Help centre | `src/app/(app)/help.tsx` |
 
 ## Navigation
@@ -142,7 +142,6 @@ customer app for muscle memory, different centre control.
   documents.tsx       — pushed documents
   profile.tsx         — pushed profile
   reviews.tsx         — pushed reviews
-  pro.tsx             — pushed Pro-tier info
   help.tsx            — pushed help centre
   tomorrow.tsx        — modal end-of-day teaser (from a push)
   recap.tsx           — modal end-of-day recap
