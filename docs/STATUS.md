@@ -207,7 +207,7 @@ into the app session so any differences get applied.
 | `job-extras-crm-prompt.md` | 68 | built (`38f67bd`); pushed to the CRM's `main` |
 | `inbox-crm-prompt.md` | 69 | built (`8bce93b`); migration 0085 applied; types regenerated |
 | `account-crm-prompt.md` | 70 | built (`05f0648`), pushed; migration 0086 applied; types regenerated |
-| `apply-crm-prompt.md` | 71 | **written, not yet run in the CRM** — anonymous document upload and submit for applying in the app |
+| `apply-crm-prompt.md` | 71 | built, on the CRM's `main` (`a639591`); no migration |
 
 ## Decisions the owner has made — do not reopen
 
@@ -226,11 +226,13 @@ into the app session so any differences get applied.
 
 "Apply to join" on sign-in now opens the application in the app
 (`src/app/(auth)/apply/`) instead of the website: the web wizard's four steps
-plus review, same fields, rules and copy, held in memory only. It needs CRM
-Task 71 (`docs/apply-crm-prompt.md`) before it can send anything — until then
-uploads and submit answer with an error. Approval is unchanged: the
-set-password link still opens the website, then the mechanic signs in here.
-Not yet seen on the simulator (it is only reachable signed out).
+plus review, same fields, rules and copy, held in memory only. CRM Task 71
+is live: `POST applications/documents` (needs `X-BMT-Client: mechanic-app`;
+10 a minute, 40 a day per IP) and `POST applications` (5 an hour, 10 a day
+per IP). A duplicate email is a 409 with a sentence telling them to email
+support. Approval is unchanged: the set-password link opens the website, which
+now tells them to sign in on the app. Not yet seen on the simulator (it is
+only reachable signed out), and no application has been sent from the app.
 
 ## Still to do outside the code
 

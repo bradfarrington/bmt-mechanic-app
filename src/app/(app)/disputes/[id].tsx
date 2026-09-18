@@ -107,7 +107,8 @@ export default function DisputeScreen() {
 
   async function send() {
     const body = draft.trim();
-    if (!body) return;
+    // Photos alone are a message too; the CRM takes an empty body with photos.
+    if (!body && !photos.length) return;
     const sent = await run('send', () => sendDisputeMessage(id, body, photos));
     if (sent) {
       setDraft('');
@@ -157,7 +158,7 @@ export default function DisputeScreen() {
                 onSend={() => void send()}
                 placeholder="Reply to the thread…"
                 sending={busy === 'send'}
-                canSend={!busy && !!draft.trim()}
+                canSend={!busy && (!!draft.trim() || photos.length > 0)}
                 maxLength={MAX_MESSAGE_CHARS}
               />
               {!attaching && (
@@ -248,25 +249,37 @@ export default function DisputeScreen() {
                     Book My Tech · only you can see this
                   </Text>
                 </View>
-                <Text variant="bodySm" color="warningText">
-                  {message.body}
-                </Text>
-              </Card>
-            ) : (
-              <View key={message.id} style={styles.bubble}>
-                <ChatBubble
-                  mine={message.sender_role === 'mechanic'}
-                  meta={`${message.sender_role === 'customer' ? dispute.customerName : WHO[message.sender_role]} · ${formatLondon(new Date(message.created_at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`}
-                >
-                  {message.body}
-                </ChatBubble>
+                {!!message.body.trim() && (
+                  <Text variant="bodySm" color="warningText">
+                    {message.body}
+                  </Text>
+                )}
                 {message.photos.length > 0 && (
-                  <View style={[styles.photos, message.sender_role === 'mechanic' && styles.mine]}>
+                  <View style={styles.photos}>
                     {message.photos.map((url) => (
                       <Image key={url} source={{ uri: url }} style={styles.photo} contentFit="cover" />
                     ))}
                   </View>
                 )}
+              </Card>
+            ) : (
+              <View key={message.id} style={styles.bubble}>
+                {/* Either party's message may carry photos, and may be photos alone. */}
+                <ChatBubble
+                  mine={message.sender_role === 'mechanic'}
+                  meta={`${message.sender_role === 'customer' ? dispute.customerName : WHO[message.sender_role]} · ${formatLondon(new Date(message.created_at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`}
+                  attachment={
+                    message.photos.length > 0 ? (
+                      <View style={[styles.photos, message.sender_role === 'mechanic' && styles.mine]}>
+                        {message.photos.map((url) => (
+                          <Image key={url} source={{ uri: url }} style={styles.photo} contentFit="cover" />
+                        ))}
+                      </View>
+                    ) : undefined
+                  }
+                >
+                  {message.body}
+                </ChatBubble>
               </View>
             ),
           )}

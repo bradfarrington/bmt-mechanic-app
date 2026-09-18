@@ -186,41 +186,25 @@ export default function EarningsScreen() {
           ) : null}
         </View>
 
-        {!payoutsSetUp && (
-          <Card tone="warn">
-            <Text variant="bodySm" color="warningText" style={styles.strong}>
-              Payouts aren&rsquo;t set up yet
-            </Text>
-            <Text variant="caption" color="warningText">
-              Connect a bank account with Stripe to start taking jobs. Each job is paid the moment
-              it&rsquo;s completed.
-            </Text>
-            <Button size="sm" iconLeft={Landmark} onPress={() => router.push('/payouts')}>
-              Set up payouts
-            </Button>
-          </Card>
-        )}
-
         {payoutsSetUp && remoteError && !remote && (
           <Text variant="bodySm" color="textMuted">
             {remoteError}
           </Text>
         )}
 
-        {remote && remote.payouts.length === 0 && (
-          <Text variant="bodySm" color="textMuted">
-            {remote.payoutsLive
-              ? 'No payouts yet. Your first completed job pays out the same day.'
-              : payoutsSetUp
-                ? "Couldn't reach Stripe just now. Pull down to try again."
-                : 'Payouts start once Stripe has verified your account.'}
-          </Text>
-        )}
-
         {remote && remote.payouts.length > 0 && (
           <Card padded={false}>
             {remote.payouts.map((payout, index) => (
-              <View key={payout.id} style={[styles.payout, index > 0 && styles.divided]}>
+              <Pressable
+                key={payout.id}
+                disabled={!payout.bookingId}
+                onPress={() =>
+                  payout.bookingId &&
+                  router.push({ pathname: '/jobs/[id]', params: { id: payout.bookingId } })
+                }
+                accessibilityRole={payout.bookingId ? 'button' : undefined}
+                style={({ pressed }) => [styles.payout, index > 0 && styles.divided, pressed && styles.pressed]}
+              >
                 <View style={styles.grow}>
                   <Text variant="bodySm" style={styles.strong}>
                     {formatDay(new Date(payout.at))}
@@ -239,8 +223,29 @@ export default function EarningsScreen() {
                     {payout.status === 'reversed' ? 'Reversed' : 'Paid'}
                   </Pill>
                 </View>
-              </View>
+              </Pressable>
             ))}
+          </Card>
+        )}
+
+        {remote && remote.payouts.length === 0 && (
+          <Text variant="bodySm" color="textMuted">
+            No payouts yet. Each completed job pays out the same day.
+          </Text>
+        )}
+
+        {(!payoutsSetUp || (remote && !remote.payoutsLive)) && (
+          <Card tone="warn">
+            <Text variant="bodySm" color="warningText" style={styles.strong}>
+              Payouts aren&rsquo;t set up yet
+            </Text>
+            <Text variant="caption" color="warningText">
+              Connect a bank account with Stripe to start taking jobs. Each job is paid the moment
+              it&rsquo;s completed.
+            </Text>
+            <Button size="sm" iconLeft={Landmark} onPress={() => router.push('/payouts')}>
+              Set up payouts
+            </Button>
           </Card>
         )}
 
@@ -264,6 +269,7 @@ const styles = StyleSheet.create({
   strong: { fontWeight: '700' },
   grow: { flex: 1, gap: Spacing[1] },
   divided: { borderTopWidth: 1, borderTopColor: Palette.borderSubtle },
+  pressed: { opacity: 0.7 },
 
   hero: { borderRadius: Radius.card, padding: Spacing[4], gap: Spacing[3] },
   heroTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: Spacing[3] },

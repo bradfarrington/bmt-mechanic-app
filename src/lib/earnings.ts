@@ -151,10 +151,15 @@ export interface EarningsRemote {
     amountPence: number;
     /** Stripe transfers carry no status; `reversed` is the one real distinction. */
     status: 'paid' | 'reversed';
+    /** Set only while the booking still exists, so a link to it always opens. */
     bookingId: string | null;
     description: string | null;
   }[];
-  /** False when Connect is not set up — and when Stripe could not be reached. */
+  /**
+   * "The next payout can go": a Connect account to pay into, and Stripe
+   * configured. `payouts` comes from the ledger, so it can list earlier
+   * payouts — even to a replaced account — while this is false.
+   */
   payoutsLive: boolean;
 }
 
