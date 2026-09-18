@@ -115,5 +115,14 @@ Re-run `npx expo prebuild --platform ios` after touching `app.json` plugins or
 adding a native dependency. It regenerates `ios/` from scratch, so never hand-
 edit anything in there — the folder is git-ignored and disposable.
 
-The customer app's `expo-modules-jsi` patch is **not** needed here: this repo
-resolves 57.1.0, where upstream already made the same fix.
+`patches/expo-modules-jsi+57.1.0.patch` (applied by `postinstall` through
+patch-package, as in the customer app) makes the package build under Xcode
+26.3 / Swift 6.2.4: it removes `SWIFT_RETURNS_RETAINED` from the two
+`RuntimeScheduler` constructors, which that compiler rejects, and boxes the
+raw pointers in `JavaScriptRuntime.swift` in an `@unchecked Sendable` struct,
+because the compiler no longer accepts a `nonisolated(unsafe) let` shadow
+being sent into `JavaScriptActor.assumeIsolated`. Swift 5 language mode is
+not an alternative: the package's bare regex literals and actor-isolated
+initialisers need Swift 6 mode. The customer app's own patch (an `abs`
+ambiguity in 57.0.4) is not needed at 57.1.0. Drop this one when a newer
+`expo-modules-jsi` builds clean.

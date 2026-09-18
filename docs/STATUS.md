@@ -32,11 +32,19 @@ In this order. Tick them off and update this file as you go.
    about the Account task"). Brad applied migration 0086; types regenerated.
    The CRM's Task 70 is on its `origin/main` (`05f0648`, the Inbox fix
    `5c58a69`, and `1a492e5` recording 0086 as applied).
-7. **`npx expo prebuild --platform ios`** — step 8 added `expo-document-picker`,
-   a native module. Any dev build made before it needs rebuilding.
-8. Step 8's layouts were **not** checked with fake data in a web build (the
-   other steps' were). Do that, or go straight to a dev build — there is now
-   nothing left to build before the end-to-end test.
+7. ~~Prebuild and a dev build~~ — **done 2026-09-18.** `npx expo prebuild` then
+   `npx expo run:ios` on the iPhone 17 Pro simulator builds, installs and
+   reaches the sign-in screen against Metro — the first time the app has run
+   anywhere. Xcode 26.3 needed `patches/expo-modules-jsi+57.1.0.patch` (see
+   `CLAUDE.md`); `npm install` applies it.
+8. **Sign in as a test mechanic on the simulator** and walk every screen. No
+   mechanic sign-in was to hand in this session, so nothing past the sign-in
+   screen has rendered yet. The three test accounts are described in the
+   CRM's `docs/DEPLOYMENT_ENV.md` → "Staging for owner testing"; the app's
+   `.env` points at `bookmytech.vercel.app`, so the account must exist there.
+   Then the end-to-end test under "Still to do outside the code".
+9. Step 8's layouts were never checked with fake data; the simulator now
+   makes that moot — check them signed in.
 
 Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
 outside the code". Nothing has run on a device yet; the sooner it does, the
@@ -196,9 +204,13 @@ into the app session so any differences get applied.
 
 - `eas init` — until the app has an EAS project id, push is switched off and
   its prompts stay hidden.
-- `npx expo prebuild --platform ios` after step 8 (`expo-document-picker` is
-  native). iOS needs a photo-library and camera usage string — the image
-  picker plugin already adds them; check `app.json` after prebuild.
+- The generated Info.plist's location string is Expo's default ("Allow
+  $(PRODUCT_NAME) to access your location"). Set a real one in `app.json`
+  (`expo-location` plugin `locationWhenInUsePermission`) before a store build.
+- Metro prints `Sending onAnimatedValueUpdate with no listeners registered`
+  repeatedly on the sign-in screen — a React Native warning from an Animated
+  value without a listener, most likely the status button's pulse. Cosmetic;
+  find and silence it.
 - Confirm the bundle id `uk.co.thedigicraft.bmt.mechanic`; replace the app icon
   and splash, which are copies of the customer app's.
 - Supabase → Authentication → URL Configuration → Redirect URLs: add
