@@ -1,5 +1,4 @@
 import { Link } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { Lock, Mail, ShieldAlert, Wrench } from 'lucide-react-native';
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
@@ -7,7 +6,6 @@ import { View, StyleSheet } from 'react-native';
 import { Button, IconTile, Input, Notice, Screen, Text } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
-import { Env } from '@/lib/env';
 
 export default function LoginScreen() {
   const { signIn, notMechanic, accountDeleted } = useAuth();
@@ -102,16 +100,11 @@ export default function LoginScreen() {
         <Text variant="caption" color="textMuted">
           Not a mechanic yet?{' '}
         </Text>
-        {/* Applications are a long web form with document uploads — not in the app. */}
-        <Text
-          variant="caption"
-          color="blue"
-          style={styles.link}
-          accessibilityRole="link"
-          onPress={() => WebBrowser.openBrowserAsync(`${Env.apiBaseUrl}/mechanics/apply`)}
-        >
-          Apply to join
-        </Text>
+        <Link href="/apply">
+          <Text variant="caption" color="blue" style={styles.link}>
+            Apply to join
+          </Text>
+        </Link>
       </View>
     </Screen>
   );

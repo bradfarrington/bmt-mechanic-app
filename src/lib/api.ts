@@ -43,22 +43,29 @@ interface RequestOptions {
    * multipart header with no boundary that the server cannot parse.
    */
   form?: FormData;
+  /**
+   * Extra request headers. An anonymous multipart route has neither a Bearer
+   * token nor the JSON content type to stop a web page posting to it, so the
+   * CRM asks for an app-only header instead — see `lib/application.ts`.
+   */
+  headers?: Record<string, string>;
   signal?: AbortSignal;
 }
 
 async function request<T>(
   method: 'GET' | 'POST',
   path: string,
-  { auth = 'required', body, form, signal }: RequestOptions = {},
+  { auth = 'required', body, form, headers: extra, signal }: RequestOptions = {},
 ): Promise<ApiResult<T>> {
   // The CRM requires this exact type. Refusing CORS is not enough on its own:
   // JSON is not a CORS-simple content type, so demanding it is what forces a
   // preflight the CRM never answers — which is what stops a web page POSTing
   // `text/plain` and creating accounts or spending DVLA credit from a
   // victim's browser.
-  const headers: Record<string, string> = form
-    ? {}
-    : { 'Content-Type': 'application/json' };
+  const headers: Record<string, string> = {
+    ...(form ? {} : { 'Content-Type': 'application/json' }),
+    ...extra,
+  };
 
   if (auth !== 'none') {
     const { data } = await supabase.auth.getSession();
