@@ -27,9 +27,11 @@ In this order. Tick them off and update this file as you go.
    repo** (the one-liner is the quote at the top of that file), then pastes
    the reply here — the CRM keeps its reply in
    `bookmytech/docs/tasks/70-*.md`, so it can be read from there too.
-6. **When the CRM's Task 70 reply is in:** apply any changed paths or shapes in
-   `src/lib/earnings.ts`, `documents.ts`, `profile.ts`, `reviews.ts` and
-   `account.ts`; apply its SQL if any; `npm run db:types`.
+6. ~~When the CRM's Task 70 reply is in~~ — **done 2026-09-18.** Contract kept
+   exactly; the three additive deviations are applied (see "What the CRM said
+   about the Account task"). Brad applied migration 0086; types regenerated.
+   **The CRM's commit `05f0648` was not pushed when it reported** — check
+   `git status` in the CRM repo before assuming the routes are deployed.
 7. **`npx expo prebuild --platform ios`** — step 8 added `expo-document-picker`,
    a native module. Any dev build made before it needs rebuilding.
 8. Step 8's layouts were **not** checked with fake data in a web build (the
@@ -78,6 +80,37 @@ production-built; **not yet called with a real token.**
 - Its dispute responses may now carry an extra `code` field, and a sent message
   an `id`. Both additive — a phone on an older build is unaffected; nothing has
   to change.
+
+### What the CRM said about the Account task (Task 70, 2026-09-18)
+
+Source: `bookmytech/docs/tasks/70-mechanic-account-earnings.md`. Eight routes,
+paths and shapes exactly as `docs/account-crm-prompt.md` asked; four cores
+extracted (`documents.ts`, `avatar.ts`, `respond.ts`, `earnings-summary.ts`)
+with the web actions now wrappers over them. Migration 0086 (mechanic account
+deletion: `delete_mechanic_account()` and two columns on `account_deletions`)
+applied by Brad. 649 unit tests; **nothing called with a token, no real Stripe
+call.**
+
+Deviations, all additive and all applied in the app:
+- `payouts[].status` is `paid` or `reversed` — Stripe transfers have no other
+  status. The app shows a red "Reversed" pill.
+- `payoutsLive` is also false when the Stripe call throws. The app now says
+  "Couldn't reach Stripe just now" rather than "no payouts yet" when Connect
+  is set up but the list is empty and not live.
+- A fifth deletion refusal code, `staff_account`: an admin who also works
+  jobs is refused, not deleted.
+- `description` reads "… · Job 00123", the house job-number format; there is
+  no `BMT-` reference anywhere in the CRM.
+
+Answers: there is no per-mechanic "replied" count — the app counts rows, as
+the web does. A replacement upload of the same `doc_type` is a new row; the
+newest is current — as the app assumes.
+
+**A follow-up the CRM offered, not yet asked for:** the Inbox keeps showing
+an old document row's "has expired" / "wasn't accepted" item after a
+replacement is uploaded, because it reads every verified/rejected/expired row
+and the replacement is `pending_review`. The CRM will make it the newest row
+per type on request. Brad decides.
 
 ## Picking up on a new machine
 
@@ -144,7 +177,7 @@ into the app session so any differences get applied.
 | `job-crm-prompt.md` | 67 | built (`e54eba7`); migration 0084 is settings rows only — apply when convenient |
 | `job-extras-crm-prompt.md` | 68 | built (`38f67bd`); pushed to the CRM's `main` |
 | `inbox-crm-prompt.md` | 69 | built (`8bce93b`); migration 0085 applied; types regenerated |
-| `account-crm-prompt.md` | 70 | **written, not yet run in the CRM** — earnings/Stripe, documents, avatar, review reply, email change, deletion |
+| `account-crm-prompt.md` | 70 | built (`05f0648`, **check it is pushed**); migration 0086 applied; types regenerated |
 
 ## Decisions the owner has made — do not reopen
 

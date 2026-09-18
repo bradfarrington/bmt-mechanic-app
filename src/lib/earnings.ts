@@ -149,10 +149,12 @@ export interface EarningsRemote {
     id: string;
     at: string;
     amountPence: number;
-    status: string;
+    /** Stripe transfers carry no status; `reversed` is the one real distinction. */
+    status: 'paid' | 'reversed';
     bookingId: string | null;
     description: string | null;
   }[];
+  /** False when Connect is not set up — and when Stripe could not be reached. */
   payoutsLive: boolean;
 }
 

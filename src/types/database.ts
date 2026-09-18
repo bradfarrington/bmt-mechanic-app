@@ -40,10 +40,12 @@ export type Database = {
       }
       account_deletions: {
         Row: {
+          account_role: string
           addresses_deleted: number
           bookings_scrubbed: number
           created_at: string
           credits_deleted: number
+          details: Json | null
           id: string
           inbox_reads_deleted: number
           ip: string | null
@@ -54,10 +56,12 @@ export type Database = {
           vehicles_deleted: number
         }
         Insert: {
+          account_role?: string
           addresses_deleted?: number
           bookings_scrubbed?: number
           created_at?: string
           credits_deleted?: number
+          details?: Json | null
           id?: string
           inbox_reads_deleted?: number
           ip?: string | null
@@ -68,10 +72,12 @@ export type Database = {
           vehicles_deleted?: number
         }
         Update: {
+          account_role?: string
           addresses_deleted?: number
           bookings_scrubbed?: number
           created_at?: string
           credits_deleted?: number
+          details?: Json | null
           id?: string
           inbox_reads_deleted?: number
           ip?: string | null
@@ -4007,6 +4013,15 @@ export type Database = {
       delete_customer_account: {
         Args: {
           p_email: string
+          p_ip?: string
+          p_sentinel_email: string
+          p_source?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      delete_mechanic_account: {
+        Args: {
           p_ip?: string
           p_sentinel_email: string
           p_source?: string

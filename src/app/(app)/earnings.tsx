@@ -211,7 +211,9 @@ export default function EarningsScreen() {
           <Text variant="bodySm" color="textMuted">
             {remote.payoutsLive
               ? 'No payouts yet. Your first completed job pays out the same day.'
-              : 'Payouts start once Stripe has verified your account.'}
+              : payoutsSetUp
+                ? "Couldn't reach Stripe just now. Pull down to try again."
+                : 'Payouts start once Stripe has verified your account.'}
           </Text>
         )}
 
@@ -233,8 +235,8 @@ export default function EarningsScreen() {
                   <Text variant="bodySm" style={styles.strong}>
                     {formatPence(payout.amountPence)}
                   </Text>
-                  <Pill tone={payout.status === 'paid' ? 'success' : 'pending'}>
-                    {payout.status === 'paid' ? 'Paid' : 'Pending'}
+                  <Pill tone={payout.status === 'reversed' ? 'error' : 'success'}>
+                    {payout.status === 'reversed' ? 'Reversed' : 'Paid'}
                   </Pill>
                 </View>
               </View>

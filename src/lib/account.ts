@@ -40,7 +40,8 @@ export async function requestEmailChange(
  * Why the CRM declined to delete the account, when it did. The sentence is
  * shown either way; the code is here so a screen could branch.
  */
-export type DeletionRefusal = 'live_booking' | 'open_dispute' | 'open_case' | 'balance_owed';
+/** `staff_account`: an admin who also works jobs — deleting here would take the admin role with it. */
+export type DeletionRefusal = 'live_booking' | 'open_dispute' | 'open_case' | 'balance_owed' | 'staff_account';
 
 export type DeleteAccountResult =
   | { ok: true }
