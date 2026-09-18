@@ -112,7 +112,9 @@ web target only exists for quick layout checks: a static web export fails on
 `"single"` and do not commit that change.
 
 Re-run `npx expo prebuild --platform ios` after touching `app.json` plugins or
-adding a native dependency. It regenerates `ios/` from scratch, so never hand-
+adding a native dependency. `app.config.ts` layers uncommitted values onto
+`app.json` — today only `GOOGLE_MAPS_ANDROID_API_KEY` (see `.env.example`);
+everything else belongs in `app.json`. It regenerates `ios/` from scratch, so never hand-
 edit anything in there — the folder is git-ignored and disposable.
 
 `patches/expo-modules-jsi+57.1.0.patch` (applied by `postinstall` through

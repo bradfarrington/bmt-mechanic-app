@@ -219,8 +219,26 @@ into the app session so any differences get applied.
 
 ## Still to do outside the code
 
-- `eas init` — until the app has an EAS project id, push is switched off and
-  its prompts stay hidden.
+Done 2026-09-18: `eas init` (project `@bradbtfx/bmt-mechanic-app`, id
+`92bf4d9f-…`, so push is live); a mechanic icon, splash and Android adaptive
+icon (the brand mark inverted on the brand gradient, generated from the
+customer app's mark — swap in designed artwork whenever); the bundle id
+`uk.co.thedigicraft.bmt.mechanic` checked — it follows the customer app's
+`uk.co.thedigicraft.bmt.customer`; and Supabase's redirect list already holds
+`bmtmechanic://reset-password`, which dev builds use too.
+
+- **Google Maps key for Android** (Brad — needs the Google Cloud console):
+  create a key with only "Maps SDK for Android", restricted to the package
+  `uk.co.thedigicraft.bmt.mechanic` and the SHA-1s from
+  `eas credentials -p android` (they exist after the first Android build).
+  Put it in `.env` as `GOOGLE_MAPS_ANDROID_API_KEY` for local builds and in EAS
+  (`eas env:create --name GOOGLE_MAPS_ANDROID_API_KEY --visibility sensitive`)
+  for cloud ones. `app.config.ts` does the rest. Until then Android's map is grey.
+- **Android has never been built.** `npm run android` once the key is in.
+- **Supabase's Site URL is `http://localhost:3000`**, and
+  `bookmytech.vercel.app` is not on its redirect list. The app is unaffected;
+  the CRM's own emailed links (password reset, mechanic invites) fall back to
+  the Site URL whenever their `redirectTo` is not listed. A CRM-side check.
 - Photo picking asks for **full** photo-library access first
   (`requestMediaLibraryPermissionsAsync`), in Documents, Profile and the
   evidence picker. iOS's own picker needs no permission at all, so that
@@ -230,14 +248,10 @@ into the app session so any differences get applied.
   repeatedly on the sign-in screen — a React Native warning from an Animated
   value without a listener, most likely the status button's pulse. Cosmetic;
   find and silence it.
-- Confirm the bundle id `uk.co.thedigicraft.bmt.mechanic`; replace the app icon
-  and splash, which are copies of the customer app's.
-- Supabase → Authentication → URL Configuration → Redirect URLs: add
-  `bmtmechanic://reset-password` (and `exp+bmt-mechanic-app://reset-password`
-  for dev builds), or "Forgot password?" opens the website instead of the app.
-- In `bmt-customer-app`: `npm run db:types` (migration 0083 added columns).
-- Android needs a Google Maps key in the `react-native-maps` config plugin
-  before the en-route map shows anything but grey.
+- **In `bmt-customer-app`** (a customer-app session, not this one):
+  `npm run db:types` — its types predate migrations 0083 and 0085 — and render
+  photos on dispute *replies*; it shows the photos attached when a dispute is
+  opened, but not those on `dispute_messages`.
 - **A real end-to-end test.** Sign in as a test mechanic on a dev build and take
   one job from offer → accepted → en route → in progress → completed. The CRM
   has asked for this after every task; it has not been done once.
