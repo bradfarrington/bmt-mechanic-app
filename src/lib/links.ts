@@ -2,11 +2,7 @@ import type { Href } from 'expo-router';
 
 import type { InboxLink } from '@/lib/inbox';
 
-/**
- * Where an inbox row or a tapped notification leads. Earnings, reviews and
- * documents are Account screens; until each exists it falls back to the
- * Account tab rather than to nothing.
- */
+/** Where an inbox row or a tapped notification leads. */
 export function hrefFor(link: InboxLink): Href {
   switch (link.type) {
     case 'thread':
@@ -18,8 +14,10 @@ export function hrefFor(link: InboxLink): Href {
     case 'case':
       return { pathname: '/cases/[id]', params: { id: link.id } };
     case 'earnings':
+      return '/earnings';
     case 'reviews':
+      return '/reviews';
     case 'documents':
-      return '/account';
+      return '/documents';
   }
 }

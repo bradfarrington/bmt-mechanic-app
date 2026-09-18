@@ -21,13 +21,20 @@ In this order. Tick them off and update this file as you go.
 4. ~~Check CRM Task 68 is live~~ — **pushed.** `38f67bd` is on the CRM's
    `origin/main` (HEAD `d025f29`). Whether Vercel has deployed it has not been
    checked from here; the CRM auto-deploys `main`.
-5. **Start step 8, the Account tail**, on a new branch `account` off `inbox` —
-   see "Next" at the bottom of this file. Same routine as every other step:
-   read the mockup, read how the CRM's web mechanic pages do it, write
-   `docs/account-crm-prompt.md`, build the app against it, check the layouts
-   with fake data, commit and push, hand Brad the one-line prompt to run.
-6. When step 8 lands, point `src/lib/links.ts` at the real earnings, reviews and
-   documents screens instead of the Account tab.
+5. ~~Start step 8, the Account tail~~ — **built 2026-09-18** on branch
+   `account` (off `inbox`). Eleven screens, six lib files, three components;
+   `docs/account-crm-prompt.md` is the CRM's side. **Brad runs it in the CRM
+   repo** (the one-liner is the quote at the top of that file), then pastes
+   the reply here — the CRM keeps its reply in
+   `bookmytech/docs/tasks/70-*.md`, so it can be read from there too.
+6. **When the CRM's Task 70 reply is in:** apply any changed paths or shapes in
+   `src/lib/earnings.ts`, `documents.ts`, `profile.ts`, `reviews.ts`, `pro.ts`
+   and `account.ts`; apply its SQL if any; `npm run db:types`.
+7. **`npx expo prebuild --platform ios`** — step 8 added `expo-document-picker`,
+   a native module. Any dev build made before it needs rebuilding.
+8. Step 8's layouts were **not** checked with fake data in a web build (the
+   other steps' were). Do that, or go straight to a dev build — there is now
+   nothing left to build before the end-to-end test.
 
 Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
 outside the code". Nothing has run on a device yet; the sooner it does, the
@@ -97,10 +104,10 @@ to `main` and no PRs are open — `main` still holds only the design mockups.
 
 ```
 main → scaffold-shell → auth-stack → today-offers → today-extras
-     → active-job → job-extras → inbox            ← latest; has everything
+     → active-job → job-extras → inbox → account  ← latest; has everything
 ```
 
-To land it: merge in that order, or merge `inbox` alone (it contains the rest).
+To land it: merge in that order, or merge `account` alone (it contains the rest).
 
 ## Build order (`design/README.md`) — status
 
@@ -114,8 +121,8 @@ To land it: merge in that order, or merge `inbox` alone (it contains the rest).
 | 5b | Daily goal, accept rate, distances, timed offline, Tomorrow, Recap | `today-extras` | done |
 | 6 | Active job: Jobs tab, job screen, messages, checklists, quotes, cancel, reschedule, live location | `active-job` | done |
 | 6b | Faults, revisions, end on site, part status, running late | `job-extras` | done |
-| 7 | Inbox feed, disputes, Get help cases | `inbox` | done — **CRM side in progress** |
-| 8 | Account: earnings, availability, documents, profile, reviews, Pro, help | — | **next** |
+| 7 | Inbox feed, disputes, Get help cases | `inbox` | done |
+| 8 | Account: earnings, availability, documents, profile, reviews, Pro, help, email, password, delete | `account` | built — **CRM side (Task 70) not yet run**; no fake-data layout check |
 
 "Done" means: typechecks, lints clean, the iOS bundle exports, and the layouts
 were checked with fake data in a throwaway web build. **None of it has been run
@@ -137,6 +144,7 @@ into the app session so any differences get applied.
 | `job-crm-prompt.md` | 67 | built (`e54eba7`); migration 0084 is settings rows only — apply when convenient |
 | `job-extras-crm-prompt.md` | 68 | built (`38f67bd`); pushed to the CRM's `main` |
 | `inbox-crm-prompt.md` | 69 | built (`8bce93b`); migration 0085 applied; types regenerated |
+| `account-crm-prompt.md` | 70 | **written, not yet run in the CRM** — earnings/Stripe, documents, avatar, review reply, Pro, email change, deletion |
 
 ## Decisions the owner has made — do not reopen
 
@@ -155,6 +163,9 @@ into the app session so any differences get applied.
 
 - `eas init` — until the app has an EAS project id, push is switched off and
   its prompts stay hidden.
+- `npx expo prebuild --platform ios` after step 8 (`expo-document-picker` is
+  native). iOS needs a photo-library and camera usage string — the image
+  picker plugin already adds them; check `app.json` after prebuild.
 - Confirm the bundle id `uk.co.thedigicraft.bmt.mechanic`; replace the app icon
   and splash, which are copies of the customer app's.
 - Supabase → Authentication → URL Configuration → Redirect URLs: add
@@ -173,16 +184,20 @@ into the app session so any differences get applied.
   background sharing needs the "always" location permission.
 - The web target exists only for layout checks; a static web export fails on
   `window` inside supabase-js (see `CLAUDE.md`).
-- `src/lib/links.ts` sends inbox rows and pushes for earnings, reviews and
-  documents to the Account tab until step 8 builds those screens.
+- The Help centre offers email and "Raise a case" only. The mockup's Chat and
+  Phone tiles have no support chat, number or hours behind them anywhere in the
+  CRM; add them to `src/app/(app)/help.tsx` when real ones exist.
+- Go Pro prints what `GET /mechanic/pro` returns. Until Task 70 lands it shows
+  the `is_pro` badge and a generic "what Pro is for" list, and says BMT sets
+  the tier — which is true today: `take_rate_pro` is seeded but never applied.
+- Earnings draws no "next payout": mechanics are paid per job on completion
+  (owner decision 2026-07-01). The web page's weekly payout preview and its
+  `•••• 4242` were placeholder UI and were not ported.
 
-## Next: step 8, the Account tail
+## Next: nothing left to build — verify
 
-Mockup `design/mockups/05-account-earnings.html`. Start the same way as the
-other steps: read how the CRM's web mechanic pages do earnings
-(`mechanic_ledger`, readable under RLS), availability (already written direct
-by onboarding — `src/lib/mechanic.ts`), documents (`mechanic_documents`: insert
-allowed under RLS, but the `mechanic-docs` bucket is private and uploads go
-through the service role), profile and avatar, reviews (and the mechanic's
-response to one), Pro, and help — then write `docs/account-crm-prompt.md` for
-whatever is cookie-only, and build against it.
+Every step of `design/README.md`'s build order is built. What is left is the
+CRM's Task 70, then the end-to-end test on a dev build under "Still to do
+outside the code". Step 8's screens in particular have never rendered anywhere
+but the type checker: run them with a real mechanic, and expect small layout
+fixes on Earnings (the hero and the chart) and Documents (the sheets).

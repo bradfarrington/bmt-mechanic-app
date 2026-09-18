@@ -63,6 +63,17 @@ lib helper, a config choice — copy that rather than inventing a second way.
 - `src/lib/messages.ts` — the booking thread; polled, like the CRM's own.
 - `src/lib/push.ts` — Expo push via `/mechanic/devices`, Android channel
   `offers`; a tapped offer push opens `/offer/[id]`.
+- The Account tail (`(tabs)/account.tsx` and the screens it pushes):
+  `src/lib/earnings.ts` sums the mechanic's own completed bookings (month to
+  date, projection, daily series) and asks the CRM only for Stripe's side
+  (`GET /mechanic/earnings`, `POST /mechanic/stripe/dashboard`); there is no
+  "next payout" — mechanics are paid per job. `src/lib/documents.ts` lists
+  direct, uploads and views through the CRM (the bucket is private).
+  `src/lib/profile.ts` writes name, phone and bio direct; the avatar goes
+  through the CRM. `src/lib/reviews.ts` reads direct; a reply goes through the
+  CRM. `src/lib/pro.ts` prints whatever `GET /mechanic/pro` says and hard-codes
+  no threshold. `src/lib/account.ts` is the email change and deletion, under
+  `/mechanic/account/*`. Availability reuses `src/lib/mechanic.ts`.
 - `src/app/index.tsx` — entry router: sign-in, first-run setup (`(onboarding)`)
   or Today. Saved working hours are the "has onboarded" signal.
 - `docs/*-crm-prompt.md` — work the CRM repo needs for this app, written as

@@ -10,7 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { Env } from '@/lib/env';
 
 export default function LoginScreen() {
-  const { signIn, notMechanic } = useAuth();
+  const { signIn, notMechanic, accountDeleted } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,6 +45,12 @@ export default function LoginScreen() {
         <Notice icon={ShieldAlert} tone="danger" title="Wrong app for this account">
           This app is for Book My Tech mechanics. If you&rsquo;re a customer, use the Book My
           Tech app instead.
+        </Notice>
+      )}
+
+      {accountDeleted && !error && (
+        <Notice icon={ShieldAlert} tone="info" title="Your account has been deleted">
+          Thanks for working with Book My Tech. You can sign up again any time.
         </Notice>
       )}
 

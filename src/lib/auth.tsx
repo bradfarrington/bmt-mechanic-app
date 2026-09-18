@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { requestAccountDeletion } from '@/lib/account';
 import { unregisterForPush } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
@@ -42,6 +43,11 @@ export interface AuthState {
    * it the sign-out looks like a silent failure.
    */
   notMechanic: boolean;
+  /**
+   * Set once the CRM has deleted the account and this device has signed out,
+   * so the login screen can say so rather than look like a failed session.
+   */
+  accountDeleted: boolean;
 }
 
 /**
@@ -65,8 +71,19 @@ export interface AuthActions {
    * has an account — see the implementation.
    */
   sendPasswordReset: (email: string) => Promise<{ error: string | null }>;
-  /** Set a new password. The emailed link is the proof of ownership. */
+  /**
+   * Set a new password. The emailed link is the proof of ownership; from
+   * Account, `verifyPassword` must have run first.
+   */
   updatePassword: (password: string) => Promise<{ error: string | null }>;
+  /**
+   * Check the current password by signing in with it, which also mints a
+   * session under 24 hours old — what Supabase's "secure password change"
+   * rule wants before a password change without an emailed code.
+   */
+  verifyPassword: (password: string) => Promise<{ error: string | null }>;
+  /** Ask the CRM to delete the account, then sign this device out. */
+  deleteAccount: () => Promise<{ error: string | null }>;
   /** Re-read the mechanic row after changing it — onboarding, payouts, status. */
   refreshMechanic: () => Promise<void>;
 }
@@ -105,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /** The user whose records have been read (or found unreadable). */
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [notMechanic, setNotMechanic] = useState(false);
+  const [accountDeleted, setAccountDeleted] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -199,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       firstName: fullName ? (fullName.split(/\s+/)[0] ?? null) : null,
       initialising: !sessionRestored || (!!userId && loadedFor !== userId),
       notMechanic,
+      accountDeleted,
 
       async signIn(email: string, password: string) {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -222,6 +241,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         setNotMechanic(false);
+        setAccountDeleted(false);
         return { error: null };
       },
 
@@ -256,6 +276,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error: error ? error.message : null };
       },
 
+      async verifyPassword(password: string) {
+        const email = session?.user?.email;
+        if (!email) return { error: 'You need to be signed in.' };
+
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (!error) return { error: null };
+        // Supabase's wording is for a sign-in form. Here the email is known to
+        // be right, so only one thing can be wrong.
+        return { error: error.status === 400 ? "That password isn't right." : error.message };
+      },
+
+      async deleteAccount() {
+        const result = await requestAccountDeletion();
+        if (!result.ok) return { error: result.error };
+
+        // Flagged before the sign-out so the login screen can explain the
+        // empty session. Local scope only: the CRM has already revoked every
+        // session, and a deleted user's token asking for a global sign-out
+        // would only be refused. Push was unregistered server-side too.
+        setAccountDeleted(true);
+        await supabase.auth.signOut({ scope: 'local' });
+        return { error: null };
+      },
+
       refreshMechanic,
     };
   }, [
@@ -266,6 +310,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadedFor,
     userId,
     notMechanic,
+    accountDeleted,
     loadRecords,
     refreshMechanic,
   ]);

@@ -731,3 +731,32 @@ export const LivePulse = {
   /** Each fade, out or in */
   halfCycleMs: 1000,
 } as const;
+
+/**
+ * Mechanic app: `components/earnings-chart.tsx` — the "vibe" area chart on
+ * Earnings, per `design/TOKENS.md` § Chart. No axes, no gridlines; the numbers
+ * live in the KPI row above it.
+ */
+export const EarningsChart = {
+  height: 120,
+  stroke: 2,
+  /** The area under the line */
+  fill: 'rgba(37, 99, 235, 0.20)',
+  /** The card's wash behind the chart, top to bottom */
+  wash: ['rgba(37, 99, 235, 0.15)', 'rgba(37, 99, 235, 0)'] as const,
+  /** Empty period: a flat line at the baseline in this colour */
+  empty: 'rgba(37, 99, 235, 0.25)',
+} as const;
+
+/** Mechanic app: the Go Pro screen — its page wash, and the progress bar on the gold card. */
+export const ProScreen = {
+  /** `#FFFBF3` in the mockup: the page behind the gold card */
+  background: '#FFFBF3',
+  /** Title and back chevron on that page */
+  ink: '#78350F',
+  barTrack: 'rgba(255, 255, 255, 0.20)',
+  barHeight: 8,
+} as const;
+
+/** Mechanic app: `components/stars.tsx` — a rating as five stars, on Reviews and the Account card. */
+export const ReviewStars = { size: 14, sizeLg: 20, gap: 2 } as const;
