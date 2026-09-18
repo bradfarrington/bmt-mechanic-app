@@ -8,6 +8,7 @@ import { Stars } from '@/components/stars';
 import { Avatar, Button, Card, Icon, Input, Notice, Screen, Text } from '@/components/ui';
 import { Palette, Radius, Sizing, Spacing } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
+import { formatPostcode, postcodeDistrict } from '@/lib/postcode';
 import { MAX_BIO_CHARS, MAX_NAME_CHARS, updateProfile, uploadAvatar } from '@/lib/profile';
 
 /**
@@ -102,8 +103,8 @@ export default function ProfileScreen() {
   const rating = mechanic?.rating ?? 0;
   const since = mechanic?.approved_at ?? mechanic?.created_at ?? profile?.created_at;
   const years = since ? Math.floor((now - new Date(since).getTime()) / (365.25 * 86_400_000)) : 0;
-  const postcode = mechanic?.base_postcode?.trim() ?? '';
-  const area = postcode.split(/\s+/)[0] ?? '';
+  const postcode = formatPostcode(mechanic?.base_postcode);
+  const area = postcodeDistrict(mechanic?.base_postcode);
 
   return (
     <Screen

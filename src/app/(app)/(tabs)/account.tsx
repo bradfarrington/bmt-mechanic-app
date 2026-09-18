@@ -149,7 +149,7 @@ export default function AccountScreen() {
             tone={docsLine ? 'pending' : 'accent'}
             title="Documents"
             subtitle={docsLine ? docsLine.label : docsLine === null ? 'All up to date' : 'ID, insurance & qualifications'}
-            badge={docsLine ? <Pill tone={docsLine.tone === 'danger' ? 'error' : 'pending'}>{docsLine.tone === 'danger' ? 'Action needed' : 'Expiring'}</Pill> : undefined}
+            badge={docsLine ? <Pill tone={docsLine.tone === 'danger' ? 'error' : 'pending'}>{docsLine.badge}</Pill> : undefined}
             divided
             onPress={() => router.push('/documents')}
           />

@@ -1,5 +1,6 @@
-import { dayInstant, formatLondon, londonDayKey, londonInstant, londonParts } from '@/lib/london-time';
 import type { Tone } from '@/constants/theme';
+import { dayInstant, formatLondon, londonDayKey, londonInstant, londonParts } from '@/lib/london-time';
+import { postcodeDistrict } from '@/lib/postcode';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -217,5 +218,5 @@ export function jobVehicle(job: Pick<Job, 'vehicle_make' | 'vehicle_model'>) {
 
 /** The outward half of the postcode — "SE15" — which is all a list row needs. */
 export function jobDistrict(job: Pick<Job, 'postcode' | 'area'>) {
-  return job.area?.trim() || job.postcode.trim().split(/\s+/)[0] || job.postcode;
+  return job.area?.trim() || postcodeDistrict(job.postcode) || job.postcode;
 }

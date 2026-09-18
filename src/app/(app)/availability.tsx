@@ -15,6 +15,7 @@ import {
   updateWorkingWeek,
   type WorkingDay,
 } from '@/lib/mechanic';
+import { postcodeDistrict } from '@/lib/postcode';
 import { SPECIALISMS } from '@/lib/specialisms';
 
 /**
@@ -114,7 +115,7 @@ export default function AvailabilityScreen() {
   }
 
   const max = Math.max(SLIDER_MAX, mechanic?.service_radius_miles ?? 0);
-  const postcodeArea = mechanic?.base_postcode?.trim().split(/\s+/)[0];
+  const postcodeArea = postcodeDistrict(mechanic?.base_postcode);
   const pickedCount = SPECIALISMS.filter((s) => picked.includes(s.slug)).length;
 
   return (

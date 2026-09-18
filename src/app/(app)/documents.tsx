@@ -246,6 +246,8 @@ export default function DocumentsScreen() {
             }}
             placeholder="DD/MM/YYYY"
             keyboardType="numbers-and-punctuation"
+            returnKeyType="done"
+            onSubmitEditing={onConfirmExpiry}
             autoCorrect={false}
             error={expiryError ?? undefined}
             helper="We remind you 30 days before, and again a week before."

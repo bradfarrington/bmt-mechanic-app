@@ -35,7 +35,12 @@
           "imageWidth": 160
         }
       ],
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": false
+        }
+      ],
       "expo-web-browser",
       [
         "expo-notifications",
@@ -46,14 +51,17 @@
       [
         "expo-location",
         {
-          "locationWhenInUseUsageDescription": "Book My Tech shares your location with your customer while you are on the way to their job, so they can see when you will arrive."
+          "locationWhenInUsePermission": "Book My Tech shares your location with your customer while you are on the way to their job, so they can see when you will arrive.",
+          "motionUsagePermission": false,
+          "locationAlwaysPermission": false,
+          "locationAlwaysAndWhenInUsePermission": false
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Book My Tech uses your photos when you add them to a job.",
-          "cameraPermission": "Book My Tech uses the camera to photograph the work on a job.",
+          "photosPermission": "Book My Tech uses your photos when you add them to a job, a case, your documents or your profile.",
+          "cameraPermission": "Book My Tech uses the camera to photograph the work on a job, your documents and your profile picture.",
           "microphonePermission": false
         }
       ]

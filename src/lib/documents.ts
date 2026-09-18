@@ -29,7 +29,12 @@ export interface DocTypeDef {
   icon: LucideIcon;
   /** Whether BMT expects an expiry date on this one. */
   expires: boolean;
-  /** Required before dispatch; the rest are optional. */
+  /**
+   * One of the four the CRM's grace sweep counts (`requiredDocTypes`); VAT is
+   * added there only for a VAT-registered mechanic. Missing ones are enforced
+   * only for a mechanic approved with a grace period, whose deadline the app
+   * cannot read (applications are admin-only), so the wording never threatens.
+   */
   required: boolean;
   hint: string;
 }
@@ -61,7 +66,7 @@ export const DOC_TYPES: readonly DocTypeDef[] = [
     required: true,
     hint: 'City & Guilds, IMI or equivalent',
   },
-  { type: 'vat', label: 'VAT certificate', icon: Receipt, expires: false, required: false, hint: 'Only if you are VAT registered' },
+  { type: 'vat', label: 'VAT registration', icon: Receipt, expires: false, required: false, hint: 'Only if you are VAT registered' },
 ];
 
 export function docTypeDef(type: string): DocTypeDef {
@@ -125,7 +130,7 @@ export function currentByType(rows: readonly DocumentRow[]): Map<string, Documen
 export function documentsAlert(
   rows: readonly DocumentRow[],
   now = new Date(),
-): { label: string; detail: string; tone: 'danger' | 'warn' } | null {
+): { label: string; detail: string; tone: 'danger' | 'warn'; badge: string } | null {
   const current = [...currentByType(rows).values()];
   const missing = DOC_TYPES.filter((def) => def.required && !current.some((row) => row.doc_type === def.type));
   const expired = current.filter((row) => row.status === 'expired' || expiryState(row.expires_at, now) === 'expired');
@@ -137,15 +142,33 @@ export function documentsAlert(
 
   if (expired.length) {
     const def = docTypeDef(expired[0]!.doc_type);
-    return { label: `${def.label} has expired`, detail: 'Upload a fresh copy to keep receiving jobs.', tone: 'danger' };
+    return {
+      label: `${def.label} has expired`,
+      detail: 'Upload a fresh copy to keep receiving jobs.',
+      tone: 'danger',
+      badge: 'Expired',
+    };
   }
   if (rejected.length) {
     const def = docTypeDef(rejected[0]!.doc_type);
-    return { label: `${def.label} was rejected`, detail: 'Upload a clearer copy and we will look again.', tone: 'danger' };
+    return {
+      label: `${def.label} was rejected`,
+      detail: 'Upload a clearer copy and we will look again.',
+      tone: 'danger',
+      badge: 'Rejected',
+    };
   }
   if (missing.length) {
     const def = missing[0]!;
-    return { label: `${def.label} needed`, detail: 'Required before you can take jobs.', tone: 'warn' };
+    const more = missing.length - 1;
+    return {
+      label: more ? `${def.label} and ${more} more not on file` : `${def.label} not on file`,
+      detail:
+        'Book My Tech keeps these on file for every mechanic. If you were approved with a ' +
+        'deadline for your paperwork, new jobs pause once it passes.',
+      tone: 'warn',
+      badge: 'Missing',
+    };
   }
   if (expiring.length) {
     const { row, days } = expiring[0]!;
@@ -155,6 +178,7 @@ export function documentsAlert(
       label: `${def.label} expires ${when}`,
       detail: `Upload a fresh certificate to keep dispatching after ${formatExpiry(row.expires_at)}.`,
       tone: 'warn',
+      badge: 'Expiring',
     };
   }
   return null;

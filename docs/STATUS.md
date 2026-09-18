@@ -37,14 +37,31 @@ In this order. Tick them off and update this file as you go.
    reaches the sign-in screen against Metro — the first time the app has run
    anywhere. Xcode 26.3 needed `patches/expo-modules-jsi+57.1.0.patch` (see
    `CLAUDE.md`); `npm install` applies it.
-8. **Sign in as a test mechanic on the simulator** and walk every screen. No
-   mechanic sign-in was to hand in this session, so nothing past the sign-in
-   screen has rendered yet. The three test accounts are described in the
-   CRM's `docs/DEPLOYMENT_ENV.md` → "Staging for owner testing"; the app's
-   `.env` points at `bookmytech.vercel.app`, so the account must exist there.
-   Then the end-to-end test under "Still to do outside the code".
-9. Step 8's layouts were never checked with fake data; the simulator now
-   makes that moot — check them signed in.
+8. ~~Walk the Account tail signed in~~ — **done 2026-09-18** on the simulator,
+   signed in as Brad's mechanic account against `bookmytech.vercel.app`.
+   First-run setup, the Account hub, Earnings, Availability, Documents (as far
+   as the expiry step, nothing uploaded), Profile, Reviews, Help, and the
+   email, password and delete screens all render with live data. Fixed on the
+   way: the chart's wash drew as a solid block; a postcode stored without a
+   space ("B772RL") printed whole instead of as its district, on Profile,
+   Availability and job rows; the Documents badge said "Expiring" for a
+   missing document and its banner claimed missing ones block jobs (only a
+   grace-period approval does); the bottom sheet was hidden by the keyboard;
+   the Help email wrapped mid-word; and `app.json`'s location string used the
+   wrong option name, so Expo's generic text shipped.
+9. **The end-to-end job test.** Not done by me: Brad was mid-job on BMT-00093
+   in the same simulator, and a job's footer buttons move a real booking with
+   one tap (begin work, complete and charge). Do it by hand, or tell a session
+   to drive while nobody else touches the simulator.
+10. **Rebuild before the next device test** (`npx expo prebuild --platform ios`
+    then `npx expo run:ios`): the permission strings changed in `app.json`
+    and only a prebuild picks them up.
+11. **Check with the CRM:** this mechanic's Earnings finds no completed jobs in
+    a year and Stripe lists no transfers, yet the ledger and Inbox show a £51
+    earning and payout for Job 00081 on 27 Aug, and `mechanics.job_count` is
+    0. Most likely Job 00081 is no longer `completed` (disputed, say) — the
+    web earnings page filters the same way — but worth one look at that
+    booking's status and the payout row's `stripe_transfer_id`.
 
 Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
 outside the code". Nothing has run on a device yet; the sooner it does, the
@@ -204,9 +221,11 @@ into the app session so any differences get applied.
 
 - `eas init` — until the app has an EAS project id, push is switched off and
   its prompts stay hidden.
-- The generated Info.plist's location string is Expo's default ("Allow
-  $(PRODUCT_NAME) to access your location"). Set a real one in `app.json`
-  (`expo-location` plugin `locationWhenInUsePermission`) before a store build.
+- Photo picking asks for **full** photo-library access first
+  (`requestMediaLibraryPermissionsAsync`), in Documents, Profile and the
+  evidence picker. iOS's own picker needs no permission at all, so that
+  prompt could be dropped on iOS — kinder, and one less thing for App Review.
+  Not changed yet: it touches three screens and wants a device test.
 - Metro prints `Sending onAnimatedValueUpdate with no listeners registered`
   repeatedly on the sign-in screen — a React Native warning from an Animated
   value without a listener, most likely the status button's pulse. Cosmetic;

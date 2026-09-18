@@ -45,18 +45,20 @@ export function EarningsChartView({ points, labels }: EarningsChartProps) {
           <Svg width={width} height={height}>
             <Defs>
               <LinearGradient id="wash" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0" stopColor={EarningsChart.wash[0]} />
-                <Stop offset="1" stopColor={EarningsChart.wash[1]} />
+                {/* react-native-svg ignores alpha in a stop's colour; the opacity is its own prop. */}
+                <Stop offset="0" stopColor={Palette.blue} stopOpacity={EarningsChart.washOpacity[0]} />
+                <Stop offset="1" stopColor={Palette.blue} stopOpacity={EarningsChart.washOpacity[1]} />
               </LinearGradient>
             </Defs>
             <Rect x={0} y={0} width={width} height={height} rx={Radius.input} fill="url(#wash)" />
             {points.length > 1 && (
               <>
-                <Path d={areaPath} fill={max > 0 ? EarningsChart.fill : 'transparent'} />
+                <Path d={areaPath} fill={Palette.blue} fillOpacity={max > 0 ? EarningsChart.fillOpacity : 0} />
                 <Path
                   d={linePath}
                   fill="none"
-                  stroke={max > 0 ? Palette.blue : EarningsChart.empty}
+                  stroke={Palette.blue}
+                  strokeOpacity={max > 0 ? 1 : EarningsChart.emptyOpacity}
                   strokeWidth={EarningsChart.stroke}
                   strokeLinecap="round"
                   strokeLinejoin="round"

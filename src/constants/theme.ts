@@ -740,12 +740,12 @@ export const LivePulse = {
 export const EarningsChart = {
   height: 120,
   stroke: 2,
-  /** The area under the line */
-  fill: 'rgba(37, 99, 235, 0.20)',
+  /** The area under the line — brand blue at this opacity (SVG takes opacity apart from colour) */
+  fillOpacity: 0.2,
   /** The card's wash behind the chart, top to bottom */
-  wash: ['rgba(37, 99, 235, 0.15)', 'rgba(37, 99, 235, 0)'] as const,
-  /** Empty period: a flat line at the baseline in this colour */
-  empty: 'rgba(37, 99, 235, 0.25)',
+  washOpacity: [0.15, 0] as const,
+  /** Empty period: the baseline stroke fades to this */
+  emptyOpacity: 0.25,
 } as const;
 
 

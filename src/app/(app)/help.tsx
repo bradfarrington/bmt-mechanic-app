@@ -208,7 +208,15 @@ function ContactCard({
         <Text variant="bodySm" style={[styles.strong, styles.centre]}>
           {title}
         </Text>
-        <Text variant="caption" color="textMuted" style={styles.centre} numberOfLines={2}>
+        <Text
+          variant="caption"
+          color="textMuted"
+          style={styles.centre}
+          numberOfLines={detail.includes('@') ? 1 : 2}
+          // An address must not break mid-word; it shrinks to fit instead.
+          adjustsFontSizeToFit={detail.includes('@')}
+          minimumFontScale={0.75}
+        >
           {detail}
         </Text>
       </Card>
@@ -282,7 +290,8 @@ const styles = StyleSheet.create({
 
   contacts: { flexDirection: 'row', gap: Spacing[2] },
   contact: { flex: 1 },
-  contactCard: { alignItems: 'center', gap: Spacing[1], padding: Sizing.compactPadding },
+  // Fills the row's height, so the two cards match whatever their text wraps to.
+  contactCard: { flex: 1, alignItems: 'center', gap: Spacing[1], padding: Sizing.compactPadding },
   contactTile: { marginBottom: Spacing[1] },
 
   row: {
