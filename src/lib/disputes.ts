@@ -77,19 +77,16 @@ export async function fetchDisputeThread(disputeId: string): Promise<DisputeMess
     .eq('dispute_id', disputeId)
     .order('created_at', { ascending: true });
 
-  // `photos` and `visible_to` arrive with the CRM's inbox migration; until the
-  // generated types have them, read them defensively.
-  return (data ?? []).map((row) => {
-    const extra = row as { photos?: string[] | null; visible_to?: DisputeMessage['visible_to'] };
-    return {
-      id: row.id,
-      sender_role: row.sender_role as DisputeMessage['sender_role'],
-      body: row.body,
-      created_at: row.created_at,
-      photos: extra.photos ?? [],
-      visible_to: extra.visible_to ?? null,
-    };
-  });
+  // A note BMT wrote for the customer alone never reaches this client: the
+  // read policy filters on `visible_to`, so nothing is hidden here.
+  return (data ?? []).map((row) => ({
+    id: row.id,
+    sender_role: row.sender_role as DisputeMessage['sender_role'],
+    body: row.body,
+    created_at: row.created_at,
+    photos: row.photos,
+    visible_to: row.visible_to as DisputeMessage['visible_to'],
+  }));
 }
 
 /** The dispute on a booking, if there is one — a booking can only ever have one. */

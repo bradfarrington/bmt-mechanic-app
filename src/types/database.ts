@@ -1182,24 +1182,30 @@ export type Database = {
           created_at: string
           dispute_id: string
           id: string
+          photos: string[]
           sender_id: string | null
           sender_role: string
+          visible_to: string | null
         }
         Insert: {
           body: string
           created_at?: string
           dispute_id: string
           id?: string
+          photos?: string[]
           sender_id?: string | null
           sender_role: string
+          visible_to?: string | null
         }
         Update: {
           body?: string
           created_at?: string
           dispute_id?: string
           id?: string
+          photos?: string[]
           sender_id?: string | null
           sender_role?: string
+          visible_to?: string | null
         }
         Relationships: [
           {
@@ -2193,6 +2199,42 @@ export type Database = {
             columns: ["related_dispute_id"]
             isOneToOne: false
             referencedRelation: "disputes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mechanic_inbox_reads: {
+        Row: {
+          mechanic_id: string
+          read_before: string | null
+          read_ids: string[]
+          updated_at: string
+        }
+        Insert: {
+          mechanic_id: string
+          read_before?: string | null
+          read_ids?: string[]
+          updated_at?: string
+        }
+        Update: {
+          mechanic_id?: string
+          read_before?: string | null
+          read_ids?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mechanic_inbox_reads_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: true
+            referencedRelation: "mechanic_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mechanic_inbox_reads_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: true
+            referencedRelation: "mechanics"
             referencedColumns: ["id"]
           },
         ]
@@ -3401,6 +3443,196 @@ export type Database = {
         }
         Relationships: []
       }
+      resolution_cases: {
+        Row: {
+          booking_id: string
+          created_at: string
+          description: string
+          id: string
+          mechanic_id: string
+          opened_by: string | null
+          opened_by_role: string
+          photos: string[]
+          reason_id: string | null
+          reason_label: string
+          redistributed: boolean
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          description: string
+          id?: string
+          mechanic_id: string
+          opened_by?: string | null
+          opened_by_role: string
+          photos?: string[]
+          reason_id?: string | null
+          reason_label: string
+          redistributed?: boolean
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          mechanic_id?: string
+          opened_by?: string | null
+          opened_by_role?: string
+          photos?: string[]
+          reason_id?: string | null
+          reason_label?: string
+          redistributed?: boolean
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resolution_cases_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_mechanic_id_fkey"
+            columns: ["mechanic_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_opened_by_fkey"
+            columns: ["opened_by"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_opened_by_fkey"
+            columns: ["opened_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_reason_id_fkey"
+            columns: ["reason_id"]
+            isOneToOne: false
+            referencedRelation: "resolution_reasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_cases_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resolution_messages: {
+        Row: {
+          body: string
+          case_id: string
+          created_at: string
+          id: string
+          sender_id: string | null
+          sender_role: string
+        }
+        Insert: {
+          body: string
+          case_id: string
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          sender_role: string
+        }
+        Update: {
+          body?: string
+          case_id?: string
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          sender_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resolution_messages_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "resolution_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resolution_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resolution_reasons: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           booking_id: string
@@ -3794,6 +4026,11 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       mark_inbox_all_read: { Args: never; Returns: undefined }
       mark_inbox_item_read: { Args: { p_item_id: string }; Returns: undefined }
+      mark_mechanic_inbox_all_read: { Args: never; Returns: undefined }
+      mark_mechanic_inbox_item_read: {
+        Args: { p_item_id: string }
+        Returns: undefined
+      }
       normalise_uk_postcode: { Args: { p: string }; Returns: string }
       owns_booking: { Args: { p_booking_id: string }; Returns: boolean }
       purge_stale_dvla_cache: { Args: { p_max_age?: string }; Returns: number }

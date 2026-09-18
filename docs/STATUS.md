@@ -1,6 +1,6 @@
 # Where we are — BMT mechanic app
 
-Last updated **2026-09-17**, end of day. Read this first when picking the work
+Last updated **2026-09-18**. Read this first when picking the work
 up, on this machine or a new one. `CLAUDE.md` explains how the code is laid
 out; `design/README.md` has the mockup → screen map and the build order.
 
@@ -8,25 +8,19 @@ out; `design/README.md` has the mockup → screen map and the build order.
 
 In this order. Tick them off and update this file as you go.
 
-1. **Get the rest of the CRM's reply to the inbox prompt**
-   (`docs/inbox-crm-prompt.md`). Only its last section has been seen — it is
-   recorded below. Brad pastes the full reply into the app session. Apply whatever it says it changed — paths, field
-   names, refusal codes — in `src/lib/inbox.ts`, `src/lib/disputes.ts`,
-   `src/lib/cases.ts`, `src/lib/uploads.ts` and the screens that use them.
-2. **Brad applies the SQL it gives** — migration 0085. It should also cover CRM
-   migration 0032:
-   production has no `resolution_reasons` / `resolution_cases` /
-   `resolution_messages` tables, so "Get help" cannot work until it is applied.
-   If the reply does not mention 0032, ask the CRM session about it again.
-3. **`npm run db:types`**, then remove the two stand-ins:
-   - `src/lib/cases.ts` — the hand-written `CaseReason` / `HelpCase` /
-     `CaseMessage` types and the untyped `db` client → use the generated types.
-   - `src/lib/disputes.ts` — the defensive read of `dispute_messages.photos` /
-     `visible_to` in `fetchDisputeThread`.
-   Then `npx tsc --noEmit`, `npm run lint`, commit and push to `inbox`.
-4. **Check CRM Task 68 is live.** Commit `38f67bd` (faults, revisions, end on
-   site, part status, running late) was not pushed or deployed when it was
-   reported. Until it is, those screens answer with an error.
+1. ~~Get the rest of the CRM's reply to the inbox prompt~~ — **done
+   2026-09-18.** The full reply is the CRM's own task note,
+   `bookmytech/docs/tasks/69-mechanic-inbox-cases-disputes.md`; what it says
+   is summarised below. The contract was kept: no path or field changed.
+2. ~~Apply the SQL~~ — **done.** Brad applied 0085 on 2026-09-17. It creates the
+   `resolution_*` tables itself; **never run CRM migration 0032** (its
+   `booking_events` CHECK is out of date and fails against today's rows).
+3. ~~`npm run db:types` and remove the stand-ins~~ — **done 2026-09-18.**
+   `src/lib/cases.ts` uses the generated types; `src/lib/disputes.ts` reads
+   `photos` / `visible_to` straight off the row.
+4. ~~Check CRM Task 68 is live~~ — **pushed.** `38f67bd` is on the CRM's
+   `origin/main` (HEAD `d025f29`). Whether Vercel has deployed it has not been
+   checked from here; the CRM auto-deploys `main`.
 5. **Start step 8, the Account tail**, on a new branch `account` off `inbox` —
    see "Next" at the bottom of this file. Same routine as every other step:
    read the mockup, read how the CRM's web mechanic pages do it, write
@@ -39,19 +33,35 @@ Whenever Brad can: the **end-to-end test on a dev build** under "Still to do
 outside the code". Nothing has run on a device yet; the sooner it does, the
 less there is to unpick.
 
-### What the CRM said about the inbox task (received 2026-09-17, tail only)
+### What the CRM said about the inbox task (Task 69, read in full 2026-09-18)
 
-Only the closing "Work needed in the app repos" section reached the app
-session — **the rest of the reply (what it built, what it changed from the
-prompt, the SQL to apply, whether 0032 is in it) still needs pasting in.** The
-migration is **0085**.
+Source: `bookmytech/docs/tasks/69-mechanic-inbox-cases-disputes.md`. Fourteen
+routes under `/api/mobile/v1/mechanic/`, paths, fields and shapes exactly as
+`docs/inbox-crm-prompt.md` asked. Built, typechecked, unit-tested and
+production-built; **not yet called with a real token.**
 
-**bmt-mechanic-app**
-- Regenerate types after 0085 (`npm run db:types`) — step 3 above.
-- "Mark all read" can return a non-zero count, because threads with unread
-  messages stay unread. *Already handled:* `(tabs)/inbox.tsx` sets the badge
+- **Migration 0085 creates the `resolution_*` tables itself**, as 0032 defined
+  them, idempotently. 0032 must never be run: Brad ran it on 2026-09-17, it
+  failed on the stale `booking_events` CHECK and rolled back whole. The CRM
+  suggests one check that the live CHECK is intact (it should still list
+  `revision_sent` and `quote_sent`):
+
+  ```sql
+  select pg_get_constraintdef(oid) from pg_constraint
+   where conname = 'booking_events_event_type_check';
+  ```
+- **Deviations from the prompt:** document-expiry pushes and inbox rows follow
+  the cron's real milestones — 30 / 7 / 0 days and on expiry, not 30 / 14 / 1.
+  The app hard-codes no milestone, so nothing changes here.
+- **Additive extras:** refusals may carry a `code` beside `error`; a posted
+  message returns `{ id }`; a closed dispute's `can` is all false.
+- `inbox/read-all` can return a non-zero `unreadCount` (threads with unread
+  messages stay unread). *Already handled:* `(tabs)/inbox.tsx` sets the badge
   from the count the route returns, and never marks a `thread:` row read
   locally. Re-check once it is live rather than assume.
+- A bug the CRM fixed on the way: withdrawing a mechanic-raised dispute used to
+  mark an unfinished job `completed`; it now restores the status from the
+  `dispute_opened` event.
 
 **bmt-customer-app** — not this repo; do it in a customer-app session
 - Regenerate types after 0085: `dispute_messages` gains `photos` and
@@ -125,19 +135,8 @@ into the app session so any differences get applied.
 | `offers-crm-prompt.md` | 65 | built; migration 0082 applied |
 | `today-crm-prompt.md` | 66 | built; migration 0083 applied; types regenerated |
 | `job-crm-prompt.md` | 67 | built (`e54eba7`); migration 0084 is settings rows only — apply when convenient |
-| `job-extras-crm-prompt.md` | 68 | built (`38f67bd`) — **was not pushed/deployed when reported; check** |
-| `inbox-crm-prompt.md` | 69? | built, migration **0085** — only the tail of its reply seen; full reply, SQL and 0032 still to confirm |
-
-### When the inbox prompt's reply comes back
-
-1. Paste it into the app session; apply whatever it changed.
-2. Apply the SQL it gives. **It should include CRM migration 0032** — production
-   has no `resolution_reasons` / `resolution_cases` / `resolution_messages`
-   tables, so the website's "Get help" has never worked there either.
-3. `npm run db:types`, then in `src/lib/cases.ts` replace the hand-written
-   `CaseReason` / `HelpCase` / `CaseMessage` types and the untyped `db` client
-   with the generated ones, and in `src/lib/disputes.ts` drop the defensive
-   read of `dispute_messages.photos` / `visible_to`.
+| `job-extras-crm-prompt.md` | 68 | built (`38f67bd`); pushed to the CRM's `main` |
+| `inbox-crm-prompt.md` | 69 | built (`8bce93b`); migration 0085 applied; types regenerated |
 
 ## Decisions the owner has made — do not reopen
 

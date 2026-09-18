@@ -1,7 +1,7 @@
 import { api, rateLimitMessage, type ApiResult } from '@/lib/api';
-import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/types/database';
 
 /**
  * Get help — a case between the mechanic and Book My Tech about one of their
@@ -9,36 +9,19 @@ import { supabase } from '@/lib/supabase';
  * dispute. Reads are direct under RLS; opening, replying and closing go
  * through the CRM.
  */
-/**
- * Typed by hand: the live database has no `resolution_*` tables yet — CRM
- * migration 0032 was never applied — so the generated types do not have them.
- * Once it is, run `npm run db:types` and take these from `Database` instead.
- */
-export interface CaseReason {
-  id: string;
-  label: string;
-}
+type Tables = Database['public']['Tables'];
 
-export interface HelpCase {
-  id: string;
-  booking_id: string;
-  reason_label: string;
-  description: string;
-  status: string;
-  resolution_note: string | null;
-  created_at: string;
-  photos: string[];
-}
+export type CaseReason = Pick<Tables['resolution_reasons']['Row'], 'id' | 'label'>;
 
-export interface CaseMessage {
-  id: string;
+export type HelpCase = Pick<
+  Tables['resolution_cases']['Row'],
+  'id' | 'booking_id' | 'reason_label' | 'description' | 'status' | 'resolution_note' | 'created_at' | 'photos'
+>;
+
+export type CaseMessage = Pick<Tables['resolution_messages']['Row'], 'id' | 'body' | 'created_at'> & {
+  /** Only the two parties to a case ever write in it. */
   sender_role: 'mechanic' | 'admin';
-  body: string;
-  created_at: string;
-}
-
-/** The same client, without the generated schema, for the tables it does not know. */
-const db = supabase as unknown as SupabaseClient;
+};
 
 export const CASE_STATUS: Record<string, { label: string; tone: 'active' | 'pending' | 'success' | 'neutral' }> = {
   open: { label: 'Open', tone: 'active' },
@@ -53,12 +36,11 @@ export const MAX_CASE_CHARS = 2000;
 
 /** The reasons are rows BMT edits, not a fixed list. */
 export async function fetchCaseReasons(): Promise<CaseReason[]> {
-  const { data } = await db
+  const { data } = await supabase
     .from('resolution_reasons')
     .select('id, label')
     .eq('active', true)
-    .order('sort_order', { ascending: true })
-    .returns<CaseReason[]>();
+    .order('sort_order', { ascending: true });
   return data ?? [];
 }
 
@@ -66,36 +48,32 @@ const CASE_COLUMNS =
   'id, booking_id, reason_label, description, status, resolution_note, created_at, photos';
 
 export async function fetchCases(): Promise<HelpCase[]> {
-  const { data } = await db
+  const { data } = await supabase
     .from('resolution_cases')
     .select(CASE_COLUMNS)
-    .order('created_at', { ascending: false })
-    .returns<HelpCase[]>();
-  return (data ?? []).map((row) => ({ ...row, photos: row.photos ?? [] }));
+    .order('created_at', { ascending: false });
+  return data ?? [];
 }
 
 export async function fetchCase(
   caseId: string,
 ): Promise<{ helpCase: HelpCase; messages: CaseMessage[] } | null> {
   const [found, thread] = await Promise.all([
-    db
-      .from('resolution_cases')
-      .select(CASE_COLUMNS)
-      .eq('id', caseId)
-      .maybeSingle()
-      .returns<HelpCase | null>(),
-    db
+    supabase.from('resolution_cases').select(CASE_COLUMNS).eq('id', caseId).maybeSingle(),
+    supabase
       .from('resolution_messages')
       .select('id, sender_role, body, created_at')
       .eq('case_id', caseId)
-      .order('created_at', { ascending: true })
-      .returns<CaseMessage[]>(),
+      .order('created_at', { ascending: true }),
   ]);
 
   return found.data
     ? {
-        helpCase: { ...found.data, photos: found.data.photos ?? [] },
-        messages: thread.data ?? [],
+        helpCase: found.data,
+        messages: (thread.data ?? []).map((row) => ({
+          ...row,
+          sender_role: row.sender_role as CaseMessage['sender_role'],
+        })),
       }
     : null;
 }
