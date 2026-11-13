@@ -419,6 +419,7 @@ export type Database = {
           ordered_at: string | null
           part_id: string | null
           part_name: string
+          price_estimated: boolean
           priced_at: string | null
           quantity: number
           source: string
@@ -440,6 +441,7 @@ export type Database = {
           ordered_at?: string | null
           part_id?: string | null
           part_name: string
+          price_estimated?: boolean
           priced_at?: string | null
           quantity?: number
           source?: string
@@ -461,6 +463,7 @@ export type Database = {
           ordered_at?: string | null
           part_id?: string | null
           part_name?: string
+          price_estimated?: boolean
           priced_at?: string | null
           quantity?: number
           source?: string
@@ -587,6 +590,7 @@ export type Database = {
           scheduled_at: string | null
           service_duration_hours: number | null
           slot_window: string | null
+          source_custom_quote_id: string | null
           source_quote_id: string | null
           special_instructions: string | null
           started_at: string | null
@@ -647,6 +651,7 @@ export type Database = {
           scheduled_at?: string | null
           service_duration_hours?: number | null
           slot_window?: string | null
+          source_custom_quote_id?: string | null
           source_quote_id?: string | null
           special_instructions?: string | null
           started_at?: string | null
@@ -707,6 +712,7 @@ export type Database = {
           scheduled_at?: string | null
           service_duration_hours?: number | null
           slot_window?: string | null
+          source_custom_quote_id?: string | null
           source_quote_id?: string | null
           special_instructions?: string | null
           started_at?: string | null
@@ -773,6 +779,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "bookings_source_custom_quote_id_fkey"
+            columns: ["source_custom_quote_id"]
+            isOneToOne: false
+            referencedRelation: "custom_quotes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_source_quote_id_fkey"
             columns: ["source_quote_id"]
             isOneToOne: false
@@ -790,8 +803,10 @@ export type Database = {
           description: string | null
           display_order: number
           duration_hours: number
+          fuel_types: string[] | null
           id: string
           includes_engine_oil: boolean
+          info_sheet: string | null
           is_active: boolean
           labour_hours: number | null
           name: string
@@ -807,8 +822,10 @@ export type Database = {
           description?: string | null
           display_order?: number
           duration_hours?: number
+          fuel_types?: string[] | null
           id?: string
           includes_engine_oil?: boolean
+          info_sheet?: string | null
           is_active?: boolean
           labour_hours?: number | null
           name: string
@@ -824,8 +841,10 @@ export type Database = {
           description?: string | null
           display_order?: number
           duration_hours?: number
+          fuel_types?: string[] | null
           id?: string
           includes_engine_oil?: boolean
+          info_sheet?: string | null
           is_active?: boolean
           labour_hours?: number | null
           name?: string
@@ -913,6 +932,123 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      custom_quotes: {
+        Row: {
+          booking_id: string | null
+          commission_rate: number | null
+          created_at: string
+          created_by: string | null
+          customer_email: string
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string | null
+          details: string | null
+          hourly_rate_pence: number | null
+          id: string
+          postcode: string | null
+          request_text: string | null
+          responded_at: string | null
+          sent_at: string | null
+          source: string
+          status: string
+          title: string | null
+          total_pence: number | null
+          updated_at: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_reg: string
+          visit_hours: number
+        }
+        Insert: {
+          booking_id?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_email: string
+          customer_id?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          details?: string | null
+          hourly_rate_pence?: number | null
+          id?: string
+          postcode?: string | null
+          request_text?: string | null
+          responded_at?: string | null
+          sent_at?: string | null
+          source?: string
+          status?: string
+          title?: string | null
+          total_pence?: number | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_reg: string
+          visit_hours?: number
+        }
+        Update: {
+          booking_id?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_email?: string
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          details?: string | null
+          hourly_rate_pence?: number | null
+          id?: string
+          postcode?: string | null
+          request_text?: string | null
+          responded_at?: string | null
+          sent_at?: string | null
+          source?: string
+          status?: string
+          title?: string | null
+          total_pence?: number | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_reg?: string
+          visit_hours?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_quotes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_quotes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_quotes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customer_addresses: {
         Row: {
@@ -4009,6 +4145,10 @@ export type Database = {
           reset_at: string
           used: number
         }[]
+      }
+      custom_quote_account_for_email: {
+        Args: { p_email: string }
+        Returns: string
       }
       delete_customer_account: {
         Args: {
