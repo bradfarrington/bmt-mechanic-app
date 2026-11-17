@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      aag_engine_codes: {
+        Row: {
+          codes: string[]
+          reg: string
+          seen_at: string
+        }
+        Insert: {
+          codes?: string[]
+          reg: string
+          seen_at?: string
+        }
+        Update: {
+          codes?: string[]
+          reg?: string
+          seen_at?: string
+        }
+        Relationships: []
+      }
       aag_part_prices: {
         Row: {
           fetched_at: string
@@ -34,6 +52,27 @@ export type Database = {
           genart_id?: number
           offers?: Json
           reg?: string
+          state?: string
+        }
+        Relationships: []
+      }
+      aag_product_prices: {
+        Row: {
+          fetched_at: string
+          info: Json
+          product_id: string
+          state: string
+        }
+        Insert: {
+          fetched_at?: string
+          info?: Json
+          product_id: string
+          state: string
+        }
+        Update: {
+          fetched_at?: string
+          info?: Json
+          product_id?: string
           state?: string
         }
         Relationships: []
@@ -2767,6 +2806,111 @@ export type Database = {
           },
         ]
       }
+      model_part_choices: {
+        Row: {
+          brand: string | null
+          chosen_at: string
+          chosen_by: string | null
+          description: string | null
+          genart_id: number
+          id: string
+          label: string | null
+          make_name: string
+          model_label: string
+          position: string | null
+          product_id: string
+        }
+        Insert: {
+          brand?: string | null
+          chosen_at?: string
+          chosen_by?: string | null
+          description?: string | null
+          genart_id: number
+          id?: string
+          label?: string | null
+          make_name: string
+          model_label: string
+          position?: string | null
+          product_id: string
+        }
+        Update: {
+          brand?: string | null
+          chosen_at?: string
+          chosen_by?: string | null
+          description?: string | null
+          genart_id?: number
+          id?: string
+          label?: string | null
+          make_name?: string
+          model_label?: string
+          position?: string | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_part_choices_chosen_by_fkey"
+            columns: ["chosen_by"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_part_choices_chosen_by_fkey"
+            columns: ["chosen_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_part_scans: {
+        Row: {
+          car_type_id: number
+          make_name: string
+          model_label: string
+          reg: string
+          repairs: Json
+          scanned_at: string
+          scanned_by: string | null
+          vehicle: string | null
+        }
+        Insert: {
+          car_type_id: number
+          make_name: string
+          model_label: string
+          reg: string
+          repairs?: Json
+          scanned_at?: string
+          scanned_by?: string | null
+          vehicle?: string | null
+        }
+        Update: {
+          car_type_id?: number
+          make_name?: string
+          model_label?: string
+          reg?: string
+          repairs?: Json
+          scanned_at?: string
+          scanned_by?: string | null
+          vehicle?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_part_scans_scanned_by_fkey"
+            columns: ["scanned_by"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "model_part_scans_scanned_by_fkey"
+            columns: ["scanned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_toggles: {
         Row: {
           channel: string
@@ -2805,6 +2949,90 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      part_code_maps: {
+        Row: {
+          decided_at: string | null
+          decided_by: string | null
+          evidence: Json
+          genart_id: number
+          label: string | null
+          napa_genart_id: number
+          napa_label: string | null
+          proposed_at: string
+          status: string
+        }
+        Insert: {
+          decided_at?: string | null
+          decided_by?: string | null
+          evidence?: Json
+          genart_id: number
+          label?: string | null
+          napa_genart_id: number
+          napa_label?: string | null
+          proposed_at?: string
+          status?: string
+        }
+        Update: {
+          decided_at?: string | null
+          decided_by?: string | null
+          evidence?: Json
+          genart_id?: number
+          label?: string | null
+          napa_genart_id?: number
+          napa_label?: string | null
+          proposed_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "part_code_maps_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "customer_admin_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "part_code_maps_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      part_gaps: {
+        Row: {
+          first_seen_at: string
+          genart_id: number
+          label: string | null
+          last_reg: string | null
+          last_seen_at: string
+          make_name: string
+          model_label: string
+          sample_repair: string | null
+        }
+        Insert: {
+          first_seen_at?: string
+          genart_id: number
+          label?: string | null
+          last_reg?: string | null
+          last_seen_at?: string
+          make_name: string
+          model_label: string
+          sample_repair?: string | null
+        }
+        Update: {
+          first_seen_at?: string
+          genart_id?: number
+          label?: string | null
+          last_reg?: string | null
+          last_seen_at?: string
+          make_name?: string
+          model_label?: string
+          sample_repair?: string | null
+        }
+        Relationships: []
       }
       part_group_settings: {
         Row: {
