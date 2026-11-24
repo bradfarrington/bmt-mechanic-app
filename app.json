@@ -61,7 +61,7 @@
         "expo-location",
         {
           "locationWhenInUsePermission": "Book My Tech shares your location with your customer while you are on the way to their job, so they can see when you will arrive.",
-          "motionUsagePermission": false,
+          "motionUsagePermission": "Book My Tech uses motion data with your location while you are on the way to a job, so your customer sees an accurate arrival time.",
           "locationAlwaysPermission": false,
           "locationAlwaysAndWhenInUsePermission": false
         }
