@@ -849,6 +849,7 @@ export type Database = {
           is_active: boolean
           labour_hours: number | null
           name: string
+          part_genart_ids: number[] | null
           price_pence: number | null
           summary: string | null
           updated_at: string
@@ -868,6 +869,7 @@ export type Database = {
           is_active?: boolean
           labour_hours?: number | null
           name: string
+          part_genart_ids?: number[] | null
           price_pence?: number | null
           summary?: string | null
           updated_at?: string
@@ -887,6 +889,7 @@ export type Database = {
           is_active?: boolean
           labour_hours?: number | null
           name?: string
+          part_genart_ids?: number[] | null
           price_pence?: number | null
           summary?: string | null
           updated_at?: string
