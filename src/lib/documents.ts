@@ -108,7 +108,12 @@ export function expiryState(expiresAt: string | null, now = new Date()): ExpiryS
 /** The CRM's private bucket for documents — written only on a token it signs. */
 const DOCS_BUCKET = 'mechanic-docs';
 
-export const MAX_DOC_BYTES = 10 * 1024 * 1024;
+/**
+ * Mirrors the CRM's `MAX_DIRECT_DOC_BYTES`: documents go straight to Storage, so
+ * the cap is no longer about request size. Photos never get near it — they are
+ * shrunk first — so in practice it only meets a very large PDF.
+ */
+export const MAX_DOC_BYTES = 25 * 1024 * 1024;
 export const ACCEPTED_DOC_MIME = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'] as const;
 
 /** Every document, newest first. The newest row per type is the current one. */
@@ -212,7 +217,7 @@ function failure(status: number | undefined, error: string, retryAfter?: number)
  * One document. The file goes straight to Storage on a token the CRM signs,
  * then the CRM checks what landed and inserts the row as `pending_review`; the
  * id comes back so the list can show it at once. Three calls rather than one
- * multipart POST so a document can be the full 10 MB — see `putToSignedUpload`.
+ * multipart POST so a document can be up to 25 MB — see `putToSignedUpload`.
  */
 export async function uploadDocument(input: {
   docType: DocType;
@@ -224,7 +229,7 @@ export async function uploadDocument(input: {
     return { ok: false, error: 'Use a PDF or a JPEG, PNG or WebP image.' };
   }
   if (input.file.size != null && input.file.size > MAX_DOC_BYTES) {
-    return { ok: false, error: 'That file is over 10 MB. Try a smaller scan or photo.' };
+    return { ok: false, error: 'This file is over 25 MB. Try scanning it at a lower quality, or upload a photo of it instead — photos are made smaller automatically.' };
   }
 
   const signed = await api.post<{ path: string; token: string }>('/mechanic/documents/upload-url', {

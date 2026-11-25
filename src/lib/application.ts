@@ -181,12 +181,13 @@ function failure(status: number, error: string, retryAfter?: number): Failure {
 }
 
 /** The CRM's caps, checked before a byte is sent. */
-export const MAX_APP_DOC_BYTES = 10 * 1024 * 1024;
+/** Mirrors the CRM's `MAX_DIRECT_DOC_BYTES`; see `MAX_DOC_BYTES` in documents.ts. */
+export const MAX_APP_DOC_BYTES = 25 * 1024 * 1024;
 const APP_DOC_MIME = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
 
 /**
  * One application document. Straight to Storage on a token the CRM signs, then
- * the CRM checks what landed — so a scanned PDF can be the full 10 MB rather
+ * the CRM checks what landed — so a scanned PDF can be up to 25 MB rather
  * than the 4.5 MB a request through the CRM allows (see `putToSignedUpload`).
  * The path that comes back goes in the submit's `docs`, as before.
  */
@@ -198,7 +199,7 @@ export async function uploadApplicationDoc(
   const mime = file.mimeType ?? 'image/jpeg';
   if (!APP_DOC_MIME.includes(mime)) return { ok: false, error: 'Use a PDF, JPG, PNG or WebP file.' };
   if (file.size != null && file.size > MAX_APP_DOC_BYTES) {
-    return { ok: false, error: 'File must be 10 MB or smaller.' };
+    return { ok: false, error: 'This file is over 25 MB. Try scanning it at a lower quality, or upload a photo of it instead — photos are made smaller automatically.' };
   }
 
   const anonymous = { auth: 'none', headers: CLIENT_HEADER } as const;
