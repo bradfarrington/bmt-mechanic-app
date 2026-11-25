@@ -3,6 +3,7 @@ import { Award, IdCard, Receipt, Shield, ShieldCheck } from 'lucide-react-native
 
 import type { Tone } from '@/constants/theme';
 import { api, rateLimitMessage } from '@/lib/api';
+import { putToSignedUpload } from '@/lib/direct-upload';
 import { dayInstant, londonDayKey } from '@/lib/london-time';
 import { supabase } from '@/lib/supabase';
 import type { PickedFile } from '@/lib/uploads';
@@ -104,6 +105,9 @@ export function expiryState(expiresAt: string | null, now = new Date()): ExpiryS
 }
 
 /** The CRM's caps, mirrored so the picker can refuse before uploading. */
+/** The CRM's private bucket for documents — written only on a token it signs. */
+const DOCS_BUCKET = 'mechanic-docs';
+
 export const MAX_DOC_BYTES = 10 * 1024 * 1024;
 export const ACCEPTED_DOC_MIME = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'] as const;
 
@@ -205,8 +209,10 @@ function failure(status: number | undefined, error: string, retryAfter?: number)
 }
 
 /**
- * One document, as multipart. The CRM stores it and inserts the row as
- * `pending_review`; the id comes back so the list can show it at once.
+ * One document. The file goes straight to Storage on a token the CRM signs,
+ * then the CRM checks what landed and inserts the row as `pending_review`; the
+ * id comes back so the list can show it at once. Three calls rather than one
+ * multipart POST so a document can be the full 10 MB — see `putToSignedUpload`.
  */
 export async function uploadDocument(input: {
   docType: DocType;
@@ -221,17 +227,31 @@ export async function uploadDocument(input: {
     return { ok: false, error: 'That file is over 10 MB. Try a smaller scan or photo.' };
   }
 
-  const form = new FormData();
-  form.append('doc_type', input.docType);
-  form.append('expires_at', input.expiresAt ?? '');
-  // React Native's FormData takes a file as this object, not a Blob.
-  form.append('file', {
-    uri: input.file.uri,
-    type: mime,
-    name: input.file.fileName ?? `document.${mime === 'application/pdf' ? 'pdf' : 'jpg'}`,
-  } as unknown as Blob);
+  const signed = await api.post<{ path: string; token: string }>('/mechanic/documents/upload-url', {
+    doc_type: input.docType,
+    mime,
+  });
+  if (!signed.ok) return failure(signed.status, signed.error, signed.retryAfter);
 
-  const response = await api.upload<{ id: string }>('/mechanic/documents', form);
+  const sent = await putToSignedUpload(
+    DOCS_BUCKET,
+    signed.data,
+    {
+      uri: input.file.uri,
+      mimeType: mime,
+      fileName: input.file.fileName ?? `document.${mime === 'application/pdf' ? 'pdf' : 'jpg'}`,
+    },
+    { upsert: false },
+  );
+  if (!sent) {
+    return { ok: false, error: "That file didn't upload. Check your connection and try again." };
+  }
+
+  const response = await api.post<{ id: string }>('/mechanic/documents/confirm', {
+    doc_type: input.docType,
+    path: signed.data.path,
+    expires_at: input.expiresAt ?? '',
+  });
   return response.ok
     ? { ok: true, id: response.data.id }
     : failure(response.status, response.error, response.retryAfter);

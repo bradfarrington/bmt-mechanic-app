@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react-native';
 import { Award, IdCard, Receipt, Shield, ShieldCheck } from 'lucide-react-native';
 
 import { api, rateLimitMessage } from '@/lib/api';
+import { putToSignedUpload } from '@/lib/direct-upload';
 import type { PickedFile } from '@/lib/uploads';
 
 /**
@@ -183,7 +184,12 @@ function failure(status: number, error: string, retryAfter?: number): Failure {
 export const MAX_APP_DOC_BYTES = 10 * 1024 * 1024;
 const APP_DOC_MIME = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
 
-/** One document, uploaded as soon as it is picked, as on the web. */
+/**
+ * One application document. Straight to Storage on a token the CRM signs, then
+ * the CRM checks what landed — so a scanned PDF can be the full 10 MB rather
+ * than the 4.5 MB a request through the CRM allows (see `putToSignedUpload`).
+ * The path that comes back goes in the submit's `docs`, as before.
+ */
 export async function uploadApplicationDoc(
   draftId: string,
   docType: AppDocType,
@@ -195,19 +201,34 @@ export async function uploadApplicationDoc(
     return { ok: false, error: 'File must be 10 MB or smaller.' };
   }
 
-  const form = new FormData();
-  form.append('draftId', draftId);
-  form.append('docType', docType);
-  form.append('file', {
-    uri: file.uri,
-    type: mime,
-    name: file.fileName ?? `${docType}.${mime === 'application/pdf' ? 'pdf' : 'jpg'}`,
-  } as unknown as Blob);
+  const anonymous = { auth: 'none', headers: CLIENT_HEADER } as const;
+  const signed = await api.post<{ path: string; token: string }>(
+    '/applications/documents/upload-url',
+    { draftId, docType, mime },
+    anonymous,
+  );
+  if (!signed.ok) return failure(signed.status, signed.error, signed.retryAfter);
 
-  const response = await api.upload<{ path: string }>('/applications/documents', form, {
-    auth: 'none',
-    headers: CLIENT_HEADER,
-  });
+  const sent = await putToSignedUpload(
+    'mechanic-docs',
+    signed.data,
+    {
+      uri: file.uri,
+      mimeType: mime,
+      fileName: file.fileName ?? `${docType}.${mime === 'application/pdf' ? 'pdf' : 'jpg'}`,
+    },
+    // Replacing a document re-uses its path.
+    { upsert: true },
+  );
+  if (!sent) {
+    return { ok: false, error: "That file didn't upload. Check your connection and try again." };
+  }
+
+  const response = await api.post<{ path: string }>(
+    '/applications/documents/confirm',
+    { draftId, docType, path: signed.data.path },
+    anonymous,
+  );
   return response.ok
     ? { ok: true, path: response.data.path }
     : failure(response.status, response.error, response.retryAfter);
