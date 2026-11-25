@@ -10,6 +10,7 @@ import { Palette, Radius, Sizing, Spacing } from '@/constants/theme';
 import { useAuth } from '@/lib/auth';
 import { formatPostcode, postcodeDistrict } from '@/lib/postcode';
 import { MAX_BIO_CHARS, MAX_NAME_CHARS, updateProfile, uploadAvatar } from '@/lib/profile';
+import { shrinkForUpload } from '@/lib/photo-upload';
 
 /**
  * Profile — mockup frame 5. Name, phone and bio are written direct under RLS,
@@ -85,12 +86,7 @@ export default function ProfileScreen() {
     if (picked.canceled || !asset) return;
 
     setUploading(true);
-    const result = await uploadAvatar({
-      uri: asset.uri,
-      mimeType: asset.mimeType,
-      fileName: asset.fileName,
-      size: asset.fileSize,
-    });
+    const result = await uploadAvatar(await shrinkForUpload(asset));
     setUploading(false);
     if (result.ok) {
       setAvatar(result.url);

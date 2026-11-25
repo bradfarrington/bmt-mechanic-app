@@ -83,6 +83,7 @@ import { formatLondon } from '@/lib/london-time';
 import { formatPence } from '@/lib/offers';
 import { useStatus } from '@/lib/status';
 import { formatMinutes } from '@/lib/summary';
+import { shrinkForUpload } from '@/lib/photo-upload';
 
 const time = (iso: string | null) =>
   iso ? formatLondon(new Date(iso), { hour: '2-digit', minute: '2-digit' }) : '';
@@ -248,7 +249,8 @@ export default function JobScreen() {
     const asset = picked.assets?.[0];
     if (picked.canceled || !asset) return;
 
-    await run('photo', () => uploadPhoto(id, asset));
+    const photo = await shrinkForUpload(asset);
+    await run('photo', () => uploadPhoto(id, photo));
   }
 
   function onComplete() {

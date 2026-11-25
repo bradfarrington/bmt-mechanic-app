@@ -17,6 +17,7 @@ import {
 } from '@/lib/application';
 import { useApplicationDraft } from '@/lib/application-draft';
 import type { PickedFile } from '@/lib/uploads';
+import { shrinkForUpload } from '@/lib/photo-upload';
 
 type Picked = PickedFile & { size?: number | null };
 
@@ -62,7 +63,7 @@ export default function ApplyDocumentsScreen() {
         : await ImagePicker.launchImageLibraryAsync(options);
     const asset = picked.assets?.[0];
     if (picked.canceled || !asset) return;
-    await send(def, { uri: asset.uri, mimeType: asset.mimeType, fileName: asset.fileName, size: asset.fileSize });
+    await send(def, await shrinkForUpload(asset));
   }
 
   async function pickFile(def: AppDocDef) {

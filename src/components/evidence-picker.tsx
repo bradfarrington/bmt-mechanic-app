@@ -7,6 +7,7 @@ import { ActivityIndicator, Alert, Pressable, StyleSheet, View } from 'react-nat
 import { Icon, Text } from '@/components/ui';
 import { DetailSizing, JobPhotos, Palette, Radius, Scrim, Spacing } from '@/constants/theme';
 import { MAX_EVIDENCE_PHOTOS, uploadEvidence } from '@/lib/uploads';
+import { shrinkForUpload } from '@/lib/photo-upload';
 
 export interface EvidencePickerProps {
   /** Which upload route the photos go to. */
@@ -45,7 +46,7 @@ export function EvidencePicker({ kind, photos, onChange }: EvidencePickerProps) 
     if (picked.canceled || !asset) return;
 
     setUploading(true);
-    const result = await uploadEvidence(kind, asset);
+    const result = await uploadEvidence(kind, await shrinkForUpload(asset));
     setUploading(false);
 
     if (result.ok) onChange([...photos, result.url]);

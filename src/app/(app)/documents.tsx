@@ -25,6 +25,7 @@ import {
 } from '@/lib/documents';
 import { formatDay } from '@/lib/london-time';
 import type { PickedFile } from '@/lib/uploads';
+import { shrinkForUpload } from '@/lib/photo-upload';
 
 /**
  * Documents — mockup frame 4. The list is the mechanic's own rows under RLS;
@@ -85,7 +86,7 @@ export default function DocumentsScreen() {
         : await ImagePicker.launchImageLibraryAsync(options);
     const asset = picked.assets?.[0];
     if (picked.canceled || !asset) return;
-    ready(def, { uri: asset.uri, mimeType: asset.mimeType, fileName: asset.fileName, size: asset.fileSize });
+    ready(def, await shrinkForUpload(asset));
   }
 
   async function pickFile(def: DocTypeDef) {
