@@ -199,7 +199,7 @@ export async function uploadApplicationDoc(
   const mime = file.mimeType ?? 'image/jpeg';
   if (!APP_DOC_MIME.includes(mime)) return { ok: false, error: 'Use a PDF, JPG, PNG or WebP file.' };
   if (file.size != null && file.size > MAX_APP_DOC_BYTES) {
-    return { ok: false, error: 'This file is over 25 MB. Try scanning it at a lower quality, or upload a photo of it instead — photos are made smaller automatically.' };
+    return { ok: false, error: 'This file is over 25 MB. Please compress it and try again.' };
   }
 
   const anonymous = { auth: 'none', headers: CLIENT_HEADER } as const;

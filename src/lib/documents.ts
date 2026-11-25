@@ -229,7 +229,7 @@ export async function uploadDocument(input: {
     return { ok: false, error: 'Use a PDF or a JPEG, PNG or WebP image.' };
   }
   if (input.file.size != null && input.file.size > MAX_DOC_BYTES) {
-    return { ok: false, error: 'This file is over 25 MB. Try scanning it at a lower quality, or upload a photo of it instead — photos are made smaller automatically.' };
+    return { ok: false, error: 'This file is over 25 MB. Please compress it and try again.' };
   }
 
   const signed = await api.post<{ path: string; token: string }>('/mechanic/documents/upload-url', {
