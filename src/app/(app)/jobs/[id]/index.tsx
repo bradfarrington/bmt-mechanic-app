@@ -256,7 +256,9 @@ export default function JobScreen() {
   function onComplete() {
     Alert.alert(
       `Charge ${charge}?`,
-      `This takes ${charge} from ${firstName}’s card and marks the job complete. You’re paid out 24 hours later.`,
+      `This takes ${charge} from ${firstName}’s card and marks the job complete${
+        booking.mileage != null ? ` at ${booking.mileage.toLocaleString('en-GB')} miles` : ''
+      }. You’re paid out 24 hours later.`,
       [
         { text: 'Not yet', style: 'cancel' },
         { text: `Confirm & charge ${charge}`, onPress: () => void run('complete', () => completeJob(id)) },
@@ -660,14 +662,21 @@ export default function JobScreen() {
         );
       })}
 
-      {status === 'in_progress' && checklists.length > 0 && (
+      {/* Every job, not just checklist ones: the reading at sign-off is the
+          record of the vehicle when the work was done, should a part fitted
+          here later be claimed as faulty. The CRM refuses completion without it. */}
+      {status === 'in_progress' && (
         <Input
           label="Vehicle mileage"
           value={mileage}
           onChangeText={setMileageText}
           placeholder="48210"
           keyboardType="number-pad"
-          helper="Needed before you can complete a job with a checklist."
+          helper={
+            booking.mileage != null
+              ? `Saved: ${booking.mileage.toLocaleString('en-GB')} miles. Needed to complete the job.`
+              : 'Read it off the dashboard and save it. Needed to complete the job.'
+          }
           labelAction={
             <Text
               variant="caption"
