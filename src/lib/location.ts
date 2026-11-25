@@ -1,6 +1,7 @@
 import * as Location from 'expo-location';
 
 import { supabase } from '@/lib/supabase';
+import type { Database } from '@/types/database';
 
 /**
  * Live location, shared with the customer only while the mechanic is on the
@@ -20,6 +21,34 @@ export interface Fix extends LatLng {
 export type SharingState = 'off' | 'starting' | 'sharing' | 'denied' | 'unavailable';
 
 let watcher: Location.LocationSubscription | null = null;
+let heartbeat: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * How often the last fix is re-sent while the mechanic isn't moving.
+ *
+ * The watcher below only fires on movement: iOS ignores `timeInterval`
+ * altogether and Android needs both conditions met, so a mechanic sat in
+ * traffic, at a junction, or still on the drive gets one fix and then
+ * silence. The customer app hides the marker after a minute of that and the
+ * read policy hides the row after five, so the customer saw "Waiting for your
+ * mechanic's location…" while sharing was on. Re-sending touches `updated_at`
+ * (the trigger stamps it), which keeps the row readable and emits a Realtime
+ * event — comfortably inside the customer app's 60-second cut-off.
+ */
+const HEARTBEAT_MS = 20_000;
+
+type LocationRow = Database['public']['Tables']['mechanic_locations']['Insert'];
+
+function save(row: LocationRow) {
+  // `updated_at` is stamped by a trigger; sending one would be ignored.
+  void supabase
+    .from('mechanic_locations')
+    .upsert(row)
+    .then(({ error }) => {
+      // Logged, not surfaced: the next fix or heartbeat retries it anyway.
+      if (error && __DEV__) console.warn('[location] fix not saved:', error.message);
+    });
+}
 
 export async function startSharing(
   mechanicId: string,
@@ -30,16 +59,18 @@ export async function startSharing(
 
   await stopWatching();
 
+  let last: LocationRow | null = null;
+  let lastAt = 0;
+
   try {
     watcher = await Location.watchPositionAsync(
-      // A fix every ten seconds or fifty metres: smooth enough on the
-      // customer's map, and the customer app treats a minute's silence as stale.
+      // A fix every ten seconds or fifty metres while moving — smooth enough on
+      // the customer's map. Standing still is covered by the heartbeat.
       { accuracy: Location.Accuracy.High, timeInterval: 10_000, distanceInterval: 50 },
       ({ coords }) => {
         onFix({ lat: coords.latitude, lng: coords.longitude, speedMps: coords.speed });
 
-        // `updated_at` is stamped by a trigger; sending one would be ignored.
-        void supabase.from('mechanic_locations').upsert({
+        last = {
           mechanic_id: mechanicId,
           lat: coords.latitude,
           lng: coords.longitude,
@@ -47,9 +78,18 @@ export async function startSharing(
           heading_deg: coords.heading,
           speed_mps: coords.speed,
           sharing_enabled: true,
-        });
+        };
+        lastAt = Date.now();
+        save(last);
       },
     );
+    heartbeat = setInterval(() => {
+      // Only when the watcher has gone quiet — while driving, real fixes keep
+      // the row fresh. Quiet means standing still, so zero the speed: the
+      // customer's ETA then uses the urban average rather than whatever the
+      // last moving fix reported.
+      if (last && Date.now() - lastAt >= HEARTBEAT_MS) save({ ...last, speed_mps: 0 });
+    }, HEARTBEAT_MS / 2);
     return 'sharing';
   } catch {
     return 'unavailable';
@@ -57,6 +97,8 @@ export async function startSharing(
 }
 
 async function stopWatching() {
+  if (heartbeat) clearInterval(heartbeat);
+  heartbeat = null;
   watcher?.remove();
   watcher = null;
 }
