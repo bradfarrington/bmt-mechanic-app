@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import {
+  CalendarClock,
   Camera,
   Check,
   CircleCheck,
@@ -57,6 +58,7 @@ import {
 import { useJourneySharing } from '@/hooks/use-journey-sharing';
 import { useAuth } from '@/lib/auth';
 import {
+  acceptRescheduleRequest,
   beginWork,
   completeJob,
   fetchJobExtras,
@@ -67,6 +69,7 @@ import {
   phoneRevealed,
   removeFault,
   removePhoto,
+  rescheduleRequestedBy,
   setMileage,
   setPartSourcing,
   setPartStatus,
@@ -87,6 +90,10 @@ import { shrinkForUpload } from '@/lib/photo-upload';
 
 const time = (iso: string | null) =>
   iso ? formatLondon(new Date(iso), { hour: '2-digit', minute: '2-digit' }) : '';
+
+/** "Thu 27 Nov · 2pm–4pm" — the day, then the arrival window or, without one, the time. */
+const slot = (iso: string, window: string | null) =>
+  `${formatLondon(new Date(iso), { weekday: 'short', day: 'numeric', month: 'short' })} · ${window ?? time(iso)}`;
 
 const QUOTE_STATUS: Record<string, string> = {
   sent: 'Waiting for the customer',
@@ -191,7 +198,11 @@ export default function JobScreen() {
   const address = jobAddress(booking);
   const active = ['confirmed', 'en_route', 'in_progress'].includes(status);
   const canMessage = active;
-  const reschedulePending = booking.reschedule_status === 'proposed';
+  const requestedBy = rescheduleRequestedBy(booking);
+  // The mechanic's own proposal holds the job until the customer answers; the
+  // customer's request is the mechanic's to answer, and lapses if they set off.
+  const reschedulePending = requestedBy === 'mechanic';
+  const customerRequest = status === 'confirmed' && requestedBy === 'customer';
   const openQuote = quotes.find((quote) => quote.status === 'sent');
   const checklists = extras?.checklists ?? [];
   const eta =
@@ -266,6 +277,16 @@ export default function JobScreen() {
     );
   }
 
+  function onStartJourney() {
+    const start = () => void run('start', () => startJourney(id));
+    // Setting off lapses the customer's request, so say so first.
+    if (!customerRequest) return start();
+    Alert.alert(`${firstName} asked to move this job`, 'Setting off keeps the booked time.', [
+      { text: 'Not yet', style: 'cancel' },
+      { text: 'Set off', onPress: start },
+    ]);
+  }
+
   async function saveMileage() {
     const miles = Number(mileage.replace(/[\s,]/g, ''));
     if (!Number.isInteger(miles) || miles < 0) {
@@ -289,7 +310,7 @@ export default function JobScreen() {
             iconLeft={Navigation}
             loading={busy === 'start'}
             disabled={busy !== null}
-            onPress={() => void run('start', () => startJourney(id))}
+            onPress={onStartJourney}
           >
             Start journey
           </Button>
@@ -479,6 +500,54 @@ export default function JobScreen() {
         </Notice>
       )}
 
+      {customerRequest && (
+        <Card tone="warn" style={styles.stack}>
+          <View style={styles.row}>
+            <IconTile icon={CalendarClock} tone="pending" />
+            <Text color="warningText" style={[styles.grow, styles.strong]}>
+              {`${firstName} asked to move this job`}
+            </Text>
+          </View>
+          <View style={styles.request}>
+            <Text style={styles.strong}>
+              {booking.reschedule_proposed_at
+                ? slot(booking.reschedule_proposed_at, booking.reschedule_proposed_window)
+                : 'A new time'}
+            </Text>
+            {!!booking.scheduled_at && (
+              <Text variant="caption" color="warningText">
+                {`Currently ${slot(booking.scheduled_at, booking.slot_window)}`}
+              </Text>
+            )}
+            {!!booking.reschedule_note?.trim() && (
+              <Text variant="bodySm" color="warningText">
+                “{booking.reschedule_note.trim()}”
+              </Text>
+            )}
+          </View>
+          <Button
+            fullWidth
+            iconLeft={Check}
+            loading={busy === 'accept'}
+            disabled={busy !== null}
+            onPress={() => void run('accept', () => acceptRescheduleRequest(id))}
+          >
+            Accept new time
+          </Button>
+          <Button
+            fullWidth
+            variant="secondary"
+            disabled={busy !== null}
+            onPress={() => router.push({ pathname: '/jobs/[id]/reschedule', params: { id } })}
+          >
+            Suggest another time
+          </Button>
+          <Text variant="caption" color="warningText">
+            {`Can’t make it? Suggest another time and ${firstName} can choose.`}
+          </Text>
+        </Card>
+      )}
+
       <View style={styles.intro}>
         <Text variant="h1">{booking.repair_description ?? 'Repair'}</Text>
         <View style={styles.line}>
@@ -525,9 +594,7 @@ export default function JobScreen() {
               When
             </Text>
             <Text variant="bodySm" style={styles.strong}>
-              {booking.scheduled_at
-                ? `${formatLondon(new Date(booking.scheduled_at), { weekday: 'short', day: 'numeric', month: 'short' })} · ${booking.slot_window ?? time(booking.scheduled_at)}`
-                : 'To be confirmed'}
+              {booking.scheduled_at ? slot(booking.scheduled_at, booking.slot_window) : 'To be confirmed'}
             </Text>
           </Card>
           <Card style={styles.fact}>
@@ -988,6 +1055,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.blueTintStrong,
   },
   fact: { flex: 1, gap: Spacing[1], padding: Spacing[3] },
+  request: { gap: Spacing[1] },
   notes: { gap: Spacing[1], padding: Spacing[4] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing[2] },
   photos: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing[2] },

@@ -625,6 +625,8 @@ export type Database = {
           repair_node_id: string | null
           reschedule_note: string | null
           reschedule_proposed_at: string | null
+          reschedule_proposed_by: string | null
+          reschedule_proposed_window: string | null
           reschedule_status: string | null
           scheduled_at: string | null
           service_duration_hours: number | null
@@ -686,6 +688,8 @@ export type Database = {
           repair_node_id?: string | null
           reschedule_note?: string | null
           reschedule_proposed_at?: string | null
+          reschedule_proposed_by?: string | null
+          reschedule_proposed_window?: string | null
           reschedule_status?: string | null
           scheduled_at?: string | null
           service_duration_hours?: number | null
@@ -747,6 +751,8 @@ export type Database = {
           repair_node_id?: string | null
           reschedule_note?: string | null
           reschedule_proposed_at?: string | null
+          reschedule_proposed_by?: string | null
+          reschedule_proposed_window?: string | null
           reschedule_status?: string | null
           scheduled_at?: string | null
           service_duration_hours?: number | null

@@ -35,7 +35,10 @@ export type JobBooking = Pick<
   | 'special_instructions'
   | 'cancellation_reason'
   | 'reschedule_status'
+  | 'reschedule_proposed_by'
   | 'reschedule_proposed_at'
+  | 'reschedule_proposed_window'
+  | 'reschedule_note'
   | 'repair_description'
   | 'service_duration_hours'
   | 'mileage'
@@ -48,8 +51,9 @@ const BOOKING_COLUMNS =
   'id, job_number, status, mechanic_id, scheduled_at, slot_window, candidate_days, total_pence, ' +
   'mechanic_payout_pence, vehicle_reg, vehicle_make, vehicle_model, postcode, area, ' +
   'address_line_1, address_line_2, customer_name, customer_phone, special_instructions, ' +
-  'cancellation_reason, reschedule_status, reschedule_proposed_at, repair_description, ' +
-  'service_duration_hours, mileage, en_route_at, started_at, completed_at';
+  'cancellation_reason, reschedule_status, reschedule_proposed_by, reschedule_proposed_at, ' +
+  'reschedule_proposed_window, reschedule_note, repair_description, service_duration_hours, ' +
+  'mileage, en_route_at, started_at, completed_at';
 
 export interface JobPhoto {
   id: string;
@@ -235,9 +239,30 @@ export const setMileage = (bookingId: string, mileage: number) =>
 export const cancelJob = (bookingId: string, reason: string, detail?: string) =>
   act(path(bookingId, 'cancel'), { reason, ...(detail?.trim() ? { detail: detail.trim() } : {}) });
 
-/** The booking keeps its slot until the customer answers. */
+/**
+ * The booking keeps its slot until the customer answers. Sent while the
+ * customer's own request is waiting, it replaces that request.
+ */
 export const proposeReschedule = (bookingId: string, newIso: string, note: string) =>
   act(path(bookingId, 'reschedule'), { newIso, note });
+
+/**
+ * Who asked for the new time. A proposal from before the column existed has
+ * no `reschedule_proposed_by`, and was always the mechanic's.
+ */
+export function rescheduleRequestedBy(
+  booking: Pick<JobBooking, 'reschedule_status' | 'reschedule_proposed_by'>,
+): 'customer' | 'mechanic' | null {
+  if (booking.reschedule_status !== 'proposed') return null;
+  return booking.reschedule_proposed_by === 'customer' ? 'customer' : 'mechanic';
+}
+
+/**
+ * Accepts the customer's request for a new time: the job moves to the time
+ * (and window) they asked for. To say no, suggest another time instead.
+ */
+export const acceptRescheduleRequest = (bookingId: string) =>
+  act(path(bookingId, 'reschedule-request'), { decision: 'accept' });
 
 export const saveChecklistAnswer = (
   bookingId: string,
