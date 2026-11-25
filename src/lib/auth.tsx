@@ -11,6 +11,7 @@ import {
 } from 'react';
 
 import { requestAccountDeletion } from '@/lib/account';
+import { stopSharing } from '@/lib/location';
 import { unregisterForPush } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
@@ -247,8 +248,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       async signOut() {
         // Before the session goes — the removal call needs the token. A shared
-        // phone must not keep getting the previous mechanic's offers.
+        // phone must not keep getting the previous mechanic's offers, nor keep
+        // sharing their position.
         await unregisterForPush();
+        const userId = (await supabase.auth.getSession()).data.session?.user.id;
+        if (userId) await stopSharing(userId);
         await supabase.auth.signOut();
       },
 

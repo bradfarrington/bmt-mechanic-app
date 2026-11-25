@@ -25,6 +25,9 @@ import { Palette } from '@/constants/theme';
 import { usePushDeepLinks, usePushRegistration } from '@/hooks/use-push';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { InboxProvider } from '@/lib/inbox-state';
+// Side effect: defines the background location task, which must exist before
+// the OS delivers a fix to a backgrounded app.
+import '@/lib/location';
 import { StatusProvider } from '@/lib/status';
 import { loadWelcomeSeen, useWelcomeSeen } from '@/lib/welcome';
 

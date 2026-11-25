@@ -222,13 +222,9 @@ export default function JobScreen() {
             ? { tone: 'cancelled', text: 'Cancelled' }
             : { tone: 'active', text: `Confirmed · ${time(booking.scheduled_at)}${booking.slot_window ? ` · ${booking.slot_window}` : ''}` };
 
-  function directions(app: 'maps' | 'waze') {
+  function directions() {
     const query = encodeURIComponent(address || booking.postcode);
-    void Linking.openURL(
-      app === 'waze'
-        ? `https://waze.com/ul?q=${query}&navigate=yes`
-        : `https://www.google.com/maps/dir/?api=1&destination=${query}`,
-    );
+    void Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${query}`);
   }
 
   async function addPhoto(source: 'camera' | 'library') {
@@ -393,11 +389,8 @@ export default function JobScreen() {
       )}
       {active && (
         <View style={styles.row}>
-          <Button variant="secondary" iconLeft={Navigation} style={styles.grow} onPress={() => directions('maps')}>
+          <Button variant="secondary" iconLeft={Navigation} style={styles.grow} onPress={directions}>
             Get directions
-          </Button>
-          <Button variant="secondary" style={styles.grow} onPress={() => directions('waze')}>
-            Open in Waze
           </Button>
         </View>
       )}
@@ -515,8 +508,8 @@ export default function JobScreen() {
             </Text>
           )}
           <Text variant="caption" color="textMuted">
-            Your position is shared only while you’re on the way, and only while this screen is
-            open.
+            Your position is shared only while you’re on the way — including while you use your
+            sat-nav — and stops as soon as you arrive.
           </Text>
         </Card>
       )}

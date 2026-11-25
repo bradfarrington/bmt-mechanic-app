@@ -1,38 +1,54 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { startSharing, stopSharing, type Fix, type SharingState } from '@/lib/location';
+import {
+  startSharing,
+  stopSharing,
+  subscribeToFixes,
+  type Fix,
+  type SharingState,
+} from '@/lib/location';
 
 /**
- * Shares the mechanic's position for as long as `active` holds — the job is
- * `en_route` — and takes it back the moment it does not, or the screen goes.
+ * Shares the mechanic's position while `active` holds — the job is
+ * `en_route` — and takes it back when the job moves on.
  *
- * Foreground only: the position updates while the app is open on the job. A
- * mechanic following their sat-nav in another app goes quiet, and the
- * customer's map says so rather than showing a stale pin.
+ * Leaving the screen does NOT stop it: sharing runs in the background (see
+ * `lib/location.ts`) so the customer's map keeps moving while the mechanic
+ * drives on their sat-nav. It stops when this screen sees the job leave
+ * `en_route`, on sign-out, or when the background task itself finds no job on
+ * the way.
  */
 export function useJourneySharing(mechanicId: string | undefined, active: boolean) {
   // Null until `startSharing` has answered — which reads as 'starting' while active.
   const [result, setResult] = useState<Exclude<SharingState, 'off' | 'starting'> | null>(null);
   const [fix, setFix] = useState<Fix | null>(null);
 
+  // Only a job this screen saw on the way may be stopped from here. Opening a
+  // different, finished job must not end sharing for the one being driven to.
+  const wasActive = useRef(false);
+
+  useEffect(() => subscribeToFixes(setFix), []);
+
   useEffect(() => {
-    if (!mechanicId || !active) return;
-    let cancelled = false;
+    if (!mechanicId) return;
 
-    startSharing(mechanicId, (next) => {
-      if (!cancelled) setFix(next);
-    }).then((next) => {
-      if (!cancelled) setResult(next);
-    });
+    if (active) {
+      wasActive.current = true;
+      let cancelled = false;
+      startSharing().then((next) => {
+        if (!cancelled) setResult(next);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
 
-    return () => {
-      cancelled = true;
-      setResult(null);
-      setFix(null);
+    if (wasActive.current) {
+      wasActive.current = false;
       void stopSharing(mechanicId);
-    };
+    }
   }, [mechanicId, active]);
 
   const state: SharingState = !active ? 'off' : (result ?? 'starting');
-  return { state, fix };
+  return { state, fix: active ? fix : null };
 }
