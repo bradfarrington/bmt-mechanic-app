@@ -2,8 +2,10 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import {
+  BookOpen,
   CalendarClock,
   Camera,
+  ChevronRight,
   Check,
   CircleCheck,
   ClipboardCheck,
@@ -71,7 +73,6 @@ import {
   removePhoto,
   rescheduleRequestedBy,
   setMileage,
-  setPartSourcing,
   setPartStatus,
   startJourney,
   uploadPhoto,
@@ -640,6 +641,40 @@ export default function JobScreen() {
         </Card>
       )}
 
+      {/* The manufacturer's manuals and data for this car, read in the app — as
+          the website's job page, which no longer sends anyone to HaynesPro. */}
+      {status !== 'cancelled' && (
+        <Card style={styles.stack}>
+          <View style={styles.titleRow}>
+            <Icon icon={BookOpen} size={DetailSizing.rowIcon} strokeWidth={2} color={Palette.textSecondary} />
+            <Overline>Technical data</Overline>
+          </View>
+          <Text variant="bodySm" color="textSecondary">
+            The manufacturer’s repair manuals and technical data for this vehicle.
+          </Text>
+          <View style={styles.buttonRow}>
+            <Button
+              size="sm"
+              variant="secondary"
+              iconRight={ChevronRight}
+              style={styles.grow}
+              onPress={() => router.push({ pathname: '/jobs/[id]/manuals', params: { id } })}
+            >
+              Repair manuals
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              iconRight={ChevronRight}
+              style={styles.grow}
+              onPress={() => router.push({ pathname: '/jobs/[id]/technical', params: { id } })}
+            >
+              Technical data
+            </Button>
+          </View>
+        </Card>
+      )}
+
       {(status === 'in_progress' || photos.length > 0) && (
         <View style={styles.section}>
           <Overline>Photos</Overline>
@@ -769,22 +804,6 @@ export default function JobScreen() {
                 <Text variant="bodySm">
                   {part.part_name}
                   {part.quantity > 1 ? ` × ${part.quantity}` : ''}
-                </Text>
-                <Text
-                  variant="caption"
-                  color="blue"
-                  style={styles.strong}
-                  accessibilityRole="button"
-                  onPress={
-                    busy
-                      ? undefined
-                      : () =>
-                          void run('part', () =>
-                            setPartSourcing(part.id, part.sourcing === 'bmt' ? 'self' : 'bmt'),
-                          )
-                  }
-                >
-                  {part.sourcing === 'bmt' ? 'BMT-sourced · switch to my own' : 'My own · switch to BMT-sourced'}
                 </Text>
                 <View style={styles.line}>
                   <Text variant="caption" color="textMuted">
@@ -1057,6 +1076,8 @@ const styles = StyleSheet.create({
   fact: { flex: 1, gap: Spacing[1], padding: Spacing[3] },
   request: { gap: Spacing[1] },
   notes: { gap: Spacing[1], padding: Spacing[4] },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing[2] },
+  buttonRow: { flexDirection: 'row', gap: Spacing[2] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing[2] },
   photos: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing[2] },
   photo: { width: JobPhotos.size, height: JobPhotos.size, borderRadius: Radius.tile },

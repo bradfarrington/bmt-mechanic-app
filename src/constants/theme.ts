@@ -550,6 +550,8 @@ export const Sizing = {
   rowChevron: 18,
   /** Saved payment card — its least height, and the contactless mark in its corner */
   paymentCard: { minHeight: 110, icon: 22 },
+  /** Mechanic app: a repair-manual picture's shape until it has loaded and told us its own */
+  technicalImageRatio: 4 / 3,
 } as const;
 
 /**

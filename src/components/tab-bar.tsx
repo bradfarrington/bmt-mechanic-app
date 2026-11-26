@@ -244,8 +244,8 @@ export function TabBar({ state, navigation, insets, items }: TabBarProps) {
       >
         {items.slice(0, half).map(renderTab)}
         {/* The label takes the button's colour, so the state reads from a distance. */}
-        <View style={[styles.tab, styles.statusLabel]}>
-          <Text variant="tabLabel" color={look.labelColor}>
+        <View style={styles.tab}>
+          <Text variant="tabLabel" color={look.labelColor} numberOfLines={1} style={styles.statusLabel}>
             {look.label}
           </Text>
         </View>
@@ -325,9 +325,16 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.danger,
     zIndex: 1,
   },
+  // Out of the row's flow, so it hangs into the bar's bottom padding: it has
+  // to sit below the button, and padding it down inside the row's fixed
+  // height left 8pt for a 13pt line, which clipped "On a job" off at the foot.
   statusLabel: {
+    position: 'absolute',
     // Measured from the bar's top edge in the mockup; the row starts below its padding.
-    paddingTop: TabBarTokens.fabLabelTop - TabBarTokens.paddingTop,
+    top: TabBarTokens.fabLabelTop - TabBarTokens.paddingTop,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
   },
   fabSlot: {
     position: 'absolute',

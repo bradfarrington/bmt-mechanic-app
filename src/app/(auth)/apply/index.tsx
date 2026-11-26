@@ -64,7 +64,10 @@ export default function ApplyAboutScreen() {
         iconLeft={MapPin}
         helper="Where you're based — it decides which jobs you're offered."
         value={draft.postcode}
-        onChangeText={(postcode) => update({ postcode: postcode.toUpperCase() })}
+        onChangeText={(postcode) => update({ postcode })}
+        // Upper-cased on blur, not per keystroke: rewriting the text while an
+        // Android keyboard is still composing scrambles the letters.
+        onBlur={() => update({ postcode: draft.postcode.trim().toUpperCase() })}
         placeholder="SE15 5DT"
         autoCapitalize="characters"
         autoCorrect={false}

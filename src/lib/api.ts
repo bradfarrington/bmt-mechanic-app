@@ -1,4 +1,5 @@
 import { Env } from '@/lib/env';
+import { sendMultipart, type MultipartResponse } from '@/lib/multipart';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -80,14 +81,17 @@ async function request<T>(
 
   const url = `${Env.apiBaseUrl}/api/mobile/${API_VERSION}${path}`;
 
-  let response: Response;
+  let response: MultipartResponse | Response;
   try {
-    response = await fetch(url, {
-      method,
-      headers,
-      body: form ?? (body === undefined ? undefined : JSON.stringify(body)),
-      signal,
-    });
+    // Multipart can't go through `fetch` any more — see lib/multipart.ts.
+    response = form
+      ? await sendMultipart('POST', url, { headers, body: form, signal })
+      : await fetch(url, {
+          method,
+          headers,
+          body: body === undefined ? undefined : JSON.stringify(body),
+          signal,
+        });
   } catch (err) {
     // Silent by default otherwise: the caller gets a friendly string, but
     // nothing reaches the Metro terminal, so a dev has no error to go on.

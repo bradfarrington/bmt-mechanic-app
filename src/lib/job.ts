@@ -288,12 +288,6 @@ export const addFault = (
 export const removeFault = (faultId: string) =>
   act(`/mechanic/faults/${encodeURIComponent(faultId)}/remove`);
 
-export const setPartSourcing = (partId: string, sourcing: 'self' | 'bmt') =>
-  act<{ payoutPence: number }>(
-    `/mechanic/booking-parts/${encodeURIComponent(partId)}/sourcing`,
-    { sourcing },
-  );
-
 /** One photo per call, as multipart — the bucket takes no direct writes. */
 export async function uploadPhoto(
   bookingId: string,

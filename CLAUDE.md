@@ -49,6 +49,10 @@ lib helper, a config choice — copy that rather than inventing a second way.
 - `src/lib/job.ts` — one job: reads direct under RLS, every write through the
   CRM (`/mechanic/bookings/:id/*`). The money, the checklists and the map
   coordinates come from `GET …/job`; the app never prices or geocodes.
+- `src/lib/technical.ts` — the job vehicle's HaynesPro repair manuals and
+  technical data, read through the CRM (`GET …/technical/*`), which holds the
+  credentials and maps HaynesPro's payloads to stable shapes. Drawn natively by
+  `src/components/technical.tsx`; no PDFs involved.
 - Revisions (`jobs/[id]/revise`) edit a list of repair ids and parts and ask the
   CRM for a preview; the app never builds a snapshot or prices one.
 - `src/lib/location.ts` + `src/hooks/use-journey-sharing.ts` — the mechanic's

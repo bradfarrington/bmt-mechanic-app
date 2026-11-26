@@ -1,4 +1,5 @@
 import { Env } from '@/lib/env';
+import { sendMultipart } from '@/lib/multipart';
 
 /**
  * Put a document straight into Supabase Storage with a one-time token the CRM
@@ -9,7 +10,7 @@ import { Env } from '@/lib/env';
  * it — and a scanned PDF is often bigger. Photos are shrunk on the phone
  * (`shrinkForUpload`); a PDF can't be.
  *
- * A plain `fetch` rather than supabase-js's `uploadToSignedUrl`: that calls
+ * A plain request rather than supabase-js's `uploadToSignedUrl`: that calls
  * `FormData.has()`, which React Native's FormData doesn't have, so it throws
  * before sending. The token in the query is the whole grant — it can write
  * this one path and nothing else; the anon key only gets the request past the
@@ -37,8 +38,8 @@ export async function putToSignedUpload(
     `?token=${encodeURIComponent(signed.token)}`;
 
   try {
-    const response = await fetch(url, {
-      method: 'PUT',
+    // Not `fetch`: it can't send a `{ uri }` part — see lib/multipart.ts.
+    const response = await sendMultipart('PUT', url, {
       headers: {
         apikey: Env.supabaseAnonKey,
         'x-upsert': String(upsert),
