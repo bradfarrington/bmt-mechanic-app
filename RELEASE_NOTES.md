@@ -7,6 +7,16 @@ release, so the **Store text** block must stay under that. When the two
 stores' previous builds differ, the store text covers everything new since
 the OLDER one.
 
+## 1.0.0 — 26 Nov 2026 (iOS build 9 · Android build 9)
+
+Store text:
+
+> Photos now upload: job photos, Report an issue, Get help, your profile picture and documents. (They never left the phone before.)
+>
+> New: a Technical data card on every job, with the manufacturer's repair manuals and technical data for that car, inside the app.
+>
+> The label under the centre button is no longer cut off. Removed the "My own / BMT-sourced" switch on parts. Postcodes no longer jumble as you type.
+
 ## 1.0.0 — 25 Nov 2026 (iOS build 8 · Android build 8)
 
 Store text:
