@@ -7,6 +7,12 @@ release, so the **Store text** block must stay under that. When the two
 stores' previous builds differ, the store text covers everything new since
 the OLDER one.
 
+## 1.0.0 — 26 Nov 2026 (iOS build 10 · Android build 10)
+
+Store text:
+
+> No changes from build 9. This build keeps the mechanic and customer apps on the same build number.
+
 ## 1.0.0 — 26 Nov 2026 (iOS build 9 · Android build 9)
 
 Store text:
