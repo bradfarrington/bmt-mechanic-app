@@ -7,6 +7,14 @@ release, so the **Store text** block must stay under that. When the two
 stores' previous builds differ, the store text covers everything new since
 the OLDER one.
 
+## 1.0.0 — 27 Nov 2026 (iOS build 11 · Android build 11)
+
+Store text:
+
+> New: when a part comes in different versions for cars with or without air-con, stop-start or an electronic handbrake, the job lists each version with its part number and which one was priced.
+>
+> If the customer wasn't sure, an amber "Check for … before buying" box asks you to check the car first, so you buy the right belt, pads or other part.
+
 ## 1.0.0 — 26 Nov 2026 (iOS build 10 · Android build 10)
 
 Store text:
