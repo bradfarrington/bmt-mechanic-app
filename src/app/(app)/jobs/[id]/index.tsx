@@ -34,6 +34,7 @@ import {
   View,
 } from 'react-native';
 
+import { FitOptionsBox } from '@/components/fit-options-box';
 import { JourneyMap } from '@/components/journey-map';
 import { StatusStrip, type StripTone } from '@/components/status-strip';
 import {
@@ -828,6 +829,9 @@ export default function JobScreen() {
                     );
                   })()}
                 </View>
+                {part.fitOptions && (
+                  <FitOptionsBox fit={part.fitOptions} charged={part.supplier_part_number} />
+                )}
               </View>
               <Text variant="bodySm" style={styles.strong}>
                 {formatPence(part.total_pence)}

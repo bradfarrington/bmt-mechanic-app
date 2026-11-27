@@ -452,6 +452,7 @@ export type Database = {
           brand: string | null
           created_at: string
           delivered_at: string | null
+          fit_options: Json | null
           genart_id: number | null
           id: string
           node_id: string | null
@@ -474,6 +475,7 @@ export type Database = {
           brand?: string | null
           created_at?: string
           delivered_at?: string | null
+          fit_options?: Json | null
           genart_id?: number | null
           id?: string
           node_id?: string | null
@@ -496,6 +498,7 @@ export type Database = {
           brand?: string | null
           created_at?: string
           delivered_at?: string | null
+          fit_options?: Json | null
           genart_id?: number | null
           id?: string
           node_id?: string | null
@@ -592,6 +595,8 @@ export type Database = {
           base_price_pence: number | null
           cancellation_reason: string | null
           candidate_days: string[] | null
+          car_air_con: boolean | null
+          car_stop_start: boolean | null
           combine_source: string | null
           commission_rate: number
           completed_at: string | null
@@ -655,6 +660,8 @@ export type Database = {
           base_price_pence?: number | null
           cancellation_reason?: string | null
           candidate_days?: string[] | null
+          car_air_con?: boolean | null
+          car_stop_start?: boolean | null
           combine_source?: string | null
           commission_rate?: number
           completed_at?: string | null
@@ -718,6 +725,8 @@ export type Database = {
           base_price_pence?: number | null
           cancellation_reason?: string | null
           candidate_days?: string[] | null
+          car_air_con?: boolean | null
+          car_stop_start?: boolean | null
           combine_source?: string | null
           commission_rate?: number
           completed_at?: string | null
@@ -1296,6 +1305,7 @@ export type Database = {
       }
       customer_vehicles: {
         Row: {
+          air_con: boolean | null
           colour: string | null
           created_at: string
           customer_id: string
@@ -1308,12 +1318,14 @@ export type Database = {
           mot_status: string | null
           nickname: string | null
           registration: string
+          stop_start: boolean | null
           tax_due_date: string | null
           tax_status: string | null
           updated_at: string
           year_of_manufacture: number | null
         }
         Insert: {
+          air_con?: boolean | null
           colour?: string | null
           created_at?: string
           customer_id: string
@@ -1326,12 +1338,14 @@ export type Database = {
           mot_status?: string | null
           nickname?: string | null
           registration: string
+          stop_start?: boolean | null
           tax_due_date?: string | null
           tax_status?: string | null
           updated_at?: string
           year_of_manufacture?: number | null
         }
         Update: {
+          air_con?: boolean | null
           colour?: string | null
           created_at?: string
           customer_id?: string
@@ -1344,6 +1358,7 @@ export type Database = {
           mot_status?: string | null
           nickname?: string | null
           registration?: string
+          stop_start?: boolean | null
           tax_due_date?: string | null
           tax_status?: string | null
           updated_at?: string

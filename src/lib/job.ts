@@ -1,4 +1,5 @@
 import { api, rateLimitMessage, type ApiResult } from '@/lib/api';
+import { readFitOptions, type FitOptions } from '@/lib/fit-options';
 import { supabase } from '@/lib/supabase';
 import type { Database } from '@/types/database';
 
@@ -62,8 +63,14 @@ export interface JobPhoto {
 
 export type JobPart = Pick<
   Tables['booking_parts']['Row'],
-  'id' | 'part_name' | 'quantity' | 'total_pence' | 'sourcing' | 'status'
->;
+  'id' | 'part_name' | 'quantity' | 'total_pence' | 'sourcing' | 'status' | 'supplier_part_number'
+> & {
+  /**
+   * The versions NAPA lists this part in, for cars with and without air-con
+   * or stop-start, and what the customer said. Null for most parts.
+   */
+  fitOptions: FitOptions | null;
+};
 
 export type JobQuote = Pick<
   Tables['job_quotes']['Row'],
@@ -105,10 +112,10 @@ export async function loadJob(
       .eq('booking_id', bookingId)
       .eq('kind', 'photo')
       .order('created_at', { ascending: true }),
-    supabase
-      .from('booking_parts')
-      .select('id, part_name, quantity, total_pence, sourcing, status')
-      .eq('booking_id', bookingId),
+    // `*`, not a column list: `fit_options` (CRM migration 0093) may not exist
+    // on the database yet, and naming a missing column fails the whole read.
+    // With `*` it is simply absent until the migration lands.
+    supabase.from('booking_parts').select('*').eq('booking_id', bookingId),
     supabase
       .from('job_quotes')
       .select('id, kind, status, title, total_pence, mechanic_payout_pence, sent_at')
@@ -138,7 +145,16 @@ export async function loadJob(
         id: row.id,
         url: supabase.storage.from(MEDIA_BUCKET).getPublicUrl(row.storage_path).data.publicUrl,
       })),
-      parts: parts.data ?? [],
+      parts: (parts.data ?? []).map((row) => ({
+        id: row.id,
+        part_name: row.part_name,
+        quantity: row.quantity,
+        total_pence: row.total_pence,
+        sourcing: row.sourcing,
+        status: row.status,
+        supplier_part_number: row.supplier_part_number ?? null,
+        fitOptions: readFitOptions(row.fit_options),
+      })),
       quotes: quotes.data ?? [],
       faults: faults.data ?? [],
       disputeId: dispute.data?.id ?? null,
