@@ -596,6 +596,7 @@ export type Database = {
           cancellation_reason: string | null
           candidate_days: string[] | null
           car_air_con: boolean | null
+          car_electric_handbrake: boolean | null
           car_stop_start: boolean | null
           combine_source: string | null
           commission_rate: number
@@ -661,6 +662,7 @@ export type Database = {
           cancellation_reason?: string | null
           candidate_days?: string[] | null
           car_air_con?: boolean | null
+          car_electric_handbrake?: boolean | null
           car_stop_start?: boolean | null
           combine_source?: string | null
           commission_rate?: number
@@ -726,6 +728,7 @@ export type Database = {
           cancellation_reason?: string | null
           candidate_days?: string[] | null
           car_air_con?: boolean | null
+          car_electric_handbrake?: boolean | null
           car_stop_start?: boolean | null
           combine_source?: string | null
           commission_rate?: number
@@ -1310,6 +1313,7 @@ export type Database = {
           created_at: string
           customer_id: string
           details_checked_at: string | null
+          electric_handbrake: boolean | null
           fuel_type: string | null
           id: string
           make: string | null
@@ -1330,6 +1334,7 @@ export type Database = {
           created_at?: string
           customer_id: string
           details_checked_at?: string | null
+          electric_handbrake?: boolean | null
           fuel_type?: string | null
           id?: string
           make?: string | null
@@ -1350,6 +1355,7 @@ export type Database = {
           created_at?: string
           customer_id?: string
           details_checked_at?: string | null
+          electric_handbrake?: boolean | null
           fuel_type?: string | null
           id?: string
           make?: string | null
