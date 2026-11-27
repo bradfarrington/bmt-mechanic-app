@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { Icon, Text } from '@/components/ui';
 import { Palette, Radius, Spacing, Tones, type PaletteColor } from '@/constants/theme';
 import {
+  fitOptionsFooter,
   fitOptionsHeading,
   fitOptionsUnsure,
   isChargedOption,
@@ -47,9 +48,9 @@ export function FitOptionsBox({ fit, charged }: { fit: FitOptions; charged?: str
           </Text>
         ))}
       </View>
-      {unsure && (
+      {fitOptionsFooter(fit) && (
         <Text variant="caption" color={ink}>
-          Ask the customer in the chat, or check on arrival.
+          {fitOptionsFooter(fit)}
         </Text>
       )}
     </View>
